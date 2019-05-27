@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="navigation_home">主页</string>
+    <string name="navigation_user">用户</string>
+    <string name="navigation_discovery">发现</string>
+</resources>
