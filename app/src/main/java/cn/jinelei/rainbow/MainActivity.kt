@@ -20,9 +20,11 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        // 透明状态栏
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
-//            window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT){
+            var lp = window.attributes
+            lp.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+            window.attributes = lp
+        }
         val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottom_navigation_view)
 
         supportFragmentManager.beginTransaction()
@@ -30,7 +32,6 @@ class MainActivity : AppCompatActivity() {
             .commit()
 
         bottomNavigationView.setOnNavigationItemSelectedListener { menuItem ->
-            val currentFragment = supportFragmentManager.findFragmentById(R.id.main_frame)
             when (menuItem.itemId) {
                 R.id.navigation_home -> {
                     switchFragment(HomeFragment.instance)
