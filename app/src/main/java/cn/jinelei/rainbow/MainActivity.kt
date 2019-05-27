@@ -1,10 +1,12 @@
 package cn.jinelei.rainbow
 
+import android.os.Build
 import android.os.Bundle
 import android.support.design.widget.BottomNavigationView
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
+import android.view.WindowManager
 import cn.jinelei.rainbow.fragment.DiscoveryFragment
 import cn.jinelei.rainbow.fragment.HomeFragment
 import cn.jinelei.rainbow.fragment.UserFragment
@@ -18,6 +20,9 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        // 透明状态栏
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+//            window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
         val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottom_navigation_view)
 
         supportFragmentManager.beginTransaction()
