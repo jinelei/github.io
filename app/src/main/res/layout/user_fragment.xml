@@ -2,8 +2,49 @@
 <android.support.constraint.ConstraintLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:background="@color/colorBackgroundColor"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+
+    <android.support.constraint.ConstraintLayout
+            android:background="@color/colorForegroundColor"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/title_height_size">
+
+        <TextView android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:textSize="@dimen/title_size"
+                  android:text="@string/mine"
+                  app:layout_constraintEnd_toEndOf="parent"
+                  android:layout_marginEnd="8dp"
+                  app:layout_constraintStart_toStartOf="parent"
+                  android:layout_marginStart="8dp"
+                  android:layout_marginBottom="8dp"
+                  app:layout_constraintBottom_toBottomOf="parent"
+                  android:layout_marginTop="8dp"
+                  app:layout_constraintTop_toTopOf="parent" android:id="@+id/textView"/>
+
+        <ImageView
+                android:scaleType="fitCenter"
+                android:maxWidth="15dp"
+                app:layout_constraintWidth_max="11dp"
+                android:maxHeight="@dimen/icon_size"
+                android:id="@+id/user_setting"
+                android:src="@mipmap/ic_menu"
+                android:layout_width="@dimen/icon_size"
+                android:layout_height="@dimen/icon_size"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginTop="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginBottom="8dp"/>
+
+    </android.support.constraint.ConstraintLayout>
 
     <TextView android:layout_width="wrap_content"
               app:layout_constraintLeft_toLeftOf="parent"
