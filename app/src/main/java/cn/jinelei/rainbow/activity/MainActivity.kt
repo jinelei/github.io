@@ -1,4 +1,4 @@
-package cn.jinelei.rainbow
+package cn.jinelei.rainbow.activity
 
 import android.os.Build
 import android.os.Bundle
@@ -11,6 +11,7 @@ import cn.jinelei.rainbow.fragment.DiscoveryFragment
 import cn.jinelei.rainbow.fragment.HomeFragment
 import cn.jinelei.rainbow.fragment.UserFragment
 import com.amap.api.maps.MapView
+import cn.jinelei.rainbow.R
 
 class MainActivity : AppCompatActivity() {
     val TAG = javaClass.simpleName
