@@ -1,11 +1,10 @@
 package cn.jinelei.rainbow.fragment
 
 import android.content.Intent
-import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.support.v4.app.Fragment
-import android.support.v4.view.ViewCompat.canScrollVertically
 import android.support.v7.widget.DividerItemDecoration
+import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.Log
@@ -20,8 +19,22 @@ import cn.jinelei.rainbow.util.isFastClick
 
 class UserFragment : Fragment() {
     val TAG = javaClass.simpleName
-    var recyclerView: RecyclerView? = null
-    val menus = listOf(
+    var listRecyclerView: RecyclerView? = null
+    var gridRecyclerView: RecyclerView? = null
+    val listMenu = listOf(
+        ListMenuItem(View.OnClickListener { v -> Log.d(TAG, "asdfasdf") }, "设置", R.mipmap.ic_home),
+        ListMenuItem(View.OnClickListener { v -> Log.d(TAG, "asdfasdf") }, "设置", R.mipmap.ic_home),
+        ListMenuItem(View.OnClickListener { v -> Log.d(TAG, "asdfasdf") }, "设置", R.mipmap.ic_home),
+        ListMenuItem(View.OnClickListener { v -> Log.d(TAG, "asdfasdf") }, "设置", R.mipmap.ic_home),
+        ListMenuItem(View.OnClickListener { v -> Log.d(TAG, "asdfasdf") }, "设置", R.mipmap.ic_home)
+    )
+    val gridMenu = listOf(
+        ListMenuItem(View.OnClickListener { v -> Log.d(TAG, "asdfasdf") }, "设置", R.mipmap.ic_home),
+        ListMenuItem(View.OnClickListener { v -> Log.d(TAG, "asdfasdf") }, "设置", R.mipmap.ic_home),
+        ListMenuItem(View.OnClickListener { v -> Log.d(TAG, "asdfasdf") }, "设置", R.mipmap.ic_home),
+        ListMenuItem(View.OnClickListener { v -> Log.d(TAG, "asdfasdf") }, "设置", R.mipmap.ic_home),
+        ListMenuItem(View.OnClickListener { v -> Log.d(TAG, "asdfasdf") }, "设置", R.mipmap.ic_home),
+        ListMenuItem(View.OnClickListener { v -> Log.d(TAG, "asdfasdf") }, "设置", R.mipmap.ic_home),
         ListMenuItem(View.OnClickListener { v -> Log.d(TAG, "asdfasdf") }, "设置", R.mipmap.ic_home),
         ListMenuItem(View.OnClickListener { v -> Log.d(TAG, "asdfasdf") }, "设置", R.mipmap.ic_home),
         ListMenuItem(View.OnClickListener { v -> Log.d(TAG, "asdfasdf") }, "设置", R.mipmap.ic_home),
@@ -41,16 +54,21 @@ class UserFragment : Fragment() {
     }
 
     fun initView(view: View) {
-        recyclerView = view.findViewById<RecyclerView>(R.id.menu_recycler_view)
-        recyclerView?.setHasFixedSize(true)
-        var layoutManager = LinearLayoutManager(activity)
-        recyclerView?.isNestedScrollingEnabled = false
-        recyclerView?.setHasFixedSize(true)
-        var itemDecoration = DividerItemDecoration(activity, DividerItemDecoration.VERTICAL)
-        recyclerView?.addItemDecoration(itemDecoration);
-        recyclerView?.layoutManager = layoutManager
-        var listAdapter = ListMenuViewAdapter(menus)
-        recyclerView?.adapter = listAdapter
+        listRecyclerView = view.findViewById(R.id.list_menu_recycler_view)
+        listRecyclerView?.setHasFixedSize(true)
+        listRecyclerView?.isNestedScrollingEnabled = false
+        listRecyclerView?.setHasFixedSize(true)
+        listRecyclerView?.addItemDecoration(DividerItemDecoration(activity, DividerItemDecoration.VERTICAL));
+        listRecyclerView?.layoutManager = LinearLayoutManager(activity)
+        listRecyclerView?.adapter = ListMenuViewAdapter(listMenu)
+
+        gridRecyclerView = view.findViewById(R.id.grid_menu_recycler_view)
+        gridRecyclerView?.setHasFixedSize(true)
+        gridRecyclerView?.isNestedScrollingEnabled = false
+        gridRecyclerView?.setHasFixedSize(true)
+        gridRecyclerView?.layoutManager = GridLayoutManager(activity, 5)
+        gridRecyclerView?.adapter = GridMenuViewAdapter(gridMenu)
+
     }
 
     companion object {
@@ -83,6 +101,31 @@ class UserFragment : Fragment() {
         }
 
         class ListMenuItemViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
+            val icon = view.findViewById<ImageView>(R.id.list_menu_icon)
+            val title = view.findViewById<TextView>(R.id.list_menu_title)
+        }
+
+    }
+
+    class GridMenuViewAdapter(var data: List<ListMenuItem>) :
+        RecyclerView.Adapter<GridMenuViewAdapter.GridMenuItemViewHolder>() {
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GridMenuItemViewHolder {
+            var view = LayoutInflater.from(parent.context).inflate(R.layout.grid_menu_layout, parent, false)
+            return GridMenuItemViewHolder(view)
+        }
+
+        override fun getItemCount(): Int {
+            return data.size
+        }
+
+        override fun onBindViewHolder(holder: GridMenuItemViewHolder, pos: Int) {
+            val menu = data[pos]
+            holder.icon.setImageResource(menu.resourceId)
+            holder.title.text = menu.title
+            holder.view.setOnClickListener(menu.callback)
+        }
+
+        class GridMenuItemViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
             val icon = view.findViewById<ImageView>(R.id.list_menu_icon)
             val title = view.findViewById<TextView>(R.id.list_menu_title)
         }
