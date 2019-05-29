@@ -1,26 +1,18 @@
 package cn.jinelei.rainbow.activity
 
-import android.app.Service
-import android.content.Intent
-import android.graphics.Color
-import android.os.Binder
-import android.os.Build
 import android.os.Bundle
 import android.support.design.widget.BottomNavigationView
 import android.support.v4.app.Fragment
-import android.support.v7.app.AppCompatActivity
 import android.util.Log
-import android.view.WindowManager
+import cn.jinelei.rainbow.R
 import cn.jinelei.rainbow.fragment.DiscoveryFragment
 import cn.jinelei.rainbow.fragment.HomeFragment
 import cn.jinelei.rainbow.fragment.UserFragment
-import com.amap.api.maps.MapView
-import cn.jinelei.rainbow.R
 import cn.jinelei.rainbow.service.MainService
 import cn.jinelei.rainbow.util.switchFragment
-import android.content.ServiceConnection as ServiceConnection
+import com.amap.api.maps.MapView
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : BaseActivity() {
     val TAG = javaClass.simpleName
     private var mMapView: MapView? = null
     private var currentFragment: Fragment = HomeFragment.instance
@@ -89,7 +81,11 @@ class MainActivity : AppCompatActivity() {
 
     override fun onSaveInstanceState(outState: Bundle?) {
         super.onSaveInstanceState(outState)
-        mMapView?.onSaveInstanceState(outState)
+//        mMapView?.onSaveInstanceState(outState)
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
+        super.onRestoreInstanceState(savedInstanceState)
     }
 
 }

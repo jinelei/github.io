@@ -2,7 +2,6 @@ package cn.jinelei.rainbow.fragment
 
 import android.content.Intent
 import android.os.Bundle
-import android.support.v4.app.Fragment
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
@@ -17,7 +16,7 @@ import cn.jinelei.rainbow.R
 import cn.jinelei.rainbow.activity.SettingActivity
 import cn.jinelei.rainbow.util.isFastClick
 
-class UserFragment : Fragment() {
+class UserFragment : BaseFragment() {
     val TAG = javaClass.simpleName
     var listRecyclerView: RecyclerView? = null
     var gridRecyclerView: RecyclerView? = null

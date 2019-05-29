@@ -3,14 +3,12 @@ package cn.jinelei.rainbow.activity
 import android.os.Build
 import android.os.Bundle
 import android.support.design.widget.Snackbar
-import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar
 import android.view.WindowManager
-import android.widget.Toolbar
 import cn.jinelei.rainbow.R
-
 import kotlinx.android.synthetic.main.activity_setting.*
 
-class SettingActivity : AppCompatActivity() {
+class SettingActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -22,11 +20,15 @@ class SettingActivity : AppCompatActivity() {
         }
 
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
-        actionBar?.setDisplayHomeAsUpEnabled(true)
+        setSupportActionBar(toolbar)
         fab.setOnClickListener { view ->
             Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                     .setAction("Action", null).show()
         }
+    }
+
+    override fun onBackPressed() {
+        finish()
     }
 
 }
