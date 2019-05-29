@@ -16,11 +16,12 @@ import cn.jinelei.rainbow.R
 import cn.jinelei.rainbow.activity.SettingActivity
 import cn.jinelei.rainbow.util.isFastClick
 
+
 class UserFragment : BaseFragment() {
     val TAG = javaClass.simpleName
     var listRecyclerView: RecyclerView? = null
     var gridRecyclerView: RecyclerView? = null
-    val listMenu = listOf(
+    val listMenu = arrayListOf(
         ListMenuItem(View.OnClickListener { v -> Log.d(TAG, "asdfasdf") }, "设置", R.mipmap.ic_home),
         ListMenuItem(View.OnClickListener { v -> Log.d(TAG, "asdfasdf") }, "设置", R.mipmap.ic_home),
         ListMenuItem(View.OnClickListener { v -> Log.d(TAG, "asdfasdf") }, "设置", R.mipmap.ic_home),
@@ -34,7 +35,7 @@ class UserFragment : BaseFragment() {
             R.mipmap.ic_home
         )
     )
-    val gridMenu = listOf(
+    val gridMenu = arrayListOf(
         ListMenuItem(View.OnClickListener { v -> Log.d(TAG, "asdfasdf") }, "设置", R.mipmap.ic_home),
         ListMenuItem(View.OnClickListener { v -> Log.d(TAG, "asdfasdf") }, "设置", R.mipmap.ic_home),
         ListMenuItem(View.OnClickListener { v -> Log.d(TAG, "asdfasdf") }, "设置", R.mipmap.ic_home),
