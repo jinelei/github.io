@@ -3,7 +3,7 @@ package cn.jinelei.rainbow.util
 import android.view.View
 
 
-const val MIN_DELAY_TIME = 100
+const val MIN_DELAY_TIME = 500
 val map: MutableMap<View?, Long> = mutableMapOf()
 
 fun isFastClick(view: View?): Boolean {

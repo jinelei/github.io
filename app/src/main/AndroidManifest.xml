@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="cn.jinelei.rainbow">
-
     <!-- 允许程序打开网络套接字 -->
     <uses-permission android:name="android.permission.INTERNET"/> <!-- 允许程序设置内置sd卡的写权限 -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/> <!-- 允许程序获取网络状态 -->
@@ -28,17 +27,20 @@
                 android:name="com.amap.api.v2.apikey"
                 android:value="86acb5e297a5c8f39d6c7290fc5a8d4c"/>
 
-        <activity
-                android:name=".activity.MainActivity">
+        <activity android:name=".activity.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
+
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
         <activity
                 android:name=".activity.SettingActivity"
-                android:theme="@style/AppTheme"/>
-        <!--<service android:name=".service.MainService"/>-->
+                android:parentActivityName=".activity.MainActivity">
+            <meta-data
+                    android:name="android.support.PARENT_ACTIVITY"
+                    android:value=".activity.MainActivity"/>
+        </activity>
     </application>
 
 </manifest>

@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity;
 import android.view.WindowManager
+import android.widget.Toolbar
 import cn.jinelei.rainbow.R
 
 import kotlinx.android.synthetic.main.activity_setting.*
@@ -19,6 +20,9 @@ class SettingActivity : AppCompatActivity() {
             lp.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
             window.attributes = lp
         }
+
+        val toolbar = findViewById<Toolbar>(R.id.toolbar)
+        actionBar?.setDisplayHomeAsUpEnabled(true)
         fab.setOnClickListener { view ->
             Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                     .setAction("Action", null).show()

@@ -26,7 +26,14 @@ class UserFragment : Fragment() {
         ListMenuItem(View.OnClickListener { v -> Log.d(TAG, "asdfasdf") }, "设置", R.mipmap.ic_home),
         ListMenuItem(View.OnClickListener { v -> Log.d(TAG, "asdfasdf") }, "设置", R.mipmap.ic_home),
         ListMenuItem(View.OnClickListener { v -> Log.d(TAG, "asdfasdf") }, "设置", R.mipmap.ic_home),
-        ListMenuItem(View.OnClickListener { v -> Log.d(TAG, "asdfasdf") }, "设置", R.mipmap.ic_home)
+        ListMenuItem(
+            View.OnClickListener { v ->
+                if (!isFastClick(v))
+                    startActivity(Intent(activity, SettingActivity::class.java))
+            },
+            "设置",
+            R.mipmap.ic_home
+        )
     )
     val gridMenu = listOf(
         ListMenuItem(View.OnClickListener { v -> Log.d(TAG, "asdfasdf") }, "设置", R.mipmap.ic_home),
@@ -39,7 +46,10 @@ class UserFragment : Fragment() {
         ListMenuItem(View.OnClickListener { v -> Log.d(TAG, "asdfasdf") }, "设置", R.mipmap.ic_home),
         ListMenuItem(View.OnClickListener { v -> Log.d(TAG, "asdfasdf") }, "设置", R.mipmap.ic_home),
         ListMenuItem(View.OnClickListener { v -> Log.d(TAG, "asdfasdf") }, "设置", R.mipmap.ic_home),
-        ListMenuItem(View.OnClickListener { v -> Log.d(TAG, "asdfasdf") }, "设置", R.mipmap.ic_home)
+        ListMenuItem(View.OnClickListener { v ->
+            if (!isFastClick(v))
+                startActivity(Intent(activity, SettingActivity::class.java))
+        }, "设置", R.mipmap.ic_home)
     )
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
