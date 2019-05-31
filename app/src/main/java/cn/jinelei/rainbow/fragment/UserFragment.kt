@@ -67,7 +67,6 @@ class UserFragment : BaseFragment() {
         listRecyclerView = view.findViewById(R.id.list_menu_recycler_view)
         listRecyclerView?.setHasFixedSize(true)
         listRecyclerView?.isNestedScrollingEnabled = false
-        listRecyclerView?.setHasFixedSize(true)
         listRecyclerView?.addItemDecoration(DividerItemDecoration(activity, DividerItemDecoration.VERTICAL));
         listRecyclerView?.layoutManager = LinearLayoutManager(activity)
         listRecyclerView?.adapter = ListMenuViewAdapter(listMenu)
@@ -75,7 +74,6 @@ class UserFragment : BaseFragment() {
         gridRecyclerView = view.findViewById(R.id.grid_menu_recycler_view)
         gridRecyclerView?.setHasFixedSize(true)
         gridRecyclerView?.isNestedScrollingEnabled = false
-        gridRecyclerView?.setHasFixedSize(true)
         gridRecyclerView?.layoutManager = GridLayoutManager(activity, 5)
         gridRecyclerView?.adapter = GridMenuViewAdapter(gridMenu)
 

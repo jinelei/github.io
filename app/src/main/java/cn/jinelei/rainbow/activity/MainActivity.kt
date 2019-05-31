@@ -20,12 +20,12 @@ class MainActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
         initView(savedInstanceState)
         initData()
     }
 
-    fun initView(savedInstanceState: Bundle?) {
+    private fun initView(savedInstanceState: Bundle?) {
+        setContentView(R.layout.activity_main)
         val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottom_navigation_view)
         supportFragmentManager.beginTransaction()
             .add(R.id.main_frame, currentFragment)
