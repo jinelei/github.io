@@ -6,6 +6,9 @@
 -- To change this template use File | Settings | File Templates.
 --
 
+--ssid: 重庆金康特-测试3
+--pwd: cqkcttest888
+
 --all constants variable
 localConfFileName = "conf.json"
 keyConnectedWifi = "connected_wifi"
@@ -14,8 +17,18 @@ connectedInfo = {}
 socketServer = nil
 socketConn = nil
 apSetup = false
+debug = true
 
---1. check exist localConfFile
+-- log function
+function log(...)
+    if (debug) then
+        local s = ""
+        for i, v in ipairs { ... } do
+            s = s + " " + v
+        end
+        print(s)
+    end
+end
 
 -- check conf file exist and set localConfFile variable
 function checkConfigFileExist()
@@ -30,6 +43,8 @@ end
 -- main interaction logic
 function onReceive(sck, data)
     print("onReceive data: ", data)
+    socketConn:send(data)
+    sck:close()
 end
 
 -- build socket server
@@ -39,6 +54,19 @@ function setupSocketServer()
     socketServer:listen(80, function(conn)
         socketConn = conn
         conn:on("receive", onReceive)
+    end)
+end
+
+-- build a simple web server
+function setupSimpleHttpServer()
+    print("build simple http server")
+    httpServer = net.createServer(net.TCP, 0)
+    httpServer:listen(80, function(conn)
+        conn:on("receive", function(sck, data)
+            print(data)
+            sck:close()
+        end)
+        conn:send("hello world")
     end)
 end
 
@@ -62,6 +90,7 @@ function setupWifiAP()
         if not apSetup then
             tmr.wdclr()
             apSetup = true
+            setupSimpleHttpServer()
             --            setupSocketServer()
         end
     end
@@ -97,6 +126,7 @@ function scanWifiAndConnect()
                 staConf.got_ip_cb = function(T)
                     print("ip: ", T.IP, " netmask: ", T.netmask, " gateway: ", T.gateway)
                     connectedInfo = T
+                    setupSocketServer()
                 end
                 staConf.connected_cb = function(T)
                     print("ssid: ", T.ssid, " bssid: ", T.bssid, " channel: ", T.channel)
@@ -118,6 +148,7 @@ end
 
 
 -- main
+log("main", "asdf")
 if checkConfigFileExist() then
     print("config file exist")
     scanWifiAndConnect()

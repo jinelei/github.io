@@ -35,7 +35,7 @@
                 app:layout_constraintWidth_max="11dp"
                 android:maxHeight="@dimen/icon_size"
                 android:id="@+id/menu_setting"
-                android:src="@mipmap/ic_menu"
+                android:src="@mipmap/ic_add"
                 android:layout_width="@dimen/icon_size"
                 android:layout_height="@dimen/icon_size"
                 app:layout_constraintBottom_toBottomOf="parent"

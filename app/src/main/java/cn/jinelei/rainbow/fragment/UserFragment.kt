@@ -12,6 +12,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import cn.jinelei.rainbow.DeviceScanActivity
 import cn.jinelei.rainbow.R
 import cn.jinelei.rainbow.activity.SettingActivity
 import cn.jinelei.rainbow.util.isFastClick
@@ -55,15 +56,16 @@ class UserFragment : BaseFragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.user_fragment, container, false)
         initView(view)
-        val menuBtn = view.findViewById<ImageView>(R.id.menu_setting)
-        menuBtn.setOnClickListener { v: View? ->
-            if (!isFastClick(v))
-                startActivity(Intent(activity, SettingActivity::class.java))
-        }
         return view
     }
 
     fun initView(view: View) {
+//        菜单按钮
+        val menuBtn = view.findViewById<ImageView>(R.id.menu_setting)
+        menuBtn.setOnClickListener { v: View? ->
+            if (!isFastClick(v))
+                startActivity(Intent(activity, DeviceScanActivity::class.java))
+        }
         listRecyclerView = view.findViewById(R.id.list_menu_recycler_view)
         listRecyclerView?.setHasFixedSize(true)
         listRecyclerView?.isNestedScrollingEnabled = false
