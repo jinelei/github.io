@@ -31,19 +31,15 @@
 
         <ImageView
                 android:scaleType="fitCenter"
-                android:maxWidth="15dp"
-                app:layout_constraintWidth_max="11dp"
-                android:maxHeight="@dimen/icon_size"
                 android:id="@+id/menu_setting"
                 android:src="@mipmap/ic_add"
-                android:layout_width="@dimen/icon_size"
-                android:layout_height="@dimen/icon_size"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:paddingRight="8dp"
+                android:paddingVertical="8dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                android:layout_marginTop="8dp"
-                android:layout_marginRight="8dp"
-                android:layout_marginBottom="8dp"/>
+                app:layout_constraintEnd_toEndOf="parent"/>
 
     </android.support.constraint.ConstraintLayout>
 

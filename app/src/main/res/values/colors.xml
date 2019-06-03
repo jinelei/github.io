@@ -4,6 +4,7 @@
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#D81B60</color>
     <color name="colorBackgroundColor">#EEEEEE</color>
+    <color name="colorTransparentBackgroundColor">#CE000000</color>
     <color name="colorForegroundColor">#FFFFFF</color>
     <color name="tab_checked">#ED6A2C</color>
     <color name="tab_unchecked">#757575</color>

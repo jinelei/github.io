@@ -4,4 +4,12 @@
     <string name="navigation_user">用户</string>
     <string name="navigation_discovery">发现</string>
     <string name="mine">我的</string>
+    <string name="scan_device">扫描设备</string>
+    <string name="scan_device_wait">设备扫描中</string>
+    <string name="request_permission">请求权限</string>
+    <string name="ok">确定</string>
+    <string name="cancel">取消</string>
+    <string name="please_open_wifi_switch">请打开WIFI开关</string>
+    <string name="wifi_already_closed">WIFI已经关闭</string>
+    <string name="nothing_click_to_refresh">这里什么都没有哦！\n点击刷新</string>
 </resources>

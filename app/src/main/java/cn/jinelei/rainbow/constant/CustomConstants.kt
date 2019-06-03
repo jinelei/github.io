@@ -1,0 +1,6 @@
+package cn.jinelei.rainbow.constant
+
+
+const val REQUEST_CODE_ACCESS_WIFI_STATE = 1000
+const val REQUEST_CODE_CHANGE_WIFI_STATE = 1001
+const val REQUEST_CODE_ACCESS_COARSE_LOCATION = 1002
