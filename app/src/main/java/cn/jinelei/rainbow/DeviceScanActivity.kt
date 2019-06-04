@@ -7,7 +7,6 @@ import android.net.wifi.ScanResult
 import android.net.wifi.WifiInfo
 import android.net.wifi.WifiManager
 import android.os.Bundle
-import android.os.Handler
 import android.provider.Settings
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.DividerItemDecoration
@@ -21,13 +20,19 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import cn.jinelei.rainbow.activity.BaseActivity
+import cn.jinelei.rainbow.components.LoadingDialog
 import cn.jinelei.rainbow.constant.REQUEST_CODE_ACCESS_COARSE_LOCATION
 import cn.jinelei.rainbow.constant.REQUEST_CODE_ACCESS_WIFI_STATE
 import cn.jinelei.rainbow.constant.REQUEST_CODE_CHANGE_WIFI_STATE
-import cn.jinelei.rainbow.message.MessageEvent
+import cn.jinelei.rainbow.message.WifiScanMessageEvent
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
+import kotlin.math.log
 
 class DeviceScanActivity : BaseActivity() {
     private var deviceScanResultRecycler: RecyclerView? = null
@@ -36,21 +41,11 @@ class DeviceScanActivity : BaseActivity() {
     private var deviceScanBtn: ImageView? = null
     private var wifiManager: WifiManager? = null
     private var wifiInfo: WifiInfo? = null
+    private var loadingDialog: LoadingDialog? = null
     private var scanFinished = true
 
     val START_SCAN_WIFI = 1
     val STOP_SCAN_WIFI = 2
-
-    val handler = Handler(Handler.Callback { msg ->
-        when (msg?.what) {
-            START_SCAN_WIFI -> {
-                showLoading();
-            }
-            STOP_SCAN_WIFI ->
-                hideLoading()
-        }
-        true
-    })
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,6 +56,7 @@ class DeviceScanActivity : BaseActivity() {
     private fun initData() {
         wifiManager = getSystemService(Context.WIFI_SERVICE) as WifiManager
         wifiInfo = wifiManager?.connectionInfo
+        loadingDialog = LoadingDialog(this@DeviceScanActivity)
         Log.v(getTag(), wifiInfo.toString())
     }
 
@@ -84,7 +80,10 @@ class DeviceScanActivity : BaseActivity() {
 
     private fun detectWifi() {
         Log.v(getTag(), "detect wifi")
-        handler.sendEmptyMessage(START_SCAN_WIFI)
+//        GlobalScope.launch(Dispatchers.Main) {
+//            if (loadingDialog?.isShowing == false)
+//                loadingDialog?.show()
+//        }
         val scanResults = wifiManager?.scanResults ?: emptyList()
         if (scanResults == null || scanResults.size == 0) {
             deviceScanInfoNothing?.visibility = View.VISIBLE
@@ -95,7 +94,14 @@ class DeviceScanActivity : BaseActivity() {
             deviceScanResultRecycler?.adapter =
                 WifiResultAdapter(scanResults.sortedWith(compareBy { Math.abs(it.level) }))
         }
-        handler.sendEmptyMessageDelayed(STOP_SCAN_WIFI, 1000)
+//        GlobalScope.launch(Dispatchers.IO) {
+//            delay(1000)
+//            GlobalScope.launch(Dispatchers.Main) {
+//                if (loadingDialog?.isShowing == true)
+//                    loadingDialog?.hide()
+//            }
+//        }
+//        GlobalScope.launch(Dispatchers.Main) { hideLoading() }
     }
 
     private fun scanDevice() {
@@ -134,7 +140,7 @@ class DeviceScanActivity : BaseActivity() {
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    fun updateView(event: MessageEvent.WifiScanMessageEvent) {
+    fun updateView(event: WifiScanMessageEvent) {
         when (event.finish) {
             true -> deviceScanTitle?.text = getString(R.string.scan_device)
             false -> deviceScanTitle?.text = getString(R.string.scan_device_wait)

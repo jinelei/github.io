@@ -7,33 +7,30 @@ import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import cn.jinelei.rainbow.components.LoadingDialog
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.util.*
 import kotlin.collections.HashMap
+import kotlin.coroutines.CoroutineContext
 
 open class BaseActivity : AppCompatActivity() {
     private val grantedPermRunnable = HashMap<Int, Runnable>()
     private val deniedPermRunnable = HashMap<Int, Runnable>()
     private var loadingDialog: LoadingDialog? = null
-    private val TIMEOUT_HIDE_LOADING = 1
     private val DEFAULT_HIDE_LOADING_TIMEOUT = 10000L
-
-    private val handler = Handler(Handler.Callback { msg ->
-        when (msg?.what) {
-            TIMEOUT_HIDE_LOADING -> hideLoading()
-        }
-        true
-    })
 
     override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
         super.onCreate(savedInstanceState, persistentState)
         Log.v(getTag(), Thread.currentThread().stackTrace[2].methodName)
-        loadingDialog = LoadingDialog(this@BaseActivity)
+        loadingDialog = LoadingDialog(this)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.v(getTag(), Thread.currentThread().stackTrace[2].methodName)
-        loadingDialog = LoadingDialog(this@BaseActivity)
+        loadingDialog = LoadingDialog(this)
     }
 
     override fun onStart() {
@@ -141,30 +138,33 @@ open class BaseActivity : AppCompatActivity() {
         }
     }
 
-    protected fun showLoading() {
-        showLoading(DEFAULT_HIDE_LOADING_TIMEOUT)
-    }
-
-
-    protected fun showLoading(timeout: Long?) {
-        if (loadingDialog?.isShowing == false) {
-            Log.v(getTag(), "show loading dialog")
-            loadingDialog?.show()
+    protected fun showLoading(timeout: Long = DEFAULT_HIDE_LOADING_TIMEOUT) {
+        Log.v(getTag(), "show loading method")
+        GlobalScope.launch(Dispatchers.Main) {
+            if (loadingDialog?.isShowing == false) {
+                loadingDialog?.show()
+                Log.v(getTag(), "show loading: " + timeout)
+            }
         }
-        handler.removeMessages(TIMEOUT_HIDE_LOADING)
-        if (timeout != null && timeout > 0) {
-            handler.sendEmptyMessageDelayed(TIMEOUT_HIDE_LOADING, timeout)
-        } else {
-            handler.sendEmptyMessageDelayed(TIMEOUT_HIDE_LOADING, DEFAULT_HIDE_LOADING_TIMEOUT)
+        GlobalScope.launch(Dispatchers.Default) {
+            delay(timeout)
+            GlobalScope.launch(Dispatchers.Main) {
+                if (loadingDialog?.isShowing == true) {
+                    loadingDialog?.hide()
+                    Log.v(getTag(), "hide loading")
+                }
+            }
         }
     }
 
     protected fun hideLoading() {
-        if (loadingDialog?.isShowing == true) {
-            loadingDialog?.hide()
-            Log.v(getTag(), "hide loading dialog")
+        Log.v(getTag(), "hide loading method")
+        GlobalScope.launch(Dispatchers.Main) {
+            if (loadingDialog?.isShowing == true) {
+                loadingDialog?.hide()
+                Log.v(getTag(), "hide loading")
+            }
         }
-        handler.removeMessages(TIMEOUT_HIDE_LOADING)
     }
 
 }
