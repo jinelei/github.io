@@ -1,11 +1,10 @@
-package cn.jinelei.rainbow
+package cn.jinelei.rainbow.activity
 
 import android.Manifest
-import android.content.Context
+import android.app.Notification
 import android.content.Intent
 import android.net.wifi.ScanResult
 import android.net.wifi.WifiInfo
-import android.net.wifi.WifiManager
 import android.os.Bundle
 import android.provider.Settings
 import android.support.v7.app.AlertDialog
@@ -19,8 +18,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
-import cn.jinelei.rainbow.activity.BaseActivity
-import cn.jinelei.rainbow.components.LoadingDialog
+import cn.jinelei.rainbow.R
 import cn.jinelei.rainbow.constant.REQUEST_CODE_ACCESS_COARSE_LOCATION
 import cn.jinelei.rainbow.constant.REQUEST_CODE_ACCESS_WIFI_STATE
 import cn.jinelei.rainbow.constant.REQUEST_CODE_CHANGE_WIFI_STATE
@@ -32,16 +30,13 @@ import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
-import kotlin.math.log
 
 class DeviceScanActivity : BaseActivity() {
     private var deviceScanResultRecycler: RecyclerView? = null
     private var deviceScanInfoNothing: TextView? = null
     private var deviceScanTitle: TextView? = null
     private var deviceScanBtn: ImageView? = null
-    private var wifiManager: WifiManager? = null
     private var wifiInfo: WifiInfo? = null
-    private var loadingDialog: LoadingDialog? = null
     private var scanFinished = true
 
     val START_SCAN_WIFI = 1
@@ -54,9 +49,7 @@ class DeviceScanActivity : BaseActivity() {
     }
 
     private fun initData() {
-        wifiManager = getSystemService(Context.WIFI_SERVICE) as WifiManager
         wifiInfo = wifiManager?.connectionInfo
-        loadingDialog = LoadingDialog(this@DeviceScanActivity)
         Log.v(getTag(), wifiInfo.toString())
     }
 
@@ -80,6 +73,15 @@ class DeviceScanActivity : BaseActivity() {
 
     private fun detectWifi() {
         Log.v(getTag(), "detect wifi")
+        val builder: Notification.Builder = Notification.Builder(this)
+        builder.setSmallIcon(R.drawable.ic_launcher_foreground)
+        builder.setContentText("content")
+        builder.setContentTitle("title")
+        builder.setAutoCancel(true)
+        notificationManager?.notify(0x01, builder.build())
+
+        Log.e(getTag(), (1 / 0).toString())
+
         showLoading()
         val scanResults = wifiManager?.scanResults ?: emptyList()
         if (scanResults == null || scanResults.size == 0) {
@@ -89,7 +91,11 @@ class DeviceScanActivity : BaseActivity() {
             deviceScanInfoNothing?.visibility = View.INVISIBLE
             deviceScanResultRecycler?.visibility = View.VISIBLE
             deviceScanResultRecycler?.adapter =
-                WifiResultAdapter(scanResults.sortedWith(compareBy { Math.abs(it.level) }))
+                WifiResultAdapter(scanResults.sortedWith(compareBy {
+                    Math.abs(
+                        it.level
+                    )
+                }))
         }
         GlobalScope.launch(Dispatchers.IO) {
             // 模拟延时

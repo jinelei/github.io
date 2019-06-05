@@ -1,11 +1,15 @@
 package cn.jinelei.rainbow.activity
 
+import android.app.NotificationManager
+import android.content.Context
 import android.content.pm.PackageManager
+import android.net.wifi.WifiManager
 import android.os.*
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
+import cn.jinelei.rainbow.application.BaseApplication
 import cn.jinelei.rainbow.components.LoadingDialog
 import kotlinx.coroutines.*
 import java.lang.Runnable
@@ -14,22 +18,49 @@ import kotlin.collections.HashMap
 import kotlin.coroutines.CoroutineContext
 
 open class BaseActivity : AppCompatActivity() {
+    //    已经授权应该执行的任务
     private val grantedPermRunnable = HashMap<Int, Runnable>()
+    //    拒绝授权应该执行的任务
     private val deniedPermRunnable = HashMap<Int, Runnable>()
+    //    加载中弹窗
     private var loadingDialog: LoadingDialog? = null
+    //    自动隐藏加载中弹窗
     private var loadingDialogTimeoutJob: Job? = null
+    //    默认隐藏加载中弹窗的超时时间
     private val DEFAULT_HIDE_LOADING_TIMEOUT = 10000L
+    //    wifi管理器
+    protected var wifiManager: WifiManager? = null
+    //    通知管理器
+    protected var notificationManager: NotificationManager? = null
+
+    //    初始化数据
+    private fun initData() {
+        loadingDialog = LoadingDialog(this)
+        wifiManager = applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+        notificationManager = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    }
+
+    //    销毁相关数据
+    private fun destoryData() {
+        loadingDialog?.dismiss()
+        loadingDialog = null
+        loadingDialogTimeoutJob = null
+        grantedPermRunnable.clear()
+        deniedPermRunnable.clear()
+        wifiManager = null
+        notificationManager = null
+    }
 
     override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
         super.onCreate(savedInstanceState, persistentState)
         Log.v(getTag(), Thread.currentThread().stackTrace[2].methodName)
-        loadingDialog = LoadingDialog(this)
+        initData()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.v(getTag(), Thread.currentThread().stackTrace[2].methodName)
-        loadingDialog = LoadingDialog(this)
+        initData()
     }
 
     override fun onStart() {
@@ -60,6 +91,7 @@ open class BaseActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         Log.v(getTag(), Thread.currentThread().stackTrace[2].methodName)
+        destoryData()
     }
 
     override fun onSaveInstanceState(outState: Bundle?, outPersistentState: PersistableBundle?) {
@@ -167,5 +199,4 @@ open class BaseActivity : AppCompatActivity() {
             loadingDialogTimeoutJob?.cancel()
         }
     }
-
 }

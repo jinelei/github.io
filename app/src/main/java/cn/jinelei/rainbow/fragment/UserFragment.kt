@@ -12,7 +12,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import cn.jinelei.rainbow.DeviceScanActivity
+import cn.jinelei.rainbow.activity.DeviceScanActivity
 import cn.jinelei.rainbow.R
 import cn.jinelei.rainbow.activity.SettingActivity
 import cn.jinelei.rainbow.util.isFastClick

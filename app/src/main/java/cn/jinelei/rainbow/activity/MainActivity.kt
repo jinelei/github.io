@@ -1,16 +1,21 @@
 package cn.jinelei.rainbow.activity
 
+import android.Manifest
 import android.os.Bundle
 import android.support.design.widget.BottomNavigationView
 import android.support.v4.app.Fragment
 import android.util.Log
 import cn.jinelei.rainbow.R
+import cn.jinelei.rainbow.constant.*
 import cn.jinelei.rainbow.fragment.DiscoveryFragment
 import cn.jinelei.rainbow.fragment.HomeFragment
 import cn.jinelei.rainbow.fragment.UserFragment
 import cn.jinelei.rainbow.service.MainService
 import cn.jinelei.rainbow.util.switchFragment
 import com.amap.api.maps.MapView
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 class MainActivity : BaseActivity() {
     val TAG = javaClass.simpleName
@@ -60,8 +65,15 @@ class MainActivity : BaseActivity() {
 //        Log.d(TAG, map.toString())
     }
 
-
-    fun initData() {
+    private fun initData() {
+        GlobalScope.launch(Dispatchers.IO) {
+            customRequestPermission(
+                REQUEST_CODE_WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                null,
+                null
+            )
+        }
     }
 
     override fun onDestroy() {
@@ -71,12 +83,10 @@ class MainActivity : BaseActivity() {
 
     override fun onResume() {
         super.onResume()
-        mMapView?.onResume()
     }
 
     override fun onPause() {
         super.onPause()
-        mMapView?.onPause()
     }
 
     override fun onSaveInstanceState(outState: Bundle?) {
