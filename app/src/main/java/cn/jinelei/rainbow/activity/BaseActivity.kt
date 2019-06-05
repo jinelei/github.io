@@ -7,10 +7,8 @@ import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import cn.jinelei.rainbow.components.LoadingDialog
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
+import java.lang.Runnable
 import java.util.*
 import kotlin.collections.HashMap
 import kotlin.coroutines.CoroutineContext
@@ -19,6 +17,7 @@ open class BaseActivity : AppCompatActivity() {
     private val grantedPermRunnable = HashMap<Int, Runnable>()
     private val deniedPermRunnable = HashMap<Int, Runnable>()
     private var loadingDialog: LoadingDialog? = null
+    private var loadingDialogTimeoutJob: Job? = null
     private val DEFAULT_HIDE_LOADING_TIMEOUT = 10000L
 
     override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
@@ -139,31 +138,33 @@ open class BaseActivity : AppCompatActivity() {
     }
 
     protected fun showLoading(timeout: Long = DEFAULT_HIDE_LOADING_TIMEOUT) {
-        Log.v(getTag(), "show loading method")
         GlobalScope.launch(Dispatchers.Main) {
             if (loadingDialog?.isShowing == false) {
+                Log.v(getTag(), "show loading dialog and set timeout: $timeout")
                 loadingDialog?.show()
-                Log.v(getTag(), "show loading: " + timeout)
             }
         }
-        GlobalScope.launch(Dispatchers.Default) {
+        loadingDialogTimeoutJob = GlobalScope.launch(Dispatchers.Default) {
             delay(timeout)
             GlobalScope.launch(Dispatchers.Main) {
                 if (loadingDialog?.isShowing == true) {
-                    loadingDialog?.hide()
-                    Log.v(getTag(), "hide loading")
+                    Log.v(getTag(), "dismiss loading dialog in timeout job")
+                    loadingDialog?.dismiss()
                 }
             }
         }
     }
 
     protected fun hideLoading() {
-        Log.v(getTag(), "hide loading method")
         GlobalScope.launch(Dispatchers.Main) {
             if (loadingDialog?.isShowing == true) {
-                loadingDialog?.hide()
-                Log.v(getTag(), "hide loading")
+                Log.v(getTag(), "dismiss loading dialog")
+                loadingDialog?.dismiss()
             }
+        }
+        if (loadingDialogTimeoutJob?.isActive == true) {
+            Log.v(getTag(), "cancel loading dialog timeout job")
+            loadingDialogTimeoutJob?.cancel()
         }
     }
 

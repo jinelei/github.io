@@ -80,10 +80,7 @@ class DeviceScanActivity : BaseActivity() {
 
     private fun detectWifi() {
         Log.v(getTag(), "detect wifi")
-//        GlobalScope.launch(Dispatchers.Main) {
-//            if (loadingDialog?.isShowing == false)
-//                loadingDialog?.show()
-//        }
+        showLoading()
         val scanResults = wifiManager?.scanResults ?: emptyList()
         if (scanResults == null || scanResults.size == 0) {
             deviceScanInfoNothing?.visibility = View.VISIBLE
@@ -94,14 +91,11 @@ class DeviceScanActivity : BaseActivity() {
             deviceScanResultRecycler?.adapter =
                 WifiResultAdapter(scanResults.sortedWith(compareBy { Math.abs(it.level) }))
         }
-//        GlobalScope.launch(Dispatchers.IO) {
-//            delay(1000)
-//            GlobalScope.launch(Dispatchers.Main) {
-//                if (loadingDialog?.isShowing == true)
-//                    loadingDialog?.hide()
-//            }
-//        }
-//        GlobalScope.launch(Dispatchers.Main) { hideLoading() }
+        GlobalScope.launch(Dispatchers.IO) {
+            // 模拟延时
+            delay(5000)
+            hideLoading()
+        }
     }
 
     private fun scanDevice() {
