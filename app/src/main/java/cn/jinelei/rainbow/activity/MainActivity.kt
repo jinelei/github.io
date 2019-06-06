@@ -5,13 +5,13 @@ import android.os.Bundle
 import android.support.design.widget.BottomNavigationView
 import android.support.v4.app.Fragment
 import android.util.Log
+import android.widget.TextView
+import android.widget.Toast
 import cn.jinelei.rainbow.R
-import cn.jinelei.rainbow.constant.*
 import cn.jinelei.rainbow.fragment.DiscoveryFragment
 import cn.jinelei.rainbow.fragment.HomeFragment
 import cn.jinelei.rainbow.fragment.UserFragment
 import cn.jinelei.rainbow.service.MainService
-import cn.jinelei.rainbow.util.switchFragment
 import com.amap.api.maps.MapView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -20,7 +20,6 @@ import kotlinx.coroutines.launch
 class MainActivity : BaseActivity() {
     val TAG = javaClass.simpleName
     private var mMapView: MapView? = null
-    private var currentFragment: Fragment = HomeFragment.instance
     private var mainBinder: MainService.MainBinder? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,46 +31,37 @@ class MainActivity : BaseActivity() {
     private fun initView(savedInstanceState: Bundle?) {
         setContentView(R.layout.activity_main)
         val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottom_navigation_view)
-        supportFragmentManager.beginTransaction()
-            .add(R.id.main_frame, currentFragment)
-            .commit()
-
+        switchFragmentTo(R.id.main_frame, HomeFragment.instance)
         bottomNavigationView.setOnNavigationItemSelectedListener { menuItem ->
             when (menuItem.itemId) {
-                R.id.navigation_home -> {
-                    currentFragment =
-                        switchFragment(supportFragmentManager, R.id.main_frame, currentFragment, HomeFragment.instance)
-                }
-                R.id.navigation_user -> {
-                    currentFragment =
-                        switchFragment(supportFragmentManager, R.id.main_frame, currentFragment, UserFragment.instance)
-                }
-                R.id.navigation_discovery -> {
-                    currentFragment =
-                        switchFragment(
-                            supportFragmentManager,
-                            R.id.main_frame,
-                            currentFragment,
-                            DiscoveryFragment.instance
-                        )
-                }
-                else -> Log.d(TAG, "other")
+                R.id.navigation_home ->
+                    switchFragmentTo(R.id.main_frame, HomeFragment.instance)
+                R.id.navigation_user ->
+                    switchFragmentTo(R.id.main_frame, UserFragment.instance)
+                R.id.navigation_discovery ->
+                    switchFragmentTo(R.id.main_frame, DiscoveryFragment.instance)
+                else -> debug(Log.ERROR, "invalid switch fragment: ${menuItem.itemId}")
             }
             true
         }
-//        mMapView = findViewById<MapView>(R.id.map)
-//        mMapView?.onCreate(savedInstanceState)
-//        val map = mMapView?.map
-//        Log.d(TAG, map.toString())
     }
 
     private fun initData() {
         GlobalScope.launch(Dispatchers.IO) {
             customRequestPermission(
-                REQUEST_CODE_WRITE_EXTERNAL_STORAGE,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                null,
-                null
+                listOf(
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE
+                ), Runnable {
+                    GlobalScope.launch(Dispatchers.Main) {
+                        Toast.makeText(this@MainActivity, "grant write log", Toast.LENGTH_SHORT).show()
+                    }
+                }, Runnable {
+                    alertDialogBuilder?.setTitle(getString(R.string.request_permission))
+                        ?.setView(TextView(this@MainActivity).also {
+                            it.text = getString(R.string.request_permission)
+                        })
+                        ?.create()?.show()
+                }
             )
         }
     }
@@ -91,7 +81,6 @@ class MainActivity : BaseActivity() {
 
     override fun onSaveInstanceState(outState: Bundle?) {
         super.onSaveInstanceState(outState)
-//        mMapView?.onSaveInstanceState(outState)
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle?) {

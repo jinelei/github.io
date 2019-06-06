@@ -12,4 +12,30 @@
     <string name="please_open_wifi_switch">please open wifi switch</string>
     <string name="wifi_already_closed">wifi already closed</string>
     <string name="nothing_click_to_refresh">there is nothing\nclick to refresh</string>
+    <string name="please_grant_application_permission">please grant application some permission</string>
+    <string name="write_log_need_write_permission">write log need write permission</string>
+    <string name="ready_grant_permission">ready grant permission</string>
+    <string name="ready_denied_permission">ready denied permission</string>
+    <string name="preference">preference</string>
+    <string name="setup">setup</string>
+    <string name="develop_mode">develop mode</string>
+    <string name="select_debug_level">select debug level</string>
+    <string name="toast_level">toast level</string>
+    <string-array name="debug_level">
+        <item>none</item>
+        <item>verbose</item>
+        <item>debug</item>
+        <item>info</item>
+        <item>warn</item>
+        <item>error</item>
+    </string-array>
+    <string-array name="debug_level_value">
+        <item>0</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+    </string-array>
+    <integer name="default_debug_level_value">2</integer>
 </resources>

@@ -12,4 +12,13 @@
     <string name="please_open_wifi_switch">请打开WIFI开关</string>
     <string name="wifi_already_closed">WIFI已经关闭</string>
     <string name="nothing_click_to_refresh">这里什么都没有哦！\n点击刷新</string>
+    <string name="please_grant_application_permission">请给应用授权</string>
+    <string name="write_log_need_write_permission">write log need write permission</string>
+    <string name="ready_grant_permission">获得授权</string>
+    <string name="ready_denied_permission">拒绝授权</string>
+    <string name="preference">首选项</string>
+    <string name="setup">设置</string>
+    <string name="develop_mode">开发者选项</string>
+    <string name="select_debug_level">选择调试级别</string>
+    <string name="toast_level">提示级别</string>
 </resources>

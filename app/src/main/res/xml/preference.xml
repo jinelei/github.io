@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:title="@string/setup">
+
+    <PreferenceCategory
+            android:enabled="true"
+            android:title="@string/develop_mode">
+
+        <ListPreference
+                android:singleLineTitle="true"
+                android:summary="@integer/default_debug_level_value"
+                android:key="KEY_DEBUG_FLAG"
+                android:entries="@array/debug_level"
+                android:entryValues="@array/debug_level_value"
+                android:dialogTitle="@string/select_debug_level"
+                android:defaultValue="@integer/default_debug_level_value"
+                android:title="@string/toast_level"/>
+
+    </PreferenceCategory>
+
+
+</PreferenceScreen>

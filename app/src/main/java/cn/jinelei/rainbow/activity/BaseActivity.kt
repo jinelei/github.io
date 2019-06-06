@@ -1,21 +1,28 @@
 package cn.jinelei.rainbow.activity
 
+import android.app.AlertDialog
 import android.app.NotificationManager
 import android.content.Context
 import android.content.pm.PackageManager
 import android.net.wifi.WifiManager
 import android.os.*
 import android.support.v4.app.ActivityCompat
+import android.support.v4.app.Fragment
+import android.support.v4.app.FragmentManager
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
-import cn.jinelei.rainbow.application.BaseApplication
+import android.widget.TextView
+import android.widget.Toast
+import cn.jinelei.rainbow.R
 import cn.jinelei.rainbow.components.LoadingDialog
+import cn.jinelei.rainbow.util.SharedPreUtil
+import cn.jinelei.rainbow.util.getCrc16
 import kotlinx.coroutines.*
 import java.lang.Runnable
-import java.util.*
+import java.nio.charset.Charset
+import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
-import kotlin.coroutines.CoroutineContext
 
 open class BaseActivity : AppCompatActivity() {
     //    已经授权应该执行的任务
@@ -32,12 +39,19 @@ open class BaseActivity : AppCompatActivity() {
     protected var wifiManager: WifiManager? = null
     //    通知管理器
     protected var notificationManager: NotificationManager? = null
+    //    请求权限的弹窗
+    protected var alertDialogBuilder: AlertDialog.Builder? = null
+    //    fragment管理器
+    protected var fragmentManager: FragmentManager? = null
+    protected var currentFragment: Fragment? = null
 
     //    初始化数据
     private fun initData() {
         loadingDialog = LoadingDialog(this)
         wifiManager = applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
         notificationManager = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        alertDialogBuilder = AlertDialog.Builder(this)
+        fragmentManager = supportFragmentManager
     }
 
     //    销毁相关数据
@@ -53,101 +67,117 @@ open class BaseActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
         super.onCreate(savedInstanceState, persistentState)
-        Log.v(getTag(), Thread.currentThread().stackTrace[2].methodName)
+        debug(Log.VERBOSE, Thread.currentThread().stackTrace[2].methodName)
         initData()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Log.v(getTag(), Thread.currentThread().stackTrace[2].methodName)
+        debug(Log.VERBOSE, Thread.currentThread().stackTrace[2].methodName)
         initData()
     }
 
     override fun onStart() {
         super.onStart()
-        Log.v(getTag(), Thread.currentThread().stackTrace[2].methodName)
+        debug(Log.VERBOSE, Thread.currentThread().stackTrace[2].methodName)
     }
 
     override fun onResume() {
         super.onResume()
-        Log.v(getTag(), Thread.currentThread().stackTrace[2].methodName)
+        debug(Log.VERBOSE, Thread.currentThread().stackTrace[2].methodName)
     }
 
     override fun onPause() {
         super.onPause()
-        Log.v(getTag(), Thread.currentThread().stackTrace[2].methodName)
+        debug(Log.VERBOSE, Thread.currentThread().stackTrace[2].methodName)
     }
 
     override fun onStop() {
         super.onStop()
-        Log.v(getTag(), Thread.currentThread().stackTrace[2].methodName)
+        debug(Log.VERBOSE, Thread.currentThread().stackTrace[2].methodName)
     }
 
     override fun onRestart() {
         super.onRestart()
-        Log.v(getTag(), Thread.currentThread().stackTrace[2].methodName)
+        debug(Log.VERBOSE, Thread.currentThread().stackTrace[2].methodName)
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        Log.v(getTag(), Thread.currentThread().stackTrace[2].methodName)
+        debug(Log.VERBOSE, Thread.currentThread().stackTrace[2].methodName)
         destoryData()
     }
 
     override fun onSaveInstanceState(outState: Bundle?, outPersistentState: PersistableBundle?) {
         super.onSaveInstanceState(outState, outPersistentState)
-        Log.v(getTag(), Thread.currentThread().stackTrace[2].methodName)
+        debug(Log.VERBOSE, Thread.currentThread().stackTrace[2].methodName)
     }
 
     override fun onSaveInstanceState(outState: Bundle?) {
         super.onSaveInstanceState(outState)
-        Log.v(getTag(), Thread.currentThread().stackTrace[2].methodName)
+        debug(Log.VERBOSE, Thread.currentThread().stackTrace[2].methodName)
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
         super.onRestoreInstanceState(savedInstanceState)
-        Log.v(getTag(), Thread.currentThread().stackTrace[2].methodName)
+        debug(Log.VERBOSE, Thread.currentThread().stackTrace[2].methodName)
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
         super.onRestoreInstanceState(savedInstanceState, persistentState)
-        Log.v(getTag(), Thread.currentThread().stackTrace[2].methodName)
+        debug(Log.VERBOSE, Thread.currentThread().stackTrace[2].methodName)
     }
 
     fun getTag(): String {
         return this.javaClass.simpleName
     }
 
-    protected fun customRequestPermission(id: Int, permission: String, grantedRun: Runnable?, deniedRun: Runnable?) {
-        if (grantedRun != null)
-            grantedPermRunnable[id] = grantedRun
-        if (deniedRun != null)
-            deniedPermRunnable[id] = deniedRun
-        if (Build.VERSION.SDK_INT > 23) {
-            if (PackageManager.PERMISSION_GRANTED == ContextCompat.checkSelfPermission(this, permission)) {
-                ActivityCompat.requestPermissions(this, arrayOf(permission), id)
-                return
-            } else {
-                Log.v(getTag(), "id ${id} permission ${permission} granted")
-                grantedRun?.run()
-            }
-        } else {
-            Log.v(getTag(), "id ${id} permission ${permission} granted")
-            grantedRun?.run()
-        }
-    }
-
     protected fun customRequestPermission(
-        ids: List<Int>,
         permissions: List<String>,
         grantedRun: Runnable?,
         deniedRun: Runnable?
     ) {
-        if (ids.size == permissions.size) {
-            for (i in ids.indices) {
-                val id = ids[i]
-                val permission = permissions[i]
-                this.customRequestPermission(id, permission, grantedRun, deniedRun)
+        val needUserAgreePermission = ArrayList<String>()
+        for (permission in permissions) {
+            val id = getCrc16(permission.toByteArray(Charset.defaultCharset()))
+            if (grantedRun != null)
+                grantedPermRunnable[id] = grantedRun
+            if (deniedRun != null)
+                deniedPermRunnable[id] = deniedRun
+            if (Build.VERSION.SDK_INT > 23) {
+                if (PackageManager.PERMISSION_GRANTED == ContextCompat.checkSelfPermission(this, permission)) {
+                    debug(Log.VERBOSE, "id ${id} permission ${permission} granted")
+                    ActivityCompat.requestPermissions(this, arrayOf(permission), id)
+                    grantedRun?.run()
+                    return
+                } else {
+                    debug(Log.VERBOSE, "id ${id} permission ${permission} denied, try alert dialog")
+                    if (ActivityCompat.shouldShowRequestPermissionRationale(this, permission)) {
+                        needUserAgreePermission.add(permission)
+                    } else {
+                        needUserAgreePermission.add(permission)
+                    }
+                }
+            } else {
+                debug(Log.VERBOSE, "id ${id} permission ${permission} granted")
+                grantedRun?.run()
+            }
+        }
+        if (needUserAgreePermission.isNotEmpty()) {
+            val textView = TextView(this)
+            textView.text = needUserAgreePermission.reduce { acc, s -> "$acc\n$s" }
+            GlobalScope.launch(Dispatchers.Main) {
+                alertDialogBuilder?.setTitle(getString(R.string.please_grant_application_permission))
+                    ?.setView(textView)
+                    ?.setPositiveButton(getString(R.string.ok)) { _, _ ->
+                        requestPermissions(
+                            needUserAgreePermission.toTypedArray(),
+                            getCrc16(needUserAgreePermission[0].toByteArray(Charset.defaultCharset()))
+                        )
+                    }
+                    ?.setNegativeButton(getString(R.string.cancel)) { _, _ -> deniedRun?.run() }
+                    ?.create()
+                    ?.show()
             }
         }
     }
@@ -160,19 +190,19 @@ open class BaseActivity : AppCompatActivity() {
             val result = resultIterator.next()
             val permission = permissionIterator.next()
             if (result == PackageManager.PERMISSION_GRANTED) {
-                Log.v(getTag(), "id ${requestCode} permission ${permission} granted")
+                debug(Log.VERBOSE, "id ${requestCode} permission ${permission} granted")
                 grantedPermRunnable.get(requestCode)?.run()
             } else {
-                Log.v(getTag(), "id ${requestCode} permission ${permission} denied")
+                debug(Log.VERBOSE, "id ${requestCode} permission ${permission} denied")
                 deniedPermRunnable.get(requestCode)?.run()
             }
         }
     }
 
-    protected fun showLoading(timeout: Long = DEFAULT_HIDE_LOADING_TIMEOUT) {
+    fun showLoading(timeout: Long = DEFAULT_HIDE_LOADING_TIMEOUT) {
         GlobalScope.launch(Dispatchers.Main) {
             if (loadingDialog?.isShowing == false) {
-                Log.v(getTag(), "show loading dialog and set timeout: $timeout")
+                debug(Log.VERBOSE, "show loading dialog and set timeout: $timeout")
                 loadingDialog?.show()
             }
         }
@@ -180,23 +210,68 @@ open class BaseActivity : AppCompatActivity() {
             delay(timeout)
             GlobalScope.launch(Dispatchers.Main) {
                 if (loadingDialog?.isShowing == true) {
-                    Log.v(getTag(), "dismiss loading dialog in timeout job")
+                    debug(Log.VERBOSE, "dismiss loading dialog in timeout job")
                     loadingDialog?.dismiss()
                 }
             }
         }
     }
 
-    protected fun hideLoading() {
+    fun hideLoading() {
         GlobalScope.launch(Dispatchers.Main) {
             if (loadingDialog?.isShowing == true) {
-                Log.v(getTag(), "dismiss loading dialog")
+                debug(Log.VERBOSE, "dismiss loading dialog")
                 loadingDialog?.dismiss()
             }
         }
         if (loadingDialogTimeoutJob?.isActive == true) {
-            Log.v(getTag(), "cancel loading dialog timeout job")
+            debug(Log.VERBOSE, "cancel loading dialog timeout job")
             loadingDialogTimeoutJob?.cancel()
+        }
+    }
+
+    fun debug(level: Int, message: String) {
+        val debug: Int = SharedPreUtil.readPre(this, SharedPreUtil.NAME_USER, SharedPreUtil.KEY_DEBUG_FLAG, 0) as Int
+        when (level) {
+            Log.VERBOSE -> Log.v(this.getTag(), message)
+            Log.DEBUG -> Log.d(this.getTag(), message)
+            Log.INFO -> Log.i(this.getTag(), message)
+            Log.WARN -> Log.w(this.getTag(), message)
+            Log.ERROR -> Log.e(this.getTag(), message)
+        }
+        if (level >= debug)
+            toast(message)
+    }
+
+    fun toast(message: String) {
+        GlobalScope.launch(Dispatchers.Main) {
+            Toast.makeText(this@BaseActivity, message, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    fun switchFragmentTo(containerId: Int, targetFragment: Fragment) {
+        debug(
+            Log.VERBOSE,
+            "from ${currentFragment?.javaClass?.simpleName} jump to ${targetFragment::class.java.simpleName}"
+        )
+        if (currentFragment == null) {
+            fragmentManager?.beginTransaction().also {
+                if (targetFragment.isAdded) {
+                    it?.show(targetFragment)?.commit()
+                } else {
+                    it?.add(containerId, targetFragment)?.commit()
+                }
+                currentFragment = targetFragment
+            }
+        } else if (currentFragment != targetFragment) {
+            fragmentManager?.beginTransaction().also {
+                if (targetFragment.isAdded) {
+                    it?.hide(currentFragment!!)?.show(targetFragment)?.commit()
+                } else {
+                    it?.hide(currentFragment!!)?.add(containerId, targetFragment)?.commit()
+                }
+                currentFragment = targetFragment
+            }
         }
     }
 }

@@ -2,8 +2,6 @@ package cn.jinelei.rainbow
 
 import org.junit.Test
 
-import org.junit.Assert.*
-
 /**
  * Example local unit test, which will execute on the development machine (host).
  *
@@ -12,6 +10,9 @@ import org.junit.Assert.*
 class ExampleUnitTest {
     @Test
     fun addition_isCorrect() {
-        assertEquals(4, 2 + 2)
+        val array = arrayOf("a", "b", "c")
+        print(array.reduce { acc, s ->  "acc: {$acc} s: {$s} "})
+        print("\n")
+        print(array.reduce { acc, s ->  "$acc $s"})
     }
 }

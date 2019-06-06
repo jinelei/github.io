@@ -50,7 +50,6 @@ class DeviceScanActivity : BaseActivity() {
 
     private fun initData() {
         wifiInfo = wifiManager?.connectionInfo
-        Log.v(getTag(), wifiInfo.toString())
     }
 
     private fun initView() {
@@ -72,15 +71,13 @@ class DeviceScanActivity : BaseActivity() {
     }
 
     private fun detectWifi() {
-        Log.v(getTag(), "detect wifi")
+        debug(Log.VERBOSE, "start detect wifi")
         val builder: Notification.Builder = Notification.Builder(this)
         builder.setSmallIcon(R.drawable.ic_launcher_foreground)
         builder.setContentText("content")
         builder.setContentTitle("title")
         builder.setAutoCancel(true)
         notificationManager?.notify(0x01, builder.build())
-
-        Log.e(getTag(), (1 / 0).toString())
 
         showLoading()
         val scanResults = wifiManager?.scanResults ?: emptyList()
@@ -108,11 +105,8 @@ class DeviceScanActivity : BaseActivity() {
         if (wifiManager?.isWifiEnabled == true) {
             customRequestPermission(
                 listOf(
-                    REQUEST_CODE_CHANGE_WIFI_STATE,
-                    REQUEST_CODE_ACCESS_WIFI_STATE,
-                    REQUEST_CODE_ACCESS_COARSE_LOCATION
-                ),
-                listOf(
+                    Manifest.permission.ACCESS_NETWORK_STATE,
+                    Manifest.permission.ACCESS_WIFI_STATE,
                     Manifest.permission.CHANGE_WIFI_STATE,
                     Manifest.permission.ACCESS_FINE_LOCATION,
                     Manifest.permission.ACCESS_COARSE_LOCATION

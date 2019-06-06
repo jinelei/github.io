@@ -14,6 +14,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import cn.jinelei.rainbow.activity.DeviceScanActivity
 import cn.jinelei.rainbow.R
+import cn.jinelei.rainbow.activity.BaseActivity
 import cn.jinelei.rainbow.activity.SettingActivity
 import cn.jinelei.rainbow.util.isFastClick
 
@@ -23,37 +24,102 @@ class UserFragment : BaseFragment() {
     var listRecyclerView: RecyclerView? = null
     var gridRecyclerView: RecyclerView? = null
     val listMenu = arrayListOf(
-        ListMenuItem(View.OnClickListener { v -> Log.d(TAG, "asdfasdf") }, "设置", R.mipmap.ic_home),
-        ListMenuItem(View.OnClickListener { v -> Log.d(TAG, "asdfasdf") }, "设置", R.mipmap.ic_home),
-        ListMenuItem(View.OnClickListener { v -> Log.d(TAG, "asdfasdf") }, "设置", R.mipmap.ic_home),
-        ListMenuItem(View.OnClickListener { v -> Log.d(TAG, "asdfasdf") }, "设置", R.mipmap.ic_home),
+        ListMenuItem(
+            View.OnClickListener { v -> (activity as BaseActivity).debug(Log.VERBOSE, "verbose") },
+            "verbose",
+            R.mipmap.ic_home
+        ),
+        ListMenuItem(
+            View.OnClickListener { v -> (activity as BaseActivity).debug(Log.DEBUG, "debug") },
+            "debug",
+            R.mipmap.ic_home
+        ),
+        ListMenuItem(
+            View.OnClickListener { v -> (activity as BaseActivity).debug(Log.INFO, "info") },
+            "info",
+            R.mipmap.ic_home
+        ),
+        ListMenuItem(
+            View.OnClickListener { v -> (activity as BaseActivity).debug(Log.WARN, "warn") },
+            "warn",
+            R.mipmap.ic_home
+        ),
+        ListMenuItem(
+            View.OnClickListener { v -> (activity as BaseActivity).debug(Log.ERROR, "error") },
+            "error",
+            R.mipmap.ic_home
+        ),
         ListMenuItem(
             View.OnClickListener { v ->
                 if (!isFastClick(v))
-                    startActivity(Intent(activity, SettingActivity::class.java))
+                    (activity as BaseActivity).switchFragmentTo(R.id.main_frame, SetupFragment.instance)
             },
-            "设置",
-            R.mipmap.ic_home
+            "首选项",
+            R.mipmap.ic_setting
         )
     )
     val gridMenu = arrayListOf(
-        ListMenuItem(View.OnClickListener { v -> Log.d(TAG, "asdfasdf") }, "设置", R.mipmap.ic_home),
-        ListMenuItem(View.OnClickListener { v -> Log.d(TAG, "asdfasdf") }, "设置", R.mipmap.ic_home),
-        ListMenuItem(View.OnClickListener { v -> Log.d(TAG, "asdfasdf") }, "设置", R.mipmap.ic_home),
-        ListMenuItem(View.OnClickListener { v -> Log.d(TAG, "asdfasdf") }, "设置", R.mipmap.ic_home),
-        ListMenuItem(View.OnClickListener { v -> Log.d(TAG, "asdfasdf") }, "设置", R.mipmap.ic_home),
-        ListMenuItem(View.OnClickListener { v -> Log.d(TAG, "asdfasdf") }, "设置", R.mipmap.ic_home),
-        ListMenuItem(View.OnClickListener { v -> Log.d(TAG, "asdfasdf") }, "设置", R.mipmap.ic_home),
-        ListMenuItem(View.OnClickListener { v -> Log.d(TAG, "asdfasdf") }, "设置", R.mipmap.ic_home),
-        ListMenuItem(View.OnClickListener { v -> Log.d(TAG, "asdfasdf") }, "设置", R.mipmap.ic_home),
-        ListMenuItem(View.OnClickListener { v -> Log.d(TAG, "asdfasdf") }, "设置", R.mipmap.ic_home),
+        ListMenuItem(
+            View.OnClickListener { v -> (activity as BaseActivity).debug(Log.VERBOSE, "asdfasdf") },
+            "设置",
+            R.mipmap.ic_home
+        ),
+        ListMenuItem(
+            View.OnClickListener { v -> (activity as BaseActivity).debug(Log.VERBOSE, "asdfasdf") },
+            "设置",
+            R.mipmap.ic_home
+        ),
+        ListMenuItem(
+            View.OnClickListener { v -> (activity as BaseActivity).debug(Log.VERBOSE, "asdfasdf") },
+            "设置",
+            R.mipmap.ic_home
+        ),
+        ListMenuItem(
+            View.OnClickListener { v -> (activity as BaseActivity).debug(Log.VERBOSE, "asdfasdf") },
+            "设置",
+            R.mipmap.ic_home
+        ),
+        ListMenuItem(
+            View.OnClickListener { v -> (activity as BaseActivity).debug(Log.VERBOSE, "asdfasdf") },
+            "设置",
+            R.mipmap.ic_home
+        ),
+        ListMenuItem(
+            View.OnClickListener { v -> (activity as BaseActivity).debug(Log.VERBOSE, "asdfasdf") },
+            "设置",
+            R.mipmap.ic_home
+        ),
+        ListMenuItem(
+            View.OnClickListener { v -> (activity as BaseActivity).debug(Log.VERBOSE, "asdfasdf") },
+            "设置",
+            R.mipmap.ic_home
+        ),
+        ListMenuItem(
+            View.OnClickListener { v -> (activity as BaseActivity).debug(Log.VERBOSE, "asdfasdf") },
+            "设置",
+            R.mipmap.ic_home
+        ),
+        ListMenuItem(
+            View.OnClickListener { v -> (activity as BaseActivity).debug(Log.VERBOSE, "asdfasdf") },
+            "设置",
+            R.mipmap.ic_home
+        ),
+        ListMenuItem(View.OnClickListener { v ->
+            if (!isFastClick(v)) startActivity(
+                Intent(activity, DeviceScanActivity::class.java)
+            )
+        }, "添加设备", R.mipmap.ic_home),
         ListMenuItem(View.OnClickListener { v ->
             if (!isFastClick(v))
                 startActivity(Intent(activity, SettingActivity::class.java))
         }, "设置", R.mipmap.ic_home)
     )
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         val view = inflater.inflate(R.layout.user_fragment, container, false)
         initView(view)
         return view
