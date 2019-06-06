@@ -17,17 +17,23 @@ class SetupFragment : PreferenceFragmentCompat() {
 
     private fun initView() {
         debugPref = preferenceManager.findPreference(KEY_DEBUG_FLAG) as ListPreference
-        val debugLevel: Int =
-            SharedPreUtil.readPre(context!!, SharedPreUtil.NAME_USER, SharedPreUtil.KEY_DEBUG_FLAG, 0) as Int
-        debugPref?.summary = resources.getStringArray(R.array.debug_level)[debugLevel.dec()]
+        val debugLevel =
+            SharedPreUtil.readPre(context!!, SharedPreUtil.NAME_USER, SharedPreUtil.KEY_DEBUG_FLAG, 2) as Int
+        updateDebugLevel(debugLevel)
     }
 
     private fun initData() {
         debugPref?.setOnPreferenceChangeListener { _, debugFlag ->
-            debugPref?.summary = resources.getStringArray(R.array.debug_level)[(debugFlag as String).toInt().dec()]
+            updateDebugLevel((debugFlag as String).toInt())
             SharedPreUtil.savePre(context!!, SharedPreUtil.NAME_USER, SharedPreUtil.KEY_DEBUG_FLAG, debugFlag)
             true
         }
+    }
+
+    private fun updateDebugLevel(debugLevel: Int) {
+        val debugArray = resources.getStringArray(R.array.debug_level)
+        val debugArrayValue = resources.getStringArray(R.array.debug_level_value)
+        debugPref?.summary = debugArray[debugArrayValue.indexOf(debugLevel.toString())]
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
