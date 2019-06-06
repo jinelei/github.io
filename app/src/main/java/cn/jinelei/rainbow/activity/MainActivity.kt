@@ -40,7 +40,7 @@ class MainActivity : BaseActivity() {
                     switchFragmentTo(R.id.main_frame, UserFragment.instance)
                 R.id.navigation_discovery ->
                     switchFragmentTo(R.id.main_frame, DiscoveryFragment.instance)
-                else -> debug(Log.ERROR, "invalid switch fragment: ${menuItem.itemId}")
+                else -> baseApplication?.debug(Log.ERROR, "invalid switch fragment: ${menuItem.itemId}")
             }
             true
         }
@@ -56,7 +56,7 @@ class MainActivity : BaseActivity() {
                         Toast.makeText(this@MainActivity, "grant write log", Toast.LENGTH_SHORT).show()
                     }
                 }, Runnable {
-                    alertDialogBuilder?.setTitle(getString(R.string.request_permission))
+                    baseApplication?.alertDialogBuilder?.setTitle(getString(R.string.request_permission))
                         ?.setView(TextView(this@MainActivity).also {
                             it.text = getString(R.string.request_permission)
                         })

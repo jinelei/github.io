@@ -16,6 +16,7 @@ import cn.jinelei.rainbow.activity.DeviceScanActivity
 import cn.jinelei.rainbow.R
 import cn.jinelei.rainbow.activity.BaseActivity
 import cn.jinelei.rainbow.activity.SettingActivity
+import cn.jinelei.rainbow.application.BaseApplication
 import cn.jinelei.rainbow.util.isFastClick
 
 
@@ -25,34 +26,34 @@ class UserFragment : BaseFragment() {
     var gridRecyclerView: RecyclerView? = null
     val listMenu = arrayListOf(
         ListMenuItem(
-            View.OnClickListener { v -> (activity as BaseActivity).debug(Log.VERBOSE, "verbose") },
+            View.OnClickListener { v -> (activity as BaseActivity).baseApplication?.debug(Log.VERBOSE, "verbose") },
             "verbose",
             R.mipmap.ic_home
         ),
         ListMenuItem(
-            View.OnClickListener { v -> (activity as BaseActivity).debug(Log.DEBUG, "debug") },
+            View.OnClickListener { v -> (activity as BaseActivity).baseApplication?.debug(Log.DEBUG, "debug") },
             "debug",
             R.mipmap.ic_home
         ),
         ListMenuItem(
-            View.OnClickListener { v -> (activity as BaseActivity).debug(Log.INFO, "info") },
+            View.OnClickListener { v -> (activity as BaseActivity).baseApplication?.debug(Log.INFO, "info") },
             "info",
             R.mipmap.ic_home
         ),
         ListMenuItem(
-            View.OnClickListener { v -> (activity as BaseActivity).debug(Log.WARN, "warn") },
+            View.OnClickListener { v -> (activity as BaseActivity).baseApplication?.debug(Log.WARN, "warn") },
             "warn",
             R.mipmap.ic_home
         ),
         ListMenuItem(
-            View.OnClickListener { v -> (activity as BaseActivity).debug(Log.ERROR, "error") },
+            View.OnClickListener { v -> (activity as BaseActivity).baseApplication?.debug(Log.ERROR, "error") },
             "error",
             R.mipmap.ic_home
         ),
         ListMenuItem(
             View.OnClickListener { v ->
                 if (!isFastClick(v))
-                    (activity as BaseActivity).switchFragmentTo(R.id.main_frame, SetupFragment.instance)
+                    (activity as BaseActivity)?.switchFragmentTo(R.id.main_frame, SetupFragment.instance)
             },
             "首选项",
             R.mipmap.ic_setting
@@ -60,47 +61,47 @@ class UserFragment : BaseFragment() {
     )
     val gridMenu = arrayListOf(
         ListMenuItem(
-            View.OnClickListener { v -> (activity as BaseActivity).debug(Log.VERBOSE, "asdfasdf") },
+            View.OnClickListener { v -> (activity?.application as BaseApplication).debug(Log.INFO, "test") },
+            "test",
+            R.mipmap.ic_home
+        ),
+        ListMenuItem(
+            View.OnClickListener { v -> (activity as BaseActivity).baseApplication?.debug(Log.VERBOSE, "asdfasdf") },
             "设置",
             R.mipmap.ic_home
         ),
         ListMenuItem(
-            View.OnClickListener { v -> (activity as BaseActivity).debug(Log.VERBOSE, "asdfasdf") },
+            View.OnClickListener { v -> (activity as BaseActivity).baseApplication?.debug(Log.VERBOSE, "asdfasdf") },
             "设置",
             R.mipmap.ic_home
         ),
         ListMenuItem(
-            View.OnClickListener { v -> (activity as BaseActivity).debug(Log.VERBOSE, "asdfasdf") },
+            View.OnClickListener { v -> (activity as BaseActivity).baseApplication?.debug(Log.VERBOSE, "asdfasdf") },
             "设置",
             R.mipmap.ic_home
         ),
         ListMenuItem(
-            View.OnClickListener { v -> (activity as BaseActivity).debug(Log.VERBOSE, "asdfasdf") },
+            View.OnClickListener { v -> (activity as BaseActivity).baseApplication?.debug(Log.VERBOSE, "asdfasdf") },
             "设置",
             R.mipmap.ic_home
         ),
         ListMenuItem(
-            View.OnClickListener { v -> (activity as BaseActivity).debug(Log.VERBOSE, "asdfasdf") },
+            View.OnClickListener { v -> (activity as BaseActivity).baseApplication?.debug(Log.VERBOSE, "asdfasdf") },
             "设置",
             R.mipmap.ic_home
         ),
         ListMenuItem(
-            View.OnClickListener { v -> (activity as BaseActivity).debug(Log.VERBOSE, "asdfasdf") },
+            View.OnClickListener { v -> (activity as BaseActivity).baseApplication?.debug(Log.VERBOSE, "asdfasdf") },
             "设置",
             R.mipmap.ic_home
         ),
         ListMenuItem(
-            View.OnClickListener { v -> (activity as BaseActivity).debug(Log.VERBOSE, "asdfasdf") },
+            View.OnClickListener { v -> (activity as BaseActivity).baseApplication?.debug(Log.VERBOSE, "asdfasdf") },
             "设置",
             R.mipmap.ic_home
         ),
         ListMenuItem(
-            View.OnClickListener { v -> (activity as BaseActivity).debug(Log.VERBOSE, "asdfasdf") },
-            "设置",
-            R.mipmap.ic_home
-        ),
-        ListMenuItem(
-            View.OnClickListener { v -> (activity as BaseActivity).debug(Log.VERBOSE, "asdfasdf") },
+            View.OnClickListener { v -> (activity as BaseActivity).baseApplication?.debug(Log.VERBOSE, "asdfasdf") },
             "设置",
             R.mipmap.ic_home
         ),

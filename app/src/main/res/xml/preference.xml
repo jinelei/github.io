@@ -3,22 +3,19 @@
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:title="@string/setup">
 
-        <ListPreference
-                android:singleLineTitle="true"
-                android:summary="@integer/default_debug_level_value"
-                android:key="KEY_DEBUG_FLAG"
-                android:icon="@mipmap/ic_developer"
-                android:entries="@array/debug_level"
-                android:entryValues="@array/debug_level_value"
-                android:dialogTitle="@string/select_debug_level"
-                android:defaultValue="@integer/default_debug_level_value"
-                android:title="@string/toast_level"/>
+    <ListPreference
+            android:singleLineTitle="true"
+            android:summary="@integer/default_debug_level_value"
+            android:key="KEY_DEBUG_FLAG"
+            android:icon="@mipmap/ic_debug"
+            android:entries="@array/debug_level"
+            android:entryValues="@array/debug_level_value"
+            android:dialogTitle="@string/select_debug_level"
+            android:defaultValue="@integer/default_debug_level_value"
+            android:title="@string/toast_level"/>
 
-    <PreferenceCategory
-            android:title="@string/app_name">
-        <SwitchPreference
+    <SwitchPreference
             android:key="@string/app_name"
             android:title="@string/app_name"/>
-    </PreferenceCategory>
 
 </PreferenceScreen>

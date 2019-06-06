@@ -1,9 +1,16 @@
 package cn.jinelei.rainbow.activity
 
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.net.wifi.WifiManager
 import android.os.Build
 import android.os.Bundle
+import android.os.Parcel
+import android.os.Parcelable
 import android.support.design.widget.Snackbar
 import android.support.v7.widget.Toolbar
+import android.util.Log
 import android.view.WindowManager
 import cn.jinelei.rainbow.R
 import kotlinx.android.synthetic.main.activity_setting.*
@@ -13,13 +20,19 @@ class SettingActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         initView(savedInstanceState)
+        initData()
+    }
+
+    fun initData() {
     }
 
     private fun initView(savedInstanceState: Bundle?) {
         setContentView(R.layout.activity_setting)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             var lp = window.attributes
-            lp.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                lp.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+            }
             window.attributes = lp
         }
 
