@@ -49,7 +49,7 @@ class DeviceScanActivity : BaseActivity() {
     }
 
     private fun initData() {
-        wifiInfo = baseApplication?.wifiManager?.connectionInfo
+        wifiInfo = wifiManager?.connectionInfo
     }
 
     private fun initView() {
@@ -71,16 +71,16 @@ class DeviceScanActivity : BaseActivity() {
     }
 
     private fun detectWifi() {
-        baseApplication?.debug(Log.VERBOSE, "start detect wifi")
+        debug(Log.VERBOSE, "start detect wifi")
         val builder: Notification.Builder = Notification.Builder(this)
         builder.setSmallIcon(R.drawable.ic_launcher_foreground)
         builder.setContentText("content")
         builder.setContentTitle("title")
         builder.setAutoCancel(true)
-        baseApplication?.notificationManager?.notify(0x01, builder.build())
+        notificationManager?.notify(0x01, builder.build())
 
-        baseApplication?.showLoading()
-        val scanResults = baseApplication?.wifiManager?.scanResults ?: emptyList()
+        showLoading()
+        val scanResults = wifiManager?.scanResults ?: emptyList()
         if (scanResults == null || scanResults.size == 0) {
             deviceScanInfoNothing?.visibility = View.VISIBLE
             deviceScanResultRecycler?.visibility = View.INVISIBLE
@@ -97,12 +97,12 @@ class DeviceScanActivity : BaseActivity() {
         GlobalScope.launch(Dispatchers.IO) {
             // 模拟延时
             delay(5000)
-            baseApplication?.hideLoading()
+            hideLoading()
         }
     }
 
     private fun scanDevice() {
-        if (baseApplication?.wifiManager?.isWifiEnabled == true) {
+        if (wifiManager?.isWifiEnabled == true) {
             customRequestPermission(
                 listOf(
                     Manifest.permission.ACCESS_NETWORK_STATE,

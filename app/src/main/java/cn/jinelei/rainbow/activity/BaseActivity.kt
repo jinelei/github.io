@@ -26,6 +26,18 @@ import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
 open class BaseActivity : AppCompatActivity() {
+    //    加载中弹窗
+    var loadingDialog: LoadingDialog? = null
+    //    自动隐藏加载中弹窗
+    var loadingDialogTimeoutJob: Job? = null
+    //    wifi管理器
+    var wifiManager: WifiManager? = null
+    //    通知管理器
+    var notificationManager: NotificationManager? = null
+    //    请求权限的弹窗
+    var alertDialogBuilder: AlertDialog.Builder? = null
+    //    默认隐藏加载中弹窗的超时时间
+    val DEFAULT_HIDE_LOADING_TIMEOUT = 10000L
     var baseApplication: BaseApplication? = null
     var fragmentManager: FragmentManager? = null    //    fragment管理器
     var currentFragment: Fragment? = null // 当前的Fragment
@@ -35,6 +47,10 @@ open class BaseActivity : AppCompatActivity() {
 
     //    初始化数据
     private fun initData() {
+        loadingDialog = LoadingDialog(this)
+        wifiManager = applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+        notificationManager = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        alertDialogBuilder = AlertDialog.Builder(this)
         fragmentManager = supportFragmentManager
         baseApplication = this.application as BaseApplication
     }
@@ -44,69 +60,74 @@ open class BaseActivity : AppCompatActivity() {
         grantedPermRunnable.clear()
         deniedPermRunnable.clear()
         baseApplication = null
+        loadingDialog?.dismiss()
+        loadingDialog = null
+        loadingDialogTimeoutJob = null
+        wifiManager = null
+        notificationManager = null
     }
 
     override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
         super.onCreate(savedInstanceState, persistentState)
-        baseApplication?.debug(Log.VERBOSE, Thread.currentThread().stackTrace[2].methodName)
+        debug(Log.VERBOSE, Thread.currentThread().stackTrace[2].methodName)
         initData()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        baseApplication?.debug(Log.VERBOSE, Thread.currentThread().stackTrace[2].methodName)
+        debug(Log.VERBOSE, Thread.currentThread().stackTrace[2].methodName)
         initData()
     }
 
     override fun onStart() {
         super.onStart()
-        baseApplication?.debug(Log.VERBOSE, Thread.currentThread().stackTrace[2].methodName)
+        debug(Log.VERBOSE, Thread.currentThread().stackTrace[2].methodName)
     }
 
     override fun onResume() {
         super.onResume()
-        baseApplication?.debug(Log.VERBOSE, Thread.currentThread().stackTrace[2].methodName)
+        debug(Log.VERBOSE, Thread.currentThread().stackTrace[2].methodName)
     }
 
     override fun onPause() {
         super.onPause()
-        baseApplication?.debug(Log.VERBOSE, Thread.currentThread().stackTrace[2].methodName)
+        debug(Log.VERBOSE, Thread.currentThread().stackTrace[2].methodName)
     }
 
     override fun onStop() {
         super.onStop()
-        baseApplication?.debug(Log.VERBOSE, Thread.currentThread().stackTrace[2].methodName)
+        debug(Log.VERBOSE, Thread.currentThread().stackTrace[2].methodName)
     }
 
     override fun onRestart() {
         super.onRestart()
-        baseApplication?.debug(Log.VERBOSE, Thread.currentThread().stackTrace[2].methodName)
+        debug(Log.VERBOSE, Thread.currentThread().stackTrace[2].methodName)
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        baseApplication?.debug(Log.VERBOSE, Thread.currentThread().stackTrace[2].methodName)
+        debug(Log.VERBOSE, Thread.currentThread().stackTrace[2].methodName)
         destoryData()
     }
 
     override fun onSaveInstanceState(outState: Bundle?, outPersistentState: PersistableBundle?) {
         super.onSaveInstanceState(outState, outPersistentState)
-        baseApplication?.debug(Log.VERBOSE, Thread.currentThread().stackTrace[2].methodName)
+        debug(Log.VERBOSE, Thread.currentThread().stackTrace[2].methodName)
     }
 
     override fun onSaveInstanceState(outState: Bundle?) {
         super.onSaveInstanceState(outState)
-        baseApplication?.debug(Log.VERBOSE, Thread.currentThread().stackTrace[2].methodName)
+        debug(Log.VERBOSE, Thread.currentThread().stackTrace[2].methodName)
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
         super.onRestoreInstanceState(savedInstanceState)
-        baseApplication?.debug(Log.VERBOSE, Thread.currentThread().stackTrace[2].methodName)
+        debug(Log.VERBOSE, Thread.currentThread().stackTrace[2].methodName)
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
         super.onRestoreInstanceState(savedInstanceState, persistentState)
-        baseApplication?.debug(Log.VERBOSE, Thread.currentThread().stackTrace[2].methodName)
+        debug(Log.VERBOSE, Thread.currentThread().stackTrace[2].methodName)
     }
 
     fun getTag(): String {
@@ -127,12 +148,12 @@ open class BaseActivity : AppCompatActivity() {
                 deniedPermRunnable[id] = deniedRun
             if (Build.VERSION.SDK_INT > 23) {
                 if (PackageManager.PERMISSION_GRANTED == ContextCompat.checkSelfPermission(this, permission)) {
-                    baseApplication?.debug(Log.VERBOSE, "id ${id} permission ${permission} granted")
+                    debug(Log.VERBOSE, "id ${id} permission ${permission} granted")
                     ActivityCompat.requestPermissions(this, arrayOf(permission), id)
                     grantedRun?.run()
                     return
                 } else {
-                    baseApplication?.debug(Log.VERBOSE, "id ${id} permission ${permission} denied, try alert dialog")
+                    debug(Log.VERBOSE, "id ${id} permission ${permission} denied, try alert dialog")
                     if (ActivityCompat.shouldShowRequestPermissionRationale(this, permission)) {
                         needUserAgreePermission.add(permission)
                     } else {
@@ -140,7 +161,7 @@ open class BaseActivity : AppCompatActivity() {
                     }
                 }
             } else {
-                baseApplication?.debug(Log.VERBOSE, "id ${id} permission ${permission} granted")
+                debug(Log.VERBOSE, "id ${id} permission ${permission} granted")
                 grantedRun?.run()
             }
         }
@@ -148,7 +169,7 @@ open class BaseActivity : AppCompatActivity() {
             val textView = TextView(this)
             textView.text = needUserAgreePermission.reduce { acc, s -> "$acc\n$s" }
             GlobalScope.launch(Dispatchers.Main) {
-                baseApplication?.alertDialogBuilder?.setTitle(getString(R.string.please_grant_application_permission))
+                alertDialogBuilder?.setTitle(getString(R.string.please_grant_application_permission))
                     ?.setView(textView)
                     ?.setPositiveButton(getString(R.string.ok)) { _, _ ->
                         requestPermissions(
@@ -171,17 +192,17 @@ open class BaseActivity : AppCompatActivity() {
             val result = resultIterator.next()
             val permission = permissionIterator.next()
             if (result == PackageManager.PERMISSION_GRANTED) {
-                baseApplication?.debug(Log.VERBOSE, "id ${requestCode} permission ${permission} granted")
+                debug(Log.VERBOSE, "id ${requestCode} permission ${permission} granted")
                 grantedPermRunnable.get(requestCode)?.run()
             } else {
-                baseApplication?.debug(Log.VERBOSE, "id ${requestCode} permission ${permission} denied")
+                debug(Log.VERBOSE, "id ${requestCode} permission ${permission} denied")
                 deniedPermRunnable.get(requestCode)?.run()
             }
         }
     }
 
     fun switchFragmentTo(containerId: Int, targetFragment: Fragment) {
-        baseApplication?.debug(
+        debug(
             Log.VERBOSE,
             "${currentFragment?.javaClass?.simpleName} to ${targetFragment::class.java.simpleName}"
         )
@@ -217,6 +238,58 @@ open class BaseActivity : AppCompatActivity() {
                     previewFragment = null
                 }
             }
+        }
+    }
+
+
+
+    fun debug(level: Int, message: String) {
+        val debug: Int = SharedPreUtil.readPre(this, SharedPreUtil.NAME_USER, SharedPreUtil.KEY_DEBUG_FLAG, 0) as Int
+        when (level) {
+            Log.VERBOSE -> Log.v(this.javaClass.simpleName, message)
+            Log.DEBUG -> Log.d(this.javaClass.simpleName, message)
+            Log.INFO -> Log.i(this.javaClass.simpleName, message)
+            Log.WARN -> Log.w(this.javaClass.simpleName, message)
+            Log.ERROR -> Log.e(this.javaClass.simpleName, message)
+        }
+        if (level >= debug)
+            toast(message)
+    }
+
+    fun toast(message: String) {
+        GlobalScope.launch(Dispatchers.Main) {
+            Toast.makeText(this@BaseActivity, message, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    fun showLoading(timeout: Long = DEFAULT_HIDE_LOADING_TIMEOUT) {
+        GlobalScope.launch(Dispatchers.Main) {
+            if (loadingDialog?.isShowing == false) {
+                debug(Log.VERBOSE, "show loading dialog and set timeout: $timeout")
+                loadingDialog?.show()
+            }
+        }
+        loadingDialogTimeoutJob = GlobalScope.launch(Dispatchers.Default) {
+            delay(timeout)
+            GlobalScope.launch(Dispatchers.Main) {
+                if (loadingDialog?.isShowing == true) {
+                    debug(Log.VERBOSE, "dismiss loading dialog in timeout job")
+                    loadingDialog?.dismiss()
+                }
+            }
+        }
+    }
+
+    fun hideLoading() {
+        GlobalScope.launch(Dispatchers.Main) {
+            if (loadingDialog?.isShowing == true) {
+                debug(Log.VERBOSE, "dismiss loading dialog")
+                loadingDialog?.dismiss()
+            }
+        }
+        if (loadingDialogTimeoutJob?.isActive == true) {
+            debug(Log.VERBOSE, "cancel loading dialog timeout job")
+            loadingDialogTimeoutJob?.cancel()
         }
     }
 }

@@ -3,7 +3,6 @@ package cn.jinelei.rainbow.activity
 import android.Manifest
 import android.os.Bundle
 import android.support.design.widget.BottomNavigationView
-import android.support.v4.app.Fragment
 import android.util.Log
 import android.widget.TextView
 import android.widget.Toast
@@ -24,11 +23,11 @@ class MainActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        initView(savedInstanceState)
+        initView()
         initData()
     }
 
-    private fun initView(savedInstanceState: Bundle?) {
+    private fun initView() {
         setContentView(R.layout.activity_main)
         val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottom_navigation_view)
         switchFragmentTo(R.id.main_frame, HomeFragment.instance)
@@ -40,7 +39,7 @@ class MainActivity : BaseActivity() {
                     switchFragmentTo(R.id.main_frame, UserFragment.instance)
                 R.id.navigation_discovery ->
                     switchFragmentTo(R.id.main_frame, DiscoveryFragment.instance)
-                else -> baseApplication?.debug(Log.ERROR, "invalid switch fragment: ${menuItem.itemId}")
+                else -> debug(Log.ERROR, "invalid switch fragment: ${menuItem.itemId}")
             }
             true
         }
@@ -56,7 +55,7 @@ class MainActivity : BaseActivity() {
                         Toast.makeText(this@MainActivity, "grant write log", Toast.LENGTH_SHORT).show()
                     }
                 }, Runnable {
-                    baseApplication?.alertDialogBuilder?.setTitle(getString(R.string.request_permission))
+                    alertDialogBuilder?.setTitle(getString(R.string.request_permission))
                         ?.setView(TextView(this@MainActivity).also {
                             it.text = getString(R.string.request_permission)
                         })

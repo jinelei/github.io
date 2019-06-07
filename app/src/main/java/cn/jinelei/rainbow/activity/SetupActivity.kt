@@ -17,6 +17,6 @@ class SetupActivity : BaseActivity() {
     fun initView() {
         setContentView(R.layout.activity_setup)
         fragmentManager?.beginTransaction()?.add(R.id.preference_container, SetupFragment.instance)?.commit()
-        findViewById<ImageView>(R.id.back_btn).setOnClickListener { v: View? -> finish() }
+        findViewById<ImageView>(R.id.back_btn).setOnClickListener { _: View? -> finish() }
     }
 }

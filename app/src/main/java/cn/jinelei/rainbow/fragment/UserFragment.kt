@@ -28,7 +28,6 @@ class UserFragment : BaseFragment() {
             View.OnClickListener { v ->
                 if (!isFastClick(v))
                     startActivity(Intent(context, SetupActivity::class.java))
-//                    (activity as BaseActivity)?.switchFragmentTo(R.id.main_frame, SetupFragment.instance)
             },
             "首选项",
             R.mipmap.ic_setup
@@ -36,27 +35,27 @@ class UserFragment : BaseFragment() {
     )
     val gridMenu = arrayListOf(
         ListMenuItem(
-            View.OnClickListener { v -> (activity as BaseActivity).baseApplication?.debug(Log.VERBOSE, "verbose") },
+            View.OnClickListener { _ -> (activity as BaseActivity).debug(Log.VERBOSE, "verbose") },
             "verbose",
             R.mipmap.ic_test
         ),
         ListMenuItem(
-            View.OnClickListener { v -> (activity as BaseActivity).baseApplication?.debug(Log.DEBUG, "debug") },
+            View.OnClickListener { _ -> (activity as BaseActivity).debug(Log.DEBUG, "debug") },
             "debug",
             R.mipmap.ic_test
         ),
         ListMenuItem(
-            View.OnClickListener { v -> (activity as BaseActivity).baseApplication?.debug(Log.INFO, "info") },
+            View.OnClickListener { _ -> (activity as BaseActivity).debug(Log.INFO, "info") },
             "info",
             R.mipmap.ic_test
         ),
         ListMenuItem(
-            View.OnClickListener { v -> (activity as BaseActivity).baseApplication?.debug(Log.WARN, "warn") },
+            View.OnClickListener { _ -> (activity as BaseActivity).debug(Log.WARN, "warn") },
             "warn",
             R.mipmap.ic_test
         ),
         ListMenuItem(
-            View.OnClickListener { v -> (activity as BaseActivity).baseApplication?.debug(Log.ERROR, "error") },
+            View.OnClickListener { _ -> (activity as BaseActivity).debug(Log.ERROR, "error") },
             "error",
             R.mipmap.ic_test
         ),
