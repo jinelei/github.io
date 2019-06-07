@@ -36,6 +36,7 @@ class DeviceScanActivity : BaseActivity() {
     private var deviceScanInfoNothing: TextView? = null
     private var deviceScanTitle: TextView? = null
     private var deviceScanBtn: ImageView? = null
+    private var backBtn: ImageView? = null
     private var wifiInfo: WifiInfo? = null
     private var scanFinished = true
 
@@ -55,19 +56,29 @@ class DeviceScanActivity : BaseActivity() {
     private fun initView() {
         EventBus.getDefault().register(this)
         setContentView(R.layout.activity_device_scan)
-        deviceScanResultRecycler = findViewById(R.id.device_scan_info_recycler_view)
-        deviceScanInfoNothing = findViewById(R.id.device_scan_info_nothing)
-        deviceScanResultRecycler?.layoutManager = LinearLayoutManager(this@DeviceScanActivity)
-        deviceScanResultRecycler?.addItemDecoration(
-            DividerItemDecoration(
-                this@DeviceScanActivity,
-                DividerItemDecoration.VERTICAL
+        deviceScanResultRecycler = findViewById<RecyclerView>(R.id.device_scan_info_recycler_view).apply {
+            this.layoutManager = LinearLayoutManager(this@DeviceScanActivity)
+            this.addItemDecoration(
+                DividerItemDecoration(
+                    this@DeviceScanActivity,
+                    DividerItemDecoration.VERTICAL
+                )
             )
-        );
-        deviceScanTitle = findViewById(R.id.device_scan_title)
-        deviceScanBtn = findViewById(R.id.device_scan_title_btn)
-        deviceScanBtn?.setOnClickListener { scanDevice() }
-        deviceScanInfoNothing?.setOnClickListener { scanDevice() }
+        }
+        deviceScanTitle = findViewById<TextView>(R.id.navigation_header_title).apply {
+            this.text = resources.getString(R.string.scan_device)
+        }
+        deviceScanBtn = findViewById<ImageView>(R.id.navigation_header_right).apply {
+            this.setImageResource(R.mipmap.ic_discovery)
+            this.setOnClickListener { scanDevice() }
+        }
+        deviceScanInfoNothing = findViewById<TextView>(R.id.device_scan_info_nothing).apply {
+            this.setOnClickListener { scanDevice() }
+        }
+        backBtn = findViewById<ImageView>(R.id.navigation_header_left).apply {
+            this.setImageResource(R.mipmap.ic_back)
+            this.setOnClickListener { finish() }
+        }
     }
 
     private fun detectWifi() {
@@ -81,7 +92,7 @@ class DeviceScanActivity : BaseActivity() {
 
         showLoading()
         val scanResults = wifiManager?.scanResults ?: emptyList()
-        if (scanResults == null || scanResults.size == 0) {
+        if (scanResults.size == 0) {
             deviceScanInfoNothing?.visibility = View.VISIBLE
             deviceScanResultRecycler?.visibility = View.INVISIBLE
         } else {
@@ -138,7 +149,6 @@ class DeviceScanActivity : BaseActivity() {
         when (event.finish) {
             true -> deviceScanTitle?.text = getString(R.string.scan_device)
             false -> deviceScanTitle?.text = getString(R.string.scan_device_wait)
-            else -> deviceScanTitle?.text = getString(R.string.scan_device)
         }
     }
 

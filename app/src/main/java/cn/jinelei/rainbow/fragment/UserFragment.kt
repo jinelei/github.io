@@ -23,6 +23,11 @@ class UserFragment : BaseFragment() {
     val TAG = javaClass.simpleName
     var listRecyclerView: RecyclerView? = null
     var gridRecyclerView: RecyclerView? = null
+    var rightBtn: ImageView? = null
+    var leftBtn: ImageView? = null
+    var navigationTitle: TextView? = null
+    var userHeaderIcon: ImageView? = null
+    var userHeaderInfo: TextView? = null
     val listMenu = arrayListOf(
         ListMenuItem(
             View.OnClickListener { v ->
@@ -77,25 +82,34 @@ class UserFragment : BaseFragment() {
     }
 
     fun initView(view: View) {
-//        菜单按钮
-        val menuBtn = view.findViewById<ImageView>(R.id.menu_setting)
-        menuBtn.setOnClickListener { v: View? ->
-            if (!isFastClick(v))
-                startActivity(Intent(activity, DeviceScanActivity::class.java))
+        listRecyclerView = view.findViewById<RecyclerView>(R.id.list_menu_recycler_view).apply {
+            setHasFixedSize(true)
+            isNestedScrollingEnabled = false
+            addItemDecoration(DividerItemDecoration(activity, DividerItemDecoration.VERTICAL));
+            layoutManager = LinearLayoutManager(activity)
+            adapter = ListMenuViewAdapter(listMenu)
         }
-        listRecyclerView = view.findViewById(R.id.list_menu_recycler_view)
-        listRecyclerView?.setHasFixedSize(true)
-        listRecyclerView?.isNestedScrollingEnabled = false
-        listRecyclerView?.addItemDecoration(DividerItemDecoration(activity, DividerItemDecoration.VERTICAL));
-        listRecyclerView?.layoutManager = LinearLayoutManager(activity)
-        listRecyclerView?.adapter = ListMenuViewAdapter(listMenu)
-
-        gridRecyclerView = view.findViewById(R.id.grid_menu_recycler_view)
-        gridRecyclerView?.setHasFixedSize(true)
-        gridRecyclerView?.isNestedScrollingEnabled = false
-        gridRecyclerView?.layoutManager = GridLayoutManager(activity, 5)
-        gridRecyclerView?.adapter = GridMenuViewAdapter(gridMenu)
-
+        gridRecyclerView = view.findViewById<RecyclerView>(R.id.grid_menu_recycler_view).apply {
+            setHasFixedSize(true)
+            isNestedScrollingEnabled = false
+            layoutManager = GridLayoutManager(activity, 5)
+            adapter = GridMenuViewAdapter(gridMenu)
+        }
+        rightBtn = view.findViewById<ImageView>(R.id.navigation_header_right).apply {
+            setImageResource(R.mipmap.ic_add)
+            setOnClickListener {
+                if (!isFastClick(it))
+                    startActivity(Intent(activity, DeviceScanActivity::class.java))
+            }
+        }
+        navigationTitle = view.findViewById<TextView>(R.id.navigation_header_title)
+            .apply { text = resources.getString(R.string.navigation_user) }
+        userHeaderIcon = view.findViewById<ImageView>(R.id.user_header_icon).apply {
+            setImageResource(R.mipmap.ic_launcher)
+        }
+        userHeaderInfo = view.findViewById<TextView>(R.id.user_header_info).apply {
+            text = "asdfasdfasdf"
+        }
     }
 
     companion object {

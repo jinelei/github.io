@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/navigation_header_container"
+        android:background="@color/colorForegroundColor"
+        android:paddingHorizontal="8dp"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/title_height_size">
+
+    <ImageView
+            android:scaleType="fitCenter"
+            android:id="@+id/navigation_header_left"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:paddingRight="8dp"
+            android:paddingVertical="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"/>
+
+    <TextView android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:textSize="@dimen/title_size"
+              android:layout_marginStart="8dp"
+              android:layout_marginEnd="8dp"
+              android:layout_marginTop="8dp"
+              android:layout_marginBottom="8dp"
+              app:layout_constraintEnd_toEndOf="parent"
+              app:layout_constraintStart_toStartOf="parent"
+              app:layout_constraintBottom_toBottomOf="parent"
+              app:layout_constraintTop_toTopOf="parent"
+              android:id="@+id/navigation_header_title"/>
+
+    <ImageView
+            android:scaleType="fitCenter"
+            android:id="@+id/navigation_header_right"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:paddingVertical="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintLeft_toRightOf="@id/navigation_header_title"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+</android.support.constraint.ConstraintLayout>
