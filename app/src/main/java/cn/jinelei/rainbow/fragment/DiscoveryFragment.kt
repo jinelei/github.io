@@ -21,63 +21,63 @@ class DiscoveryFragment : BaseFragment() {
             R.string.app_name,
             View.OnClickListener { Log.d(TAG, "discovery 1") }),
         DiscoveryCardAdapter.DiscoveryCardItem(
-            R.drawable.abc_cab_background_internal_bg,
+            R.mipmap.ws2812,
             R.string.app_name,
             View.OnClickListener { Log.d(TAG, "discovery 2") }),
         DiscoveryCardAdapter.DiscoveryCardItem(
-            R.drawable.abc_cab_background_internal_bg,
+            R.mipmap.ws2812,
             R.string.app_name,
             View.OnClickListener { Log.d(TAG, "discovery 3") }),
         DiscoveryCardAdapter.DiscoveryCardItem(
-            R.drawable.abc_cab_background_internal_bg,
+            R.mipmap.ws2812,
             R.string.app_name,
             View.OnClickListener { Log.d(TAG, "discovery 4") }),
         DiscoveryCardAdapter.DiscoveryCardItem(
-            R.drawable.abc_cab_background_internal_bg,
+            R.mipmap.ws2812,
             R.string.app_name,
             View.OnClickListener { Log.d(TAG, "discovery 5") }),
         DiscoveryCardAdapter.DiscoveryCardItem(
-            R.drawable.abc_cab_background_internal_bg,
+            R.mipmap.ws2812,
             R.string.app_name,
             View.OnClickListener { Log.d(TAG, "discovery 6") }),
         DiscoveryCardAdapter.DiscoveryCardItem(
-            R.drawable.abc_cab_background_internal_bg,
+            R.mipmap.ws2812,
             R.string.app_name,
             View.OnClickListener { Log.d(TAG, "discovery 7") }),
         DiscoveryCardAdapter.DiscoveryCardItem(
-            R.drawable.abc_cab_background_internal_bg,
+            R.mipmap.ws2812,
             R.string.app_name,
             View.OnClickListener { Log.d(TAG, "discovery 8") }),
         DiscoveryCardAdapter.DiscoveryCardItem(
-            R.drawable.abc_cab_background_internal_bg,
+            R.mipmap.ws2812,
             R.string.app_name,
             View.OnClickListener { Log.d(TAG, "discovery 9") }),
         DiscoveryCardAdapter.DiscoveryCardItem(
-            R.drawable.abc_cab_background_internal_bg,
+            R.mipmap.ws2812,
             R.string.app_name,
             View.OnClickListener { Log.d(TAG, "discovery 10") }),
         DiscoveryCardAdapter.DiscoveryCardItem(
-            R.drawable.abc_cab_background_internal_bg,
+            R.mipmap.ws2812,
             R.string.app_name,
             View.OnClickListener { Log.d(TAG, "discovery 11") }),
         DiscoveryCardAdapter.DiscoveryCardItem(
-            R.drawable.abc_cab_background_internal_bg,
+            R.mipmap.ws2812,
             R.string.app_name,
             View.OnClickListener { Log.d(TAG, "discovery 12") }),
         DiscoveryCardAdapter.DiscoveryCardItem(
-            R.drawable.abc_cab_background_internal_bg,
+            R.mipmap.ws2812,
             R.string.app_name,
             View.OnClickListener { Log.d(TAG, "discovery 13") }),
         DiscoveryCardAdapter.DiscoveryCardItem(
-            R.drawable.abc_cab_background_internal_bg,
+            R.mipmap.ws2812,
             R.string.app_name,
             View.OnClickListener { Log.d(TAG, "discovery 14") }),
         DiscoveryCardAdapter.DiscoveryCardItem(
-            R.drawable.abc_cab_background_internal_bg,
+            R.mipmap.ws2812,
             R.string.app_name,
             View.OnClickListener { Log.d(TAG, "discovery 15") }),
         DiscoveryCardAdapter.DiscoveryCardItem(
-            R.drawable.abc_cab_background_internal_bg,
+            R.mipmap.ws2812,
             R.string.app_name,
             View.OnClickListener { Log.d(TAG, "discovery 16") })
     )

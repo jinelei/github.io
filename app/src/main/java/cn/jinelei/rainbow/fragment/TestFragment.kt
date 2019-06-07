@@ -17,5 +17,4 @@ class TestFragment : BaseFragment() {
         return inflater.inflate(R.layout.fragment_test, container, false)
     }
 
-
 }

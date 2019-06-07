@@ -3,7 +3,12 @@ package cn.jinelei.rainbow.fragment
 import android.os.Bundle
 import android.support.v7.preference.ListPreference
 import android.support.v7.preference.PreferenceFragmentCompat
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.ImageView
 import cn.jinelei.rainbow.R
+import cn.jinelei.rainbow.activity.BaseActivity
 import cn.jinelei.rainbow.util.SharedPreUtil
 import cn.jinelei.rainbow.util.SharedPreUtil.Companion.KEY_DEBUG_FLAG
 

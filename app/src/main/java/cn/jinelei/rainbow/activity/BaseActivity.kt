@@ -27,13 +27,11 @@ import kotlin.collections.HashMap
 
 open class BaseActivity : AppCompatActivity() {
     var baseApplication: BaseApplication? = null
-    //    fragment管理器
-    protected var fragmentManager: FragmentManager? = null
-    protected var currentFragment: Fragment? = null
-    //    已经授权应该执行的任务
-    private val grantedPermRunnable = HashMap<Int, Runnable>()
-    //    拒绝授权应该执行的任务
-    private val deniedPermRunnable = HashMap<Int, Runnable>()
+    var fragmentManager: FragmentManager? = null    //    fragment管理器
+    var currentFragment: Fragment? = null // 当前的Fragment
+    var previewFragment: Fragment? = null // 上一个Fragment
+    val grantedPermRunnable = HashMap<Int, Runnable>()    //    已经授权应该执行的任务
+    val deniedPermRunnable = HashMap<Int, Runnable>()    //    拒绝授权应该执行的任务
 
     //    初始化数据
     private fun initData() {
@@ -203,7 +201,21 @@ open class BaseActivity : AppCompatActivity() {
                 } else {
                     it?.hide(currentFragment!!)?.add(containerId, targetFragment)?.commit()
                 }
+                previewFragment = currentFragment
                 currentFragment = targetFragment
+            }
+        }
+    }
+
+    fun restorePreviewFragment(recyclerCurrent: Boolean = false) {
+        if (previewFragment != null && currentFragment != null) {
+            fragmentManager?.beginTransaction().also {
+                it?.hide(currentFragment!!)?.show(previewFragment!!)?.commit()
+                if (recyclerCurrent) {
+                    previewFragment = currentFragment
+                } else {
+                    previewFragment = null
+                }
             }
         }
     }
