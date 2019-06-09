@@ -83,24 +83,21 @@ class DiscoveryFragment : BaseFragment() {
     )
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(R.layout.discovery_fragment, container, false)
-        initView(view)
-        return view
+        return inflater.inflate(R.layout.discovery_fragment, container, false).apply {
+            initView(this)
+        }
     }
 
     private fun initView(view: View) {
-        val recyclerView = view.findViewById<RecyclerView>(R.id.discovery_recyclerview)
-        recyclerView.layoutManager = LinearLayoutManager(activity)
-        recyclerView.adapter = DiscoveryCardAdapter(datas)
+        val recyclerView = view.findViewById<RecyclerView>(R.id.discovery_recyclerview).apply {
+            layoutManager = LinearLayoutManager(activity)
+            adapter = DiscoveryCardAdapter(datas)
+        }
     }
 
     companion object {
-        val instance = SingletonHolder.holder
+        val instance = DiscoveryFragment()
         val name = "DiscoveryFragment"
-    }
-
-    private object SingletonHolder {
-        val holder = DiscoveryFragment()
     }
 
     class DiscoveryCardAdapter(val data: ArrayList<DiscoveryCardItem>) :

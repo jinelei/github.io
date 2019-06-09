@@ -10,6 +10,7 @@ import org.greenrobot.eventbus.EventBus
 class MainService : Service() {
     companion object {
         val TAG: String = MainService::class.java.simpleName
+        val instance = MainService()
     }
 
     override fun onBind(intent: Intent): IBinder {
@@ -33,4 +34,5 @@ class MainService : Service() {
             }).start()
         }
     }
+
 }

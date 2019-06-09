@@ -21,4 +21,6 @@
     <string name="develop_mode">开发者选项</string>
     <string name="select_debug_level">选择调试级别</string>
     <string name="toast_level">提示级别</string>
+    <string name="change_language">切换语言</string>
+    <string name="add_device">添加设备</string>
 </resources>

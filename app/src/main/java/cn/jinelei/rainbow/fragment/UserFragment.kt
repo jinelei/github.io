@@ -1,7 +1,9 @@
 package cn.jinelei.rainbow.fragment
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
+import android.support.constraint.ConstraintLayout
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
@@ -12,11 +14,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import cn.jinelei.rainbow.activity.DeviceScanActivity
 import cn.jinelei.rainbow.R
-import cn.jinelei.rainbow.activity.BaseActivity
-import cn.jinelei.rainbow.activity.SetupActivity
 import cn.jinelei.rainbow.util.isFastClick
+import android.os.Build
+import cn.jinelei.rainbow.activity.*
+import cn.jinelei.rainbow.application.BaseApplication
+import cn.jinelei.rainbow.util.SharedPreUtil
+import java.util.*
 
 
 class UserFragment : BaseFragment() {
@@ -30,11 +34,21 @@ class UserFragment : BaseFragment() {
     var userHeaderInfo: TextView? = null
     val listMenu = arrayListOf(
         ListMenuItem(
-            View.OnClickListener { v ->
-                if (!isFastClick(v))
-                    startActivity(Intent(context, SetupActivity::class.java))
-            },
+            View.OnClickListener {
+                if (!isFastClick(it)) startActivity(
+                    Intent(
+                        context,
+                        ChangeLanguageActivity::class.java
+                    )
+                )
+            }, "切换语言",
+//            resources.getString(R.string.change_language),
+            R.mipmap.ic_language
+        ),
+        ListMenuItem(
+            View.OnClickListener { if (!isFastClick(it)) startActivity(Intent(context, SetupActivity::class.java)) },
             "首选项",
+//            resources.getString(R.string.preference),
             R.mipmap.ic_setup
         )
     )
@@ -64,11 +78,12 @@ class UserFragment : BaseFragment() {
             "error",
             R.mipmap.ic_test
         ),
-        ListMenuItem(View.OnClickListener { v ->
-            if (!isFastClick(v)) startActivity(
-                Intent(activity, DeviceScanActivity::class.java)
-            )
-        }, "添加设备", R.mipmap.ic_add)
+        ListMenuItem(
+            View.OnClickListener {
+                if (!isFastClick(it)) startActivity(Intent(activity, DeviceScanActivity::class.java))
+            },
+            "首选项", R.mipmap.ic_add
+        )
     )
 
     override fun onCreateView(
@@ -76,12 +91,12 @@ class UserFragment : BaseFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.user_fragment, container, false)
-        initView(view)
-        return view
+        return inflater.inflate(R.layout.user_fragment, container, false).apply {
+            initView(this)
+        }
     }
 
-    fun initView(view: View) {
+    private fun initView(view: View) {
         listRecyclerView = view.findViewById<RecyclerView>(R.id.list_menu_recycler_view).apply {
             setHasFixedSize(true)
             isNestedScrollingEnabled = false
@@ -97,10 +112,7 @@ class UserFragment : BaseFragment() {
         }
         rightBtn = view.findViewById<ImageView>(R.id.navigation_header_right).apply {
             setImageResource(R.mipmap.ic_add)
-            setOnClickListener {
-                if (!isFastClick(it))
-                    startActivity(Intent(activity, DeviceScanActivity::class.java))
-            }
+            setOnClickListener { if (!isFastClick(it)) startActivity(Intent(activity, DeviceScanActivity::class.java)) }
         }
         navigationTitle = view.findViewById<TextView>(R.id.navigation_header_title)
             .apply { text = resources.getString(R.string.navigation_user) }
@@ -110,15 +122,9 @@ class UserFragment : BaseFragment() {
         userHeaderInfo = view.findViewById<TextView>(R.id.user_header_info).apply {
             text = "asdfasdfasdf"
         }
-    }
-
-    companion object {
-        val instance = SingletonHolder.holder
-        val name = "UserFragment"
-    }
-
-    private object SingletonHolder {
-        val holder = UserFragment()
+        view.findViewById<ConstraintLayout>(R.id.user_info_layout).apply {
+            setOnClickListener { if (!isFastClick(it)) startActivity(Intent(context, UserInfoActivity::class.java)) }
+        }
     }
 
     class ListMenuItem(var callback: View.OnClickListener, var title: String, var resourceId: Int)
@@ -151,8 +157,13 @@ class UserFragment : BaseFragment() {
     class GridMenuViewAdapter(var data: List<ListMenuItem>) :
         RecyclerView.Adapter<GridMenuViewAdapter.GridMenuItemViewHolder>() {
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GridMenuItemViewHolder {
-            var view = LayoutInflater.from(parent.context).inflate(R.layout.grid_menu_layout, parent, false)
-            return GridMenuItemViewHolder(view)
+            return GridMenuItemViewHolder(
+                LayoutInflater.from(parent.context).inflate(
+                    R.layout.grid_menu_layout,
+                    parent,
+                    false
+                )
+            )
         }
 
         override fun getItemCount(): Int {
@@ -173,4 +184,8 @@ class UserFragment : BaseFragment() {
 
     }
 
+    companion object {
+        val instance = UserFragment()
+        val name = "UserFragment"
+    }
 }

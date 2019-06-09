@@ -36,4 +36,6 @@
         <item>6</item>
     </string-array>
     <integer name="default_debug_level_value">2</integer>
+    <string name="change_language">change language</string>
+    <string name="add_device">add device</string>
 </resources>

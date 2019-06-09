@@ -5,7 +5,9 @@ import android.app.NotificationManager
 import android.content.Context
 import android.content.pm.PackageManager
 import android.net.wifi.WifiManager
-import android.os.*
+import android.os.Build
+import android.os.Bundle
+import android.os.PersistableBundle
 import android.support.v4.app.ActivityCompat
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
@@ -18,12 +20,14 @@ import cn.jinelei.rainbow.R
 import cn.jinelei.rainbow.application.BaseApplication
 import cn.jinelei.rainbow.components.LoadingDialog
 import cn.jinelei.rainbow.util.SharedPreUtil
+import cn.jinelei.rainbow.util.attachBaseContext
 import cn.jinelei.rainbow.util.getCrc16
 import kotlinx.coroutines.*
-import java.lang.Runnable
 import java.nio.charset.Charset
+import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
+
 
 open class BaseActivity : AppCompatActivity() {
     //    加载中弹窗
@@ -129,6 +133,15 @@ open class BaseActivity : AppCompatActivity() {
         super.onRestoreInstanceState(savedInstanceState, persistentState)
         debug(Log.VERBOSE, Thread.currentThread().stackTrace[2].methodName)
     }
+//
+//    override fun attachBaseContext(newBase: Context) {
+//        super.attachBaseContext(attachBaseContext(newBase, language))
+//        val language = (applicationContext as BaseApplication).readPreference(
+//            name = SharedPreUtil.NAME_USER,
+//            key = SharedPreUtil.KEY_LANGUAGE,
+//            defaultValue = Locale.ENGLISH.language
+//        )
+//    }
 
     fun getTag(): String {
         return this.javaClass.simpleName
@@ -242,9 +255,12 @@ open class BaseActivity : AppCompatActivity() {
     }
 
 
-
     fun debug(level: Int, message: String) {
-        val debug: Int = SharedPreUtil.readPre(this, SharedPreUtil.NAME_USER, SharedPreUtil.KEY_DEBUG_FLAG, 0) as Int
+        val debug = (applicationContext as BaseApplication).readPreference(
+            name = SharedPreUtil.NAME_USER,
+            key = SharedPreUtil.KEY_DEBUG_FLAG,
+            defaultValue = 0
+        )
         when (level) {
             Log.VERBOSE -> Log.v(this.javaClass.simpleName, message)
             Log.DEBUG -> Log.d(this.javaClass.simpleName, message)

@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import cn.jinelei.rainbow.R
 import cn.jinelei.rainbow.activity.BaseActivity
+import cn.jinelei.rainbow.application.BaseApplication
 import cn.jinelei.rainbow.util.SharedPreUtil
 import cn.jinelei.rainbow.util.SharedPreUtil.Companion.KEY_DEBUG_FLAG
 
@@ -22,15 +23,22 @@ class SetupFragment : PreferenceFragmentCompat() {
 
     private fun initView() {
         debugPref = preferenceManager.findPreference(KEY_DEBUG_FLAG) as ListPreference
-        val debugLevel =
-            SharedPreUtil.readPre(context!!, SharedPreUtil.NAME_USER, SharedPreUtil.KEY_DEBUG_FLAG, 2) as Int
+        val debugLevel = (activity?.applicationContext as BaseApplication).readPreference(
+            name = SharedPreUtil.NAME_USER,
+            key = SharedPreUtil.KEY_DEBUG_FLAG,
+            defaultValue = 2
+        )
         updateDebugLevel(debugLevel)
     }
 
     private fun initData() {
         debugPref?.setOnPreferenceChangeListener { _, debugFlag ->
             updateDebugLevel((debugFlag as String).toInt())
-            SharedPreUtil.savePre(context!!, SharedPreUtil.NAME_USER, SharedPreUtil.KEY_DEBUG_FLAG, debugFlag)
+            (activity?.applicationContext as BaseApplication).savePreference(
+                name = SharedPreUtil.NAME_USER,
+                key = SharedPreUtil.KEY_DEBUG_FLAG,
+                defaultValue = debugFlag.toInt()
+            )
             true
         }
     }
@@ -48,10 +56,7 @@ class SetupFragment : PreferenceFragmentCompat() {
     }
 
     companion object {
-        val instance = SingletonHolder.holder
+        val instance = SetupFragment()
     }
 
-    private object SingletonHolder {
-        val holder = SetupFragment()
-    }
 }

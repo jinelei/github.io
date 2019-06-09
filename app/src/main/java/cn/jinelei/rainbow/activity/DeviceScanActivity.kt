@@ -83,12 +83,6 @@ class DeviceScanActivity : BaseActivity() {
 
     private fun detectWifi() {
         debug(Log.VERBOSE, "start detect wifi")
-        val builder: Notification.Builder = Notification.Builder(this)
-        builder.setSmallIcon(R.drawable.ic_launcher_foreground)
-        builder.setContentText("content")
-        builder.setContentTitle("title")
-        builder.setAutoCancel(true)
-        notificationManager?.notify(0x01, builder.build())
 
         showLoading()
         val scanResults = wifiManager?.scanResults ?: emptyList()
