@@ -1,4 +1,4 @@
-package cn.jinelei.rainbow.fragment
+package cn.jinelei.rainbow.ui.fragment
 
 
 import android.os.Bundle
@@ -6,7 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import cn.jinelei.rainbow.R
-import cn.jinelei.rainbow.custom.ColorPickerView
+import cn.jinelei.rainbow.base.BaseFragment
 
 class TestFragment : BaseFragment() {
 

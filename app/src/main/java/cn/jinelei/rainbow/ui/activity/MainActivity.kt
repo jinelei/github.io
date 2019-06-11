@@ -1,17 +1,17 @@
-package cn.jinelei.rainbow.activity
+package cn.jinelei.rainbow.ui.activity
 
 import android.Manifest
 import android.os.Bundle
-import android.support.design.widget.BottomNavigationView
 import android.util.Log
 import android.widget.TextView
 import android.widget.Toast
 import cn.jinelei.rainbow.R
-import cn.jinelei.rainbow.fragment.DiscoveryFragment
-import cn.jinelei.rainbow.fragment.HomeFragment
-import cn.jinelei.rainbow.fragment.UserFragment
-import cn.jinelei.rainbow.service.MainService
+import cn.jinelei.rainbow.base.BaseActivity
+import cn.jinelei.rainbow.ui.fragment.DiscoveryFragment
+import cn.jinelei.rainbow.ui.fragment.HomeFragment
+import cn.jinelei.rainbow.ui.fragment.UserFragment
 import com.amap.api.maps.MapView
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -19,7 +19,6 @@ import kotlinx.coroutines.launch
 class MainActivity : BaseActivity() {
     val TAG = javaClass.simpleName
     private var mMapView: MapView? = null
-    private var mainBinder: MainService.MainBinder? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,16 +28,16 @@ class MainActivity : BaseActivity() {
 
     private fun initView() {
         setContentView(R.layout.activity_main)
-        val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottom_navigation_view)
-        switchFragmentTo(R.id.main_frame, HomeFragment.instance)
-        bottomNavigationView.setOnNavigationItemSelectedListener { menuItem ->
+        val mBottomNavigationView = bnv_main
+        switchFragmentTo(R.id.frame_main, HomeFragment.instance)
+        mBottomNavigationView.setOnNavigationItemSelectedListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.navigation_home ->
-                    switchFragmentTo(R.id.main_frame, HomeFragment.instance)
+                    switchFragmentTo(R.id.frame_main, HomeFragment.instance)
                 R.id.navigation_user ->
-                    switchFragmentTo(R.id.main_frame, UserFragment.instance)
+                    switchFragmentTo(R.id.frame_main, UserFragment.instance)
                 R.id.navigation_discovery ->
-                    switchFragmentTo(R.id.main_frame, DiscoveryFragment.instance)
+                    switchFragmentTo(R.id.frame_main, DiscoveryFragment.instance)
                 else -> debug(Log.ERROR, "invalid switch fragment: ${menuItem.itemId}")
             }
             true

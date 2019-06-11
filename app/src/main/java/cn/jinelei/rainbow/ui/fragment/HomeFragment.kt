@@ -1,4 +1,4 @@
-package cn.jinelei.rainbow.fragment
+package cn.jinelei.rainbow.ui.fragment
 
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -9,8 +9,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import cn.jinelei.rainbow.R
-import android.view.Gravity
-import android.widget.TextView
+import cn.jinelei.rainbow.base.BaseFragment
+import kotlinx.android.synthetic.main.home_fragment.view.*
 
 class HomeFragment : BaseFragment() {
     val TAG = javaClass.simpleName
@@ -35,8 +35,8 @@ class HomeFragment : BaseFragment() {
     }
 
     fun initView(view: View) {
-        val homeViewPager = view.findViewById<ViewPager>(R.id.home_viewpager)
-        homeViewPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
+        val vpHome = view.vp_home
+        vpHome.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
             override fun onPageSelected(p0: Int) {
                 Log.v(TAG, "onPageSelected $p0")
             }
@@ -49,7 +49,7 @@ class HomeFragment : BaseFragment() {
                 Log.v(TAG, "onPageScrolled $p0 $p1 $p2")
             }
         })
-        homeViewPager.adapter = object : FragmentPagerAdapter(fragmentManager) {
+        vpHome.adapter = object : FragmentPagerAdapter(fragmentManager) {
             override fun getCount(): Int {
                 return fragments.size
             }

@@ -2,7 +2,7 @@
 <android.support.constraint.ConstraintLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/discovery_card_container"
+        android:id="@+id/layout_discovery_card"
         android:layout_margin="10dp"
         android:maxHeight="200dp"
         android:minHeight="200dp"
@@ -15,7 +15,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            android:id="@+id/discovery_card_image"
+            android:id="@+id/iv_background"
             android:scaleType="centerCrop"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
@@ -23,7 +23,7 @@
     <TextView
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
-            android:id="@+id/discovery_card_title"
+            android:id="@+id/tv_title"
             android:layout_gravity="left|top"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

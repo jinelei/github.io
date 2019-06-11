@@ -1,4 +1,4 @@
-package cn.jinelei.rainbow.message
+package cn.jinelei.rainbow.constant
 
 sealed class MessageEvent {}
 

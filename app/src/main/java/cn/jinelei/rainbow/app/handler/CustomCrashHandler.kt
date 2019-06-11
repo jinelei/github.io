@@ -1,4 +1,4 @@
-package cn.jinelei.rainbow.handler
+package cn.jinelei.rainbow.app.handler
 
 import android.os.Environment
 import android.util.Log

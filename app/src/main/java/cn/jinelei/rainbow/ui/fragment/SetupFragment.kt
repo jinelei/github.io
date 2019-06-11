@@ -1,42 +1,37 @@
-package cn.jinelei.rainbow.fragment
+package cn.jinelei.rainbow.ui.fragment
 
 import android.os.Bundle
 import android.support.v7.preference.ListPreference
 import android.support.v7.preference.PreferenceFragmentCompat
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.widget.ImageView
 import cn.jinelei.rainbow.R
-import cn.jinelei.rainbow.activity.BaseActivity
-import cn.jinelei.rainbow.application.BaseApplication
-import cn.jinelei.rainbow.util.SharedPreUtil
-import cn.jinelei.rainbow.util.SharedPreUtil.Companion.KEY_DEBUG_FLAG
+import cn.jinelei.rainbow.app.BaseApp
+import cn.jinelei.rainbow.constant.PRE_KEY_DEBUG
+import cn.jinelei.rainbow.constant.PRE_NAME_USER
 
 
 class SetupFragment : PreferenceFragmentCompat() {
-    private var debugPref: ListPreference? = null
+    private var lpDebug: ListPreference? = null
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.preference)
     }
 
     private fun initView() {
-        debugPref = preferenceManager.findPreference(KEY_DEBUG_FLAG) as ListPreference
-        val debugLevel = (activity?.applicationContext as BaseApplication).readPreference(
-            name = SharedPreUtil.NAME_USER,
-            key = SharedPreUtil.KEY_DEBUG_FLAG,
+        lpDebug = preferenceManager.findPreference(PRE_KEY_DEBUG) as ListPreference
+        val debugLevel = (activity?.applicationContext as BaseApp).readPreference(
+            name = PRE_NAME_USER,
+            key = PRE_KEY_DEBUG,
             defaultValue = 2
         )
         updateDebugLevel(debugLevel)
     }
 
     private fun initData() {
-        debugPref?.setOnPreferenceChangeListener { _, debugFlag ->
+        lpDebug?.setOnPreferenceChangeListener { _, debugFlag ->
             updateDebugLevel((debugFlag as String).toInt())
-            (activity?.applicationContext as BaseApplication).savePreference(
-                name = SharedPreUtil.NAME_USER,
-                key = SharedPreUtil.KEY_DEBUG_FLAG,
+            (activity?.applicationContext as BaseApp).savePreference(
+                name = PRE_NAME_USER,
+                key = PRE_KEY_DEBUG,
                 defaultValue = debugFlag.toInt()
             )
             true
@@ -46,7 +41,7 @@ class SetupFragment : PreferenceFragmentCompat() {
     private fun updateDebugLevel(debugLevel: Int) {
         val debugArray = resources.getStringArray(R.array.debug_level)
         val debugArrayValue = resources.getStringArray(R.array.debug_level_value)
-        debugPref?.summary = debugArray[debugArrayValue.indexOf(debugLevel.toString())]
+        lpDebug?.summary = debugArray[debugArrayValue.indexOf(debugLevel.toString())]
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

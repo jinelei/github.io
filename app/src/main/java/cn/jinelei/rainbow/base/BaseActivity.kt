@@ -1,4 +1,4 @@
-package cn.jinelei.rainbow.activity
+package cn.jinelei.rainbow.base
 
 import android.app.AlertDialog
 import android.app.NotificationManager
@@ -17,14 +17,13 @@ import android.util.Log
 import android.widget.TextView
 import android.widget.Toast
 import cn.jinelei.rainbow.R
-import cn.jinelei.rainbow.application.BaseApplication
-import cn.jinelei.rainbow.components.LoadingDialog
-import cn.jinelei.rainbow.util.SharedPreUtil
-import cn.jinelei.rainbow.util.attachBaseContext
+import cn.jinelei.rainbow.app.BaseApp
+import cn.jinelei.rainbow.constant.PRE_KEY_DEBUG
+import cn.jinelei.rainbow.constant.PRE_NAME_USER
+import cn.jinelei.rainbow.ui.view.LoadingDialog
 import cn.jinelei.rainbow.util.getCrc16
 import kotlinx.coroutines.*
 import java.nio.charset.Charset
-import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
@@ -42,7 +41,7 @@ open class BaseActivity : AppCompatActivity() {
     var alertDialogBuilder: AlertDialog.Builder? = null
     //    默认隐藏加载中弹窗的超时时间
     val DEFAULT_HIDE_LOADING_TIMEOUT = 10000L
-    var baseApplication: BaseApplication? = null
+    var baseApp: BaseApp? = null
     var fragmentManager: FragmentManager? = null    //    fragment管理器
     var currentFragment: Fragment? = null // 当前的Fragment
     var previewFragment: Fragment? = null // 上一个Fragment
@@ -56,14 +55,14 @@ open class BaseActivity : AppCompatActivity() {
         notificationManager = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         alertDialogBuilder = AlertDialog.Builder(this)
         fragmentManager = supportFragmentManager
-        baseApplication = this.application as BaseApplication
+        baseApp = this.application as BaseApp
     }
 
     //    销毁相关数据
     private fun destoryData() {
         grantedPermRunnable.clear()
         deniedPermRunnable.clear()
-        baseApplication = null
+        baseApp = null
         loadingDialog?.dismiss()
         loadingDialog = null
         loadingDialogTimeoutJob = null
@@ -136,9 +135,9 @@ open class BaseActivity : AppCompatActivity() {
 //
 //    override fun attachBaseContext(newBase: Context) {
 //        super.attachBaseContext(attachBaseContext(newBase, language))
-//        val language = (applicationContext as BaseApplication).readPreference(
-//            name = SharedPreUtil.NAME_USER,
-//            key = SharedPreUtil.KEY_LANGUAGE,
+//        val language = (applicationContext as BaseApp).readPreference(
+//            name = PRE_NAME_USER,
+//            key = PRE_KEY_LANGUAGE,
 //            defaultValue = Locale.ENGLISH.language
 //        )
 //    }
@@ -256,9 +255,9 @@ open class BaseActivity : AppCompatActivity() {
 
 
     fun debug(level: Int, message: String) {
-        val debug = (applicationContext as BaseApplication).readPreference(
-            name = SharedPreUtil.NAME_USER,
-            key = SharedPreUtil.KEY_DEBUG_FLAG,
+        val debug = (applicationContext as BaseApp).readPreference(
+            name = PRE_NAME_USER,
+            key = PRE_KEY_DEBUG,
             defaultValue = 0
         )
         when (level) {

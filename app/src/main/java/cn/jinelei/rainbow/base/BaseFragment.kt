@@ -1,4 +1,4 @@
-package cn.jinelei.rainbow.fragment
+package cn.jinelei.rainbow.base
 
 import android.content.Context
 import android.os.Bundle

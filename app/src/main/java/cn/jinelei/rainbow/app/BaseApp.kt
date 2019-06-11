@@ -1,23 +1,12 @@
-package cn.jinelei.rainbow.application
+package cn.jinelei.rainbow.app
 
-import android.app.AlertDialog
 import android.app.Application
-import android.app.NotificationManager
 import android.content.Context
-import android.net.wifi.WifiManager
-import android.support.v4.app.Fragment
-import android.support.v4.app.FragmentManager
-import android.util.Log
-import android.widget.Toast
 import cn.jinelei.rainbow.BuildConfig
-import cn.jinelei.rainbow.components.LoadingDialog
-import cn.jinelei.rainbow.handler.CustomCrashHandler
-import cn.jinelei.rainbow.util.SharedPreUtil
+import cn.jinelei.rainbow.app.handler.CustomCrashHandler
 import com.facebook.stetho.Stetho
-import kotlinx.coroutines.*
-import java.lang.Runnable
 
-class BaseApplication : Application() {
+class BaseApp : Application() {
 
     private fun initData() {
     }
@@ -66,6 +55,6 @@ class BaseApplication : Application() {
     }
 
     companion object {
-        val instace = BaseApplication()
+        val instace = BaseApp()
     }
 }

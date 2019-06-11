@@ -6,7 +6,7 @@
         android:background="@color/colorForegroundColor"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".fragment.TestFragment">
+        tools:context=".ui.fragment.TestFragment">
 
     <TextView
             app:layout_constraintTop_toTopOf="parent"
