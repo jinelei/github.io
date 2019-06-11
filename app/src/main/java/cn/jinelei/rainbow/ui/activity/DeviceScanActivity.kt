@@ -2,7 +2,6 @@ package cn.jinelei.rainbow.ui.activity
 
 import android.Manifest
 import android.content.Intent
-import android.net.wifi.ScanResult
 import android.net.wifi.WifiInfo
 import android.os.Bundle
 import android.provider.Settings
@@ -11,9 +10,7 @@ import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.Log
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -24,7 +21,6 @@ import cn.jinelei.rainbow.ui.common.BaseRecyclerAdapter
 import kotlinx.android.synthetic.main.activity_device_scan.*
 import kotlinx.android.synthetic.main.include_top_navigation.*
 import kotlinx.android.synthetic.main.wifi_info_layout.*
-import kotlinx.android.synthetic.main.wifi_info_layout.view.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -34,11 +30,11 @@ import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 
 class DeviceScanActivity : BaseActivity() {
-    private var rvDeviceScanResult: RecyclerView? = null
-    private var tvDeviceScanInfoNothing: TextView? = null
-    private var tvDeviceScanTitle: TextView? = null
-    private var ivDeviceScanBtn: ImageView? = null
-    private var ivBackBtn: ImageView? = null
+    private lateinit var rvDeviceScanResult: RecyclerView
+    private lateinit var tvDeviceScanInfoNothing: TextView
+    private lateinit var tvDeviceScanTitle: TextView
+    private lateinit var ivDeviceScanBtn: ImageView
+    private lateinit var ivBackBtn: ImageView
     private var mWifiInfo: WifiInfo? = null
     private var bScanFinished = true
 
@@ -52,7 +48,7 @@ class DeviceScanActivity : BaseActivity() {
     }
 
     private fun initData() {
-        mWifiInfo = wifiManager?.connectionInfo
+        mWifiInfo = mWifiManager.connectionInfo
     }
 
     private fun initView() {
@@ -67,17 +63,17 @@ class DeviceScanActivity : BaseActivity() {
                 )
             )
         }
-        tvDeviceScanTitle = tv_title.apply {
+        tvDeviceScanTitle = tv_nav_title.apply {
             text = resources.getString(R.string.scan_device)
         }
-        ivDeviceScanBtn = iv_right.apply {
+        ivDeviceScanBtn = iv_nav_right.apply {
             setImageResource(R.mipmap.ic_discovery)
             setOnClickListener { scanDevice() }
         }
         tvDeviceScanInfoNothing = tv_device_scan_info_nothing.apply {
             setOnClickListener { scanDevice() }
         }
-        ivBackBtn = iv_left.apply {
+        ivBackBtn = iv_nav_left.apply {
             setImageResource(R.mipmap.ic_back)
             setOnClickListener { finish() }
         }
@@ -86,8 +82,8 @@ class DeviceScanActivity : BaseActivity() {
     private fun detectWifi() {
         debug(Log.VERBOSE, "start detect wifi")
         showLoading()
-        val scanResults = wifiManager?.scanResults ?: emptyList()
-        rvDeviceScanResult?.apply {
+        val scanResults = mWifiManager.scanResults
+        rvDeviceScanResult.apply {
             if (scanResults.size == 0) {
                 this.visibility = View.INVISIBLE
             } else {
@@ -110,11 +106,10 @@ class DeviceScanActivity : BaseActivity() {
                 }
             }
         }
-        tvDeviceScanInfoNothing.apply {
-            if (scanResults.size == 0) {
-                this?.visibility = View.VISIBLE
-            } else {
-                this?.visibility = View.INVISIBLE
+        tvDeviceScanInfoNothing.let {
+            it.visibility = when (scanResults.size) {
+                0 -> View.VISIBLE
+                else -> View.INVISIBLE
             }
         }
         GlobalScope.launch(Dispatchers.IO) {
@@ -125,7 +120,7 @@ class DeviceScanActivity : BaseActivity() {
     }
 
     private fun scanDevice() {
-        if (wifiManager?.isWifiEnabled == true) {
+        if (mWifiManager.isWifiEnabled) {
             customRequestPermission(
                 listOf(
                     Manifest.permission.ACCESS_NETWORK_STATE,
@@ -159,8 +154,8 @@ class DeviceScanActivity : BaseActivity() {
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun updateView(event: WifiScanMessageEvent) {
         when (event.finish) {
-            true -> tvDeviceScanTitle?.text = getString(R.string.scan_device)
-            false -> tvDeviceScanTitle?.text = getString(R.string.scan_device_wait)
+            true -> tvDeviceScanTitle.text = getString(R.string.scan_device)
+            false -> tvDeviceScanTitle.text = getString(R.string.scan_device_wait)
         }
     }
 

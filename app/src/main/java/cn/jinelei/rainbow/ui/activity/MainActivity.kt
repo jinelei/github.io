@@ -18,7 +18,6 @@ import kotlinx.coroutines.launch
 
 class MainActivity : BaseActivity() {
     val TAG = javaClass.simpleName
-    private var mMapView: MapView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,7 +65,6 @@ class MainActivity : BaseActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        mMapView?.onDestroy()
     }
 
     override fun onResume() {

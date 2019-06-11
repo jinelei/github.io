@@ -10,7 +10,7 @@ import cn.jinelei.rainbow.constant.PRE_NAME_USER
 
 
 class SetupFragment : PreferenceFragmentCompat() {
-    private var lpDebug: ListPreference? = null
+    private lateinit var lpDebug: ListPreference
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.preference)
@@ -27,7 +27,7 @@ class SetupFragment : PreferenceFragmentCompat() {
     }
 
     private fun initData() {
-        lpDebug?.setOnPreferenceChangeListener { _, debugFlag ->
+        lpDebug.setOnPreferenceChangeListener { _, debugFlag ->
             updateDebugLevel((debugFlag as String).toInt())
             (activity?.applicationContext as BaseApp).savePreference(
                 name = PRE_NAME_USER,
@@ -41,7 +41,7 @@ class SetupFragment : PreferenceFragmentCompat() {
     private fun updateDebugLevel(debugLevel: Int) {
         val debugArray = resources.getStringArray(R.array.debug_level)
         val debugArrayValue = resources.getStringArray(R.array.debug_level_value)
-        lpDebug?.summary = debugArray[debugArrayValue.indexOf(debugLevel.toString())]
+        lpDebug.summary = debugArray[debugArrayValue.indexOf(debugLevel.toString())]
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

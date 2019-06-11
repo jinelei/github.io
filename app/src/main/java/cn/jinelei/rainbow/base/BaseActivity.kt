@@ -18,6 +18,7 @@ import android.widget.TextView
 import android.widget.Toast
 import cn.jinelei.rainbow.R
 import cn.jinelei.rainbow.app.BaseApp
+import cn.jinelei.rainbow.constant.DEFAULT_HIDE_LOADING_TIMEOUT
 import cn.jinelei.rainbow.constant.PRE_KEY_DEBUG
 import cn.jinelei.rainbow.constant.PRE_NAME_USER
 import cn.jinelei.rainbow.ui.view.LoadingDialog
@@ -29,45 +30,38 @@ import kotlin.collections.HashMap
 
 
 open class BaseActivity : AppCompatActivity() {
-    //    加载中弹窗
-    var loadingDialog: LoadingDialog? = null
-    //    自动隐藏加载中弹窗
-    var loadingDialogTimeoutJob: Job? = null
-    //    wifi管理器
-    var wifiManager: WifiManager? = null
-    //    通知管理器
-    var notificationManager: NotificationManager? = null
-    //    请求权限的弹窗
-    var alertDialogBuilder: AlertDialog.Builder? = null
-    //    默认隐藏加载中弹窗的超时时间
-    val DEFAULT_HIDE_LOADING_TIMEOUT = 10000L
-    var baseApp: BaseApp? = null
-    var fragmentManager: FragmentManager? = null    //    fragment管理器
+    lateinit var mBaseApp: BaseApp
+    // 公共的管理器
+    lateinit var mWifiManager: WifiManager    //    wifi管理器
+    lateinit var mNotificationManager: NotificationManager    //    通知管理器
+    // 弹窗相关
+    private lateinit var loadingDialog: LoadingDialog    //    加载中弹窗
+    lateinit var alertDialogBuilder: AlertDialog.Builder    //    请求权限的弹窗
+    private var loadingDialogTimeoutJob: Job? = null    //    自动隐藏加载中弹窗
+    // Fragment相关
+    lateinit var fragmentManager: FragmentManager    //    fragment管理器
     var currentFragment: Fragment? = null // 当前的Fragment
     var previewFragment: Fragment? = null // 上一个Fragment
-    val grantedPermRunnable = HashMap<Int, Runnable>()    //    已经授权应该执行的任务
-    val deniedPermRunnable = HashMap<Int, Runnable>()    //    拒绝授权应该执行的任务
+    //权限相关
+    private val grantedPermRunnable = HashMap<Int, Runnable>()    //    已经授权应该执行的任务
+    private val deniedPermRunnable = HashMap<Int, Runnable>()    //    拒绝授权应该执行的任务
 
     //    初始化数据
     private fun initData() {
         loadingDialog = LoadingDialog(this)
-        wifiManager = applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
-        notificationManager = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        mWifiManager = applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+        mNotificationManager = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         alertDialogBuilder = AlertDialog.Builder(this)
         fragmentManager = supportFragmentManager
-        baseApp = this.application as BaseApp
+        mBaseApp = this.application as BaseApp
     }
 
     //    销毁相关数据
-    private fun destoryData() {
+    private fun destroyData() {
         grantedPermRunnable.clear()
         deniedPermRunnable.clear()
-        baseApp = null
-        loadingDialog?.dismiss()
-        loadingDialog = null
+        loadingDialog.dismiss()
         loadingDialogTimeoutJob = null
-        wifiManager = null
-        notificationManager = null
     }
 
     override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
@@ -110,7 +104,7 @@ open class BaseActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         debug(Log.VERBOSE, Thread.currentThread().stackTrace[2].methodName)
-        destoryData()
+        destroyData()
     }
 
     override fun onSaveInstanceState(outState: Bundle?, outPersistentState: PersistableBundle?) {
@@ -131,19 +125,6 @@ open class BaseActivity : AppCompatActivity() {
     override fun onRestoreInstanceState(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
         super.onRestoreInstanceState(savedInstanceState, persistentState)
         debug(Log.VERBOSE, Thread.currentThread().stackTrace[2].methodName)
-    }
-//
-//    override fun attachBaseContext(newBase: Context) {
-//        super.attachBaseContext(attachBaseContext(newBase, language))
-//        val language = (applicationContext as BaseApp).readPreference(
-//            name = PRE_NAME_USER,
-//            key = PRE_KEY_LANGUAGE,
-//            defaultValue = Locale.ENGLISH.language
-//        )
-//    }
-
-    fun getTag(): String {
-        return this.javaClass.simpleName
     }
 
     protected fun customRequestPermission(
@@ -181,7 +162,7 @@ open class BaseActivity : AppCompatActivity() {
             val textView = TextView(this)
             textView.text = needUserAgreePermission.reduce { acc, s -> "$acc\n$s" }
             GlobalScope.launch(Dispatchers.Main) {
-                alertDialogBuilder?.setTitle(getString(R.string.please_grant_application_permission))
+                alertDialogBuilder.setTitle(getString(R.string.please_grant_application_permission))
                     ?.setView(textView)
                     ?.setPositiveButton(getString(R.string.ok)) { _, _ ->
                         requestPermissions(
@@ -219,20 +200,20 @@ open class BaseActivity : AppCompatActivity() {
             "${currentFragment?.javaClass?.simpleName} to ${targetFragment::class.java.simpleName}"
         )
         if (currentFragment == null) {
-            fragmentManager?.beginTransaction().also {
+            fragmentManager.beginTransaction().also {
                 if (targetFragment.isAdded) {
-                    it?.show(targetFragment)?.commit()
+                    it.show(targetFragment).commit()
                 } else {
-                    it?.add(containerId, targetFragment)?.commit()
+                    it.add(containerId, targetFragment).commit()
                 }
                 currentFragment = targetFragment
             }
         } else if (currentFragment != targetFragment) {
-            fragmentManager?.beginTransaction().also {
+            fragmentManager.beginTransaction().also {
                 if (targetFragment.isAdded) {
-                    it?.hide(currentFragment!!)?.show(targetFragment)?.commit()
+                    it.hide(currentFragment!!).show(targetFragment).commit()
                 } else {
-                    it?.hide(currentFragment!!)?.add(containerId, targetFragment)?.commit()
+                    it.hide(currentFragment!!).add(containerId, targetFragment).commit()
                 }
                 previewFragment = currentFragment
                 currentFragment = targetFragment
@@ -242,8 +223,8 @@ open class BaseActivity : AppCompatActivity() {
 
     fun restorePreviewFragment(recyclerCurrent: Boolean = false) {
         if (previewFragment != null && currentFragment != null) {
-            fragmentManager?.beginTransaction().also {
-                it?.hide(currentFragment!!)?.show(previewFragment!!)?.commit()
+            fragmentManager.beginTransaction().also {
+                it.hide(currentFragment!!).show(previewFragment!!).commit()
                 if (recyclerCurrent) {
                     previewFragment = currentFragment
                 } else {
@@ -252,7 +233,6 @@ open class BaseActivity : AppCompatActivity() {
             }
         }
     }
-
 
     fun debug(level: Int, message: String) {
         val debug = (applicationContext as BaseApp).readPreference(
@@ -271,7 +251,7 @@ open class BaseActivity : AppCompatActivity() {
             toast(message)
     }
 
-    fun toast(message: String) {
+    private fun toast(message: String) {
         GlobalScope.launch(Dispatchers.Main) {
             Toast.makeText(this@BaseActivity, message, Toast.LENGTH_SHORT).show()
         }
@@ -279,17 +259,17 @@ open class BaseActivity : AppCompatActivity() {
 
     fun showLoading(timeout: Long = DEFAULT_HIDE_LOADING_TIMEOUT) {
         GlobalScope.launch(Dispatchers.Main) {
-            if (loadingDialog?.isShowing == false) {
+            if (!loadingDialog.isShowing) {
                 debug(Log.VERBOSE, "show loading dialog and set timeout: $timeout")
-                loadingDialog?.show()
+                loadingDialog.show()
             }
         }
         loadingDialogTimeoutJob = GlobalScope.launch(Dispatchers.Default) {
             delay(timeout)
             GlobalScope.launch(Dispatchers.Main) {
-                if (loadingDialog?.isShowing == true) {
+                if (loadingDialog.isShowing) {
                     debug(Log.VERBOSE, "dismiss loading dialog in timeout job")
-                    loadingDialog?.dismiss()
+                    loadingDialog.dismiss()
                 }
             }
         }
@@ -297,9 +277,9 @@ open class BaseActivity : AppCompatActivity() {
 
     fun hideLoading() {
         GlobalScope.launch(Dispatchers.Main) {
-            if (loadingDialog?.isShowing == true) {
+            if (loadingDialog.isShowing) {
                 debug(Log.VERBOSE, "dismiss loading dialog")
-                loadingDialog?.dismiss()
+                loadingDialog.dismiss()
             }
         }
         if (loadingDialogTimeoutJob?.isActive == true) {

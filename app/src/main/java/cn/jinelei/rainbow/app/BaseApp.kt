@@ -1,18 +1,20 @@
 package cn.jinelei.rainbow.app
 
+import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Context
 import cn.jinelei.rainbow.BuildConfig
 import cn.jinelei.rainbow.app.handler.CustomCrashHandler
 import com.facebook.stetho.Stetho
 
+@Suppress("UNCHECKED_CAST")
 class BaseApp : Application() {
 
     private fun initData() {
     }
 
     //    销毁相关数据
-    private fun destoryData() {
+    private fun destroyData() {
     }
 
 
@@ -27,7 +29,7 @@ class BaseApp : Application() {
 
     override fun onTerminate() {
         super.onTerminate()
-        destoryData()
+        destroyData()
     }
 
     fun <T> readPreference(name: String, key: String, defaultValue: T): T {
@@ -42,6 +44,7 @@ class BaseApp : Application() {
         }
     }
 
+    @SuppressLint("ApplySharedPref")
     fun <T> savePreference(name: String, key: String, defaultValue: T) {
         val preference = getSharedPreferences(name, Context.MODE_PRIVATE)
         when (defaultValue) {

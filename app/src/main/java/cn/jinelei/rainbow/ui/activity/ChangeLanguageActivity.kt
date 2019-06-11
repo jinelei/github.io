@@ -15,7 +15,7 @@ import cn.jinelei.rainbow.constant.PRE_NAME_USER
 import cn.jinelei.rainbow.ui.common.BaseRecyclerAdapter
 import kotlinx.android.synthetic.main.activity_change_language.*
 import kotlinx.android.synthetic.main.include_top_navigation.*
-import kotlinx.android.synthetic.main.include_top_navigation.tv_title
+import kotlinx.android.synthetic.main.include_top_navigation.tv_nav_title
 import kotlinx.android.synthetic.main.language_item_layout.*
 import java.util.*
 import java.util.function.Consumer
@@ -70,7 +70,7 @@ class ChangeLanguageActivity : AppCompatActivity() {
         )
         iCurrentLocaleIdx =
             allSupportLocales.indexOfFirst { languageItem -> languageItem.locale.equals(sLanguage) }
-        val rvLanguage = this.rv_language.apply {
+        this.rv_language.apply {
             layoutManager = LinearLayoutManager(this@ChangeLanguageActivity)
             adapter = BaseRecyclerAdapter(
                 itemLayoutId = R.layout.language_item_layout,
@@ -78,7 +78,7 @@ class ChangeLanguageActivity : AppCompatActivity() {
             ) {
                 onBindViewHolder { holder, position ->
                     holder.iv_icon.setImageResource(getItem(position).resId)
-                    holder.tv_title.text = getItem(position).locale
+                    holder.tv_nav_title.text = getItem(position).locale
                     holder.layout_language_item.setOnClickListener { getItem(position).callback.accept(getItem(position).locale) }
                     holder.iv_rta.visibility = when (iCurrentLocaleIdx == position) {
                         true -> VISIBLE
@@ -87,15 +87,11 @@ class ChangeLanguageActivity : AppCompatActivity() {
                 }
             }
         }
-        tv_title.text = resources.getString(R.string.change_language)
-        iv_left.apply {
+        tv_nav_title.text = resources.getString(R.string.change_language)
+        iv_nav_left.apply {
             setImageResource(R.mipmap.ic_back)
             setOnClickListener { finish() }
         }
-    }
-
-    override fun onResume() {
-        super.onResume()
     }
 
     class LanguageItem(val resId: Int, val locale: String, val callback: Consumer<String>) {}

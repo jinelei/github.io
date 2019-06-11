@@ -5,13 +5,13 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:paddingVertical="5dp"
         android:paddingHorizontal="8dp"
-        android:id="@+id/layout_grid_menu"
+        android:id="@+id/layout_list_menu"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
     <!--列表图标-->
     <ImageView
-            android:id="@+id/iv_icon"
+            android:id="@+id/iv_list_item_icon"
             android:layout_width="@dimen/icon_size"
             android:layout_height="@dimen/icon_size"
             app:layout_constraintTop_toTopOf="parent"
@@ -22,7 +22,7 @@
 
     <!--标题-->
     <TextView
-            android:id="@+id/tv_title"
+            android:id="@+id/tv_list_item_title"
             app:layout_constraintLeft_toRightOf="@id/iv_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -34,7 +34,7 @@
 
     <!--更多-->
     <ImageView
-            android:id="@+id/iv_rta"
+            android:id="@+id/iv_list_item_rta"
             android:layout_width="@dimen/icon_size"
             android:layout_height="@dimen/icon_size"
             android:layout_marginTop="8dp"

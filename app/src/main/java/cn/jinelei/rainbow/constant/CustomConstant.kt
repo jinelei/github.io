@@ -1,5 +1,7 @@
 package cn.jinelei.rainbow.constant
 
+//    默认隐藏加载中弹窗的超时时间
+val DEFAULT_HIDE_LOADING_TIMEOUT = 10000L
 
 //权限请求码
 const val REQUEST_CODE_ACCESS_WIFI_STATE = 0x01

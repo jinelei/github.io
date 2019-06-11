@@ -16,11 +16,11 @@ class SetupActivity : BaseActivity() {
 
     fun initView() {
         setContentView(R.layout.activity_setup)
-        fragmentManager?.beginTransaction()?.add(R.id.frame_setup, SetupFragment.instance)?.commit()
-        iv_left.apply {
+        fragmentManager.beginTransaction().add(R.id.frame_setup, SetupFragment.instance).commit()
+        iv_nav_left.apply {
             this.setImageResource(R.mipmap.ic_back)
-            this.setOnClickListener { _: View? -> finish() }
+            this.setOnClickListener { finish() }
         }
-        tv_title.text = resources.getString(R.string.preference)
+        tv_nav_title.text = resources.getString(R.string.preference)
     }
 }

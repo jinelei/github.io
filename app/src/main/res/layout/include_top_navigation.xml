@@ -10,7 +10,7 @@
 
     <ImageView
             android:scaleType="fitCenter"
-            android:id="@+id/iv_left"
+            android:id="@+id/iv_nav_left"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:paddingRight="8dp"
@@ -30,17 +30,17 @@
               app:layout_constraintStart_toStartOf="parent"
               app:layout_constraintBottom_toBottomOf="parent"
               app:layout_constraintTop_toTopOf="parent"
-              android:id="@+id/tv_title"/>
+              android:id="@+id/tv_nav_title"/>
 
     <ImageView
             android:scaleType="fitCenter"
-            android:id="@+id/iv_right"
+            android:id="@+id/iv_nav_right"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:paddingVertical="8dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintLeft_toRightOf="@id/tv_title"
+            app:layout_constraintLeft_toRightOf="@id/tv_nav_title"
             app:layout_constraintEnd_toEndOf="parent"/>
 
 </android.support.constraint.ConstraintLayout>

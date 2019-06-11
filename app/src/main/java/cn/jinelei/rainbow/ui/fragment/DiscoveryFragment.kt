@@ -13,7 +13,7 @@ import kotlinx.android.synthetic.main.discovery_card_layout.*
 import kotlinx.android.synthetic.main.discovery_fragment.view.*
 
 class DiscoveryFragment : BaseFragment() {
-    val TAG = javaClass.simpleName
+    private val TAG = javaClass.simpleName
     private val mDataSet: MutableList<DiscoveryCardItem> = mutableListOf()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -134,7 +134,7 @@ class DiscoveryFragment : BaseFragment() {
             ) {
                 onBindViewHolder { holder, position ->
                     if (getItem(position).titleRes!! > 0)
-                        holder.tv_title.text = getString(getItem(position).titleRes!!)
+                        holder.tv_nav_title.text = getString(getItem(position).titleRes!!)
                     if (getItem(position).backgroundRes!! > 0)
                         holder.iv_background.setImageResource(getItem(position).backgroundRes!!)
                     if (getItem(position).callback!! != null)

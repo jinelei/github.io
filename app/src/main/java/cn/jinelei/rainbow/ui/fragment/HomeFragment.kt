@@ -13,7 +13,7 @@ import cn.jinelei.rainbow.base.BaseFragment
 import kotlinx.android.synthetic.main.home_fragment.view.*
 
 class HomeFragment : BaseFragment() {
-    val TAG = javaClass.simpleName
+    private val TAG = javaClass.simpleName
     val fragments: ArrayList<Fragment> = arrayListOf(
         TestFragment(),
         TestFragment(),
@@ -29,35 +29,37 @@ class HomeFragment : BaseFragment() {
         }
     }
 
+    private fun initView(view: View) {
+        view.vp_home.apply {
+            addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
+                override fun onPageSelected(p0: Int) {
+                    Log.v(TAG, "onPageSelected $p0")
+                }
+
+                override fun onPageScrollStateChanged(p0: Int) {
+                    Log.v(TAG, "onPageScrollStateChanged $p0")
+                }
+
+                override fun onPageScrolled(p0: Int, p1: Float, p2: Int) {
+                    Log.v(TAG, "onPageScrolled $p0 $p1 $p2")
+                }
+            })
+            adapter = object : FragmentPagerAdapter(fragmentManager) {
+                override fun getCount(): Int {
+                    return fragments.size
+                }
+
+                override fun getItem(p0: Int): Fragment {
+                    return fragments[p0]
+                }
+            }
+        }
+    }
+
     companion object {
         val instance = HomeFragment()
         val name = "HomeFragment"
-    }
 
-    fun initView(view: View) {
-        val vpHome = view.vp_home
-        vpHome.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
-            override fun onPageSelected(p0: Int) {
-                Log.v(TAG, "onPageSelected $p0")
-            }
-
-            override fun onPageScrollStateChanged(p0: Int) {
-                Log.v(TAG, "onPageScrollStateChanged $p0")
-            }
-
-            override fun onPageScrolled(p0: Int, p1: Float, p2: Int) {
-                Log.v(TAG, "onPageScrolled $p0 $p1 $p2")
-            }
-        })
-        vpHome.adapter = object : FragmentPagerAdapter(fragmentManager) {
-            override fun getCount(): Int {
-                return fragments.size
-            }
-
-            override fun getItem(p0: Int): Fragment {
-                return fragments[p0]
-            }
-        }
     }
 
 }
