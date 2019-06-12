@@ -2,18 +2,17 @@ package cn.jinelei.rainbow.ui.activity
 
 import android.Manifest
 import android.content.Intent
+import android.net.Uri
+import android.net.wifi.ScanResult
 import android.net.wifi.WifiInfo
 import android.os.Bundle
 import android.provider.Settings
-import android.support.v7.app.AlertDialog
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.View
-import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import cn.jinelei.rainbow.R
 import cn.jinelei.rainbow.base.BaseActivity
 import cn.jinelei.rainbow.constant.WifiScanMessageEvent
@@ -29,17 +28,12 @@ import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 
+
 class DeviceScanActivity : BaseActivity() {
     private lateinit var rvDeviceScanResult: RecyclerView
     private lateinit var tvDeviceScanInfoNothing: TextView
     private lateinit var tvDeviceScanTitle: TextView
-    private lateinit var ivDeviceScanBtn: ImageView
-    private lateinit var ivBackBtn: ImageView
     private var mWifiInfo: WifiInfo? = null
-    private var bScanFinished = true
-
-    val START_SCAN_WIFI = 1
-    val STOP_SCAN_WIFI = 2
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,14 +60,14 @@ class DeviceScanActivity : BaseActivity() {
         tvDeviceScanTitle = tv_nav_title.apply {
             text = resources.getString(R.string.scan_device)
         }
-        ivDeviceScanBtn = iv_nav_right.apply {
-            setImageResource(R.mipmap.ic_discovery)
-            setOnClickListener { scanDevice() }
-        }
         tvDeviceScanInfoNothing = tv_device_scan_info_nothing.apply {
             setOnClickListener { scanDevice() }
         }
-        ivBackBtn = iv_nav_left.apply {
+        iv_nav_right.apply {
+            setImageResource(R.mipmap.ic_discovery)
+            setOnClickListener { scanDevice() }
+        }
+        iv_nav_left.apply {
             setImageResource(R.mipmap.ic_back)
             setOnClickListener { finish() }
         }
@@ -84,25 +78,24 @@ class DeviceScanActivity : BaseActivity() {
         showLoading()
         val scanResults = mWifiManager.scanResults
         rvDeviceScanResult.apply {
-            if (scanResults.size == 0) {
-                this.visibility = View.INVISIBLE
-            } else {
-                this.visibility = View.VISIBLE
+            visibility = when (scanResults.size == 0) {
+                true -> View.INVISIBLE
+                false -> View.VISIBLE
             }
             adapter = BaseRecyclerAdapter(
                 itemLayoutId = R.layout.wifi_info_layout,
-                dataList = scanResults.sortedWith(compareBy {
-                    Math.abs(
-                        it.level
-                    )
-                }).toMutableList()
+                dataList = scanResults.sortedWith(compareBy { Math.abs(it.level) }).toMutableList()
             ) {
                 onBindViewHolder { holder, position ->
                     holder.tv_ssid.text = getItem(position).SSID
                     holder.tv_bssid.text = getItem(position).BSSID
                     holder.tv_level.text = getItem(position).level.toString()
-                    holder.tv_operatorFriendlyName.text = getItem(position).operatorFriendlyName
-                    holder.tv_venueName.text = getItem(position).venueName
+                    holder.iv_frequency.let {
+                        if (getItem(position).frequency in 4901..5899)
+                            it.setImageResource(R.mipmap.ic_5ghz)
+                        else
+                            it.setImageResource(R.mipmap.ic_2_4ghz)
+                    }
                 }
             }
         }
@@ -112,37 +105,81 @@ class DeviceScanActivity : BaseActivity() {
                 else -> View.INVISIBLE
             }
         }
-        GlobalScope.launch(Dispatchers.IO) {
-            // 模拟延时
-            delay(5000)
-            hideLoading()
-        }
+        hideLoading()
     }
 
     private fun scanDevice() {
         if (mWifiManager.isWifiEnabled) {
-            customRequestPermission(
+            setNecessaryPermission(
                 listOf(
                     Manifest.permission.ACCESS_NETWORK_STATE,
                     Manifest.permission.ACCESS_WIFI_STATE,
-                    Manifest.permission.CHANGE_WIFI_STATE,
                     Manifest.permission.ACCESS_FINE_LOCATION,
                     Manifest.permission.ACCESS_COARSE_LOCATION
                 ),
                 Runnable { detectWifi() },
-                null
+                Runnable { toast(getString(R.string.failed_to_turn_on_wifi_please_turn_on_wifi_permissions_manually)) },
+                Runnable { showExplainDialog() }
             )
         } else {
-            AlertDialog.Builder(this).setTitle(getString(R.string.wifi_already_closed))
-                .setNegativeButton(getString(R.string.please_open_wifi_switch)) { _, _ ->
-                    Toast.makeText(
-                        this@DeviceScanActivity,
-                        getString(R.string.please_open_wifi_switch),
-                        Toast.LENGTH_SHORT
-                    ).show()
+            setNecessaryPermission(
+                listOf(
+                    Manifest.permission.CHANGE_WIFI_STATE
+                ),
+                Runnable { showOpenWifiDialog() },
+                Runnable { toast(getString(R.string.failed_to_turn_on_wifi__please_turn_on_wifi_manually)) },
+                Runnable { showExplainDialog() }
+            )
+        }
+    }
+
+    private fun showOpenWifiDialog() {
+        alertDialogBuilder.apply {
+            setTitle(getString(R.string.wifi_already_closed))
+            setView(TextView(this@DeviceScanActivity).apply {
+                text = getString(R.string.scan_wifi_need_open_wifi)
+                setPadding(
+                    resources.getDimensionPixelOffset(R.dimen.default_padding),
+                    resources.getDimensionPixelOffset(R.dimen.default_padding),
+                    resources.getDimensionPixelOffset(R.dimen.default_padding),
+                    resources.getDimensionPixelOffset(R.dimen.default_padding)
+                )
+            })
+            setPositiveButton(
+                getString(R.string.open)
+            ) { _, _ ->
+                mWifiManager.isWifiEnabled = true
+            }
+            setNegativeButton(getString(R.string.cancel)) { _, _ -> finish() }
+            create()
+            show()
+        }
+    }
+
+    private fun showExplainDialog() {
+        GlobalScope.launch(Dispatchers.Main) {
+            alertDialogBuilder.apply {
+                setTitle(getString(R.string.please_grant_application_permission))
+                setView(TextView(this@DeviceScanActivity).apply {
+                    text = getString(R.string.please_grant_application_permission)
+                    setPadding(
+                        resources.getDimensionPixelOffset(R.dimen.default_padding),
+                        resources.getDimensionPixelOffset(R.dimen.default_padding),
+                        resources.getDimensionPixelOffset(R.dimen.default_padding),
+                        resources.getDimensionPixelOffset(R.dimen.default_padding)
+                    )
+                })
+                setPositiveButton(
+                    getString(R.string.ok)
+                ) { _, _ ->
+                    startActivity(Intent().apply {
+                        action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+                        data = Uri.fromParts("package", packageName, null)
+                    })
                 }
-                .setPositiveButton(getString(R.string.ok)) { _, _ -> startActivity(Intent(Settings.ACTION_WIFI_SETTINGS)) }
-                .show()
+                create()
+                show()
+            }
         }
     }
 

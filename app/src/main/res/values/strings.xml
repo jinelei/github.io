@@ -39,4 +39,12 @@
     <integer name="default_debug_level_value">2</integer>
     <string name="change_language">change language</string>
     <string name="add_device">add device</string>
+    <string name="user_info">user info</string>
+    <string name="scan_wifi_need_open_wifi">scan wifi need open wifi</string>
+    <string name="open">open</string>
+    <string name="failed_to_turn_on_wifi__please_turn_on_wifi_manually">failed to turn on wifi, please turn on wifi
+    </string>
+    <string name="failed_to_turn_on_wifi_please_turn_on_wifi_permissions_manually">failed to turn on wifi, please turn
+        on wifi permissions manually
+    </string>
 </resources>

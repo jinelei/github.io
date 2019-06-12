@@ -97,37 +97,6 @@ class UserFragment : BaseFragment() {
     }
 
     private fun initData() {
-        mListMenuDataSet.apply {
-            clear()
-            add(
-                ListMenuItem(
-                    View.OnClickListener {
-                        if (!isFastClick(it)) startActivity(
-                            Intent(
-                                context,
-                                ChangeLanguageActivity::class.java
-                            )
-                        )
-                    },
-                    resources.getString(R.string.change_language),
-                    R.mipmap.ic_language
-                )
-            )
-            add(
-                ListMenuItem(
-                    View.OnClickListener {
-                        if (!isFastClick(it)) startActivity(
-                            Intent(
-                                context,
-                                SetupActivity::class.java
-                            )
-                        )
-                    },
-                    resources.getString(R.string.preference),
-                    R.mipmap.ic_setup
-                )
-            )
-        }
         mGridMenuDataSet.apply {
             clear()
             add(
@@ -170,7 +139,38 @@ class UserFragment : BaseFragment() {
                     View.OnClickListener {
                         if (!isFastClick(it)) startActivity(Intent(activity, DeviceScanActivity::class.java))
                     },
-                    resources.getString(R.string.preference), R.mipmap.ic_add
+                    resources.getString(R.string.scan_device), R.mipmap.ic_add
+                )
+            )
+        }
+        mListMenuDataSet.apply {
+            clear()
+            add(
+                ListMenuItem(
+                    View.OnClickListener {
+                        if (!isFastClick(it)) startActivity(
+                            Intent(
+                                context,
+                                ChangeLanguageActivity::class.java
+                            )
+                        )
+                    },
+                    resources.getString(R.string.change_language),
+                    R.mipmap.ic_language
+                )
+            )
+            add(
+                ListMenuItem(
+                    View.OnClickListener {
+                        if (!isFastClick(it)) startActivity(
+                            Intent(
+                                context,
+                                SetupActivity::class.java
+                            )
+                        )
+                    },
+                    resources.getString(R.string.preference),
+                    R.mipmap.ic_setup
                 )
             )
         }

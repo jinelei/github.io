@@ -23,4 +23,10 @@
     <string name="toast_level">提示级别</string>
     <string name="change_language">切换语言</string>
     <string name="add_device">添加设备</string>
+    <string name="user_info">用户信息</string>
+    <string name="scan_wifi_need_open_wifi">扫描需要打开wifi开关</string>
+    <string name="open">打开</string>
+    <string name="failed_to_turn_on_wifi__please_turn_on_wifi_manually">打开wifi失败，请手动开启WiFi</string>
+    <string name="failed_to_turn_on_wifi_please_turn_on_wifi_permissions_manually">打开wifi失败，请手动开启WiFi权限
+    </string>
 </resources>

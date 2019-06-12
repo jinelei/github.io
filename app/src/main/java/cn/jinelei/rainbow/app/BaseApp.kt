@@ -66,7 +66,4 @@ class BaseApp : Application() {
         return getSharedPreferences(name, Context.MODE_PRIVATE).contains(key)
     }
 
-    companion object {
-        val instace = BaseApp()
-    }
 }

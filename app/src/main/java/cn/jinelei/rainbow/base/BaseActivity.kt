@@ -30,7 +30,7 @@ import kotlin.collections.HashMap
 
 
 open class BaseActivity : AppCompatActivity() {
-    lateinit var mBaseApp: BaseApp
+    private lateinit var mBaseApp: BaseApp
     // 公共的管理器
     lateinit var mWifiManager: WifiManager    //    wifi管理器
     lateinit var mNotificationManager: NotificationManager    //    通知管理器
@@ -40,11 +40,15 @@ open class BaseActivity : AppCompatActivity() {
     private var loadingDialogTimeoutJob: Job? = null    //    自动隐藏加载中弹窗
     // Fragment相关
     lateinit var fragmentManager: FragmentManager    //    fragment管理器
-    var currentFragment: Fragment? = null // 当前的Fragment
-    var previewFragment: Fragment? = null // 上一个Fragment
+    private var currentFragment: Fragment? = null // 当前的Fragment
+    private var previewFragment: Fragment? = null // 上一个Fragment
     //权限相关
     private val grantedPermRunnable = HashMap<Int, Runnable>()    //    已经授权应该执行的任务
     private val deniedPermRunnable = HashMap<Int, Runnable>()    //    拒绝授权应该执行的任务
+    private val deniedActions = mutableMapOf<Int, Runnable>()
+    private val grantedActions = mutableMapOf<Int, Runnable>()
+    private var grantedTaskCount = 0    //    已经授权的数量
+    private var deniedTaskCount = 0    //    已经拒绝的数量
 
     //    初始化数据
     private fun initData() {
@@ -127,6 +131,50 @@ open class BaseActivity : AppCompatActivity() {
         debug(Log.VERBOSE, Thread.currentThread().stackTrace[2].methodName)
     }
 
+    //    设置必要权限
+    protected fun setNecessaryPermission(
+        permissions: List<String>,
+        grantedAction: java.lang.Runnable? = null,
+        deniedAction: java.lang.Runnable? = null,
+        explainAction: Runnable? = null
+    ) {
+        grantedTaskCount = permissions.size
+        deniedTaskCount = 0
+        var couldShowExplainAction = true
+        for (permission in permissions) {
+            val requestCode = getCrc16(permission.toByteArray())
+            if (grantedAction != null)
+                grantedActions[requestCode] = grantedAction
+            if (deniedAction != null)
+                deniedActions[requestCode] = deniedAction
+            val grantResult = ActivityCompat.checkSelfPermission(this, permission)
+            if (PackageManager.PERMISSION_GRANTED == grantResult) { // 已经获得授权
+                debug(Log.VERBOSE, "permission $permission granted")
+                if (deniedTaskCount + --grantedTaskCount == 0) { // 请求权限结束
+                    if (grantedTaskCount == 0) { // 完全授权成功
+                        grantedAction?.run()
+                    }
+                }
+            } else { // 没有授权
+                if (ActivityCompat.shouldShowRequestPermissionRationale(this, permission)) {
+                    // 弹窗解释
+                    debug(Log.VERBOSE, "permission $permission explain")
+                    --deniedTaskCount
+                    if (couldShowExplainAction) {
+                        couldShowExplainAction = false
+                        explainAction?.run()
+                    }
+                } else {
+                    debug(Log.VERBOSE, "permission $permission denied")
+                    ActivityCompat.requestPermissions(this, listOf(permission).toTypedArray(), requestCode);
+                    if (--deniedTaskCount + grantedTaskCount == 0) { // 请求权限结束
+                        deniedAction?.run()
+                    }
+                }
+            }
+        }
+    }
+
     protected fun customRequestPermission(
         permissions: List<String>,
         grantedRun: Runnable?,
@@ -141,12 +189,12 @@ open class BaseActivity : AppCompatActivity() {
                 deniedPermRunnable[id] = deniedRun
             if (Build.VERSION.SDK_INT > 23) {
                 if (PackageManager.PERMISSION_GRANTED == ContextCompat.checkSelfPermission(this, permission)) {
-                    debug(Log.VERBOSE, "id ${id} permission ${permission} granted")
+                    debug(Log.VERBOSE, "id $id permission $permission granted")
                     ActivityCompat.requestPermissions(this, arrayOf(permission), id)
                     grantedRun?.run()
                     return
                 } else {
-                    debug(Log.VERBOSE, "id ${id} permission ${permission} denied, try alert dialog")
+                    debug(Log.VERBOSE, "id $id permission $permission denied, try alert dialog")
                     if (ActivityCompat.shouldShowRequestPermissionRationale(this, permission)) {
                         needUserAgreePermission.add(permission)
                     } else {
@@ -154,7 +202,7 @@ open class BaseActivity : AppCompatActivity() {
                     }
                 }
             } else {
-                debug(Log.VERBOSE, "id ${id} permission ${permission} granted")
+                debug(Log.VERBOSE, "id $id permission $permission granted")
                 grantedRun?.run()
             }
         }
@@ -185,11 +233,17 @@ open class BaseActivity : AppCompatActivity() {
             val result = resultIterator.next()
             val permission = permissionIterator.next()
             if (result == PackageManager.PERMISSION_GRANTED) {
-                debug(Log.VERBOSE, "id ${requestCode} permission ${permission} granted")
-                grantedPermRunnable.get(requestCode)?.run()
+                debug(Log.VERBOSE, "requestCode $requestCode permission $permission granted")
+                if (deniedTaskCount + --grantedTaskCount == 0) { // 请求权限结束
+                    if (grantedTaskCount == 0) { // 完全授权成功
+                        grantedActions[requestCode]?.run()
+                    }
+                }
             } else {
-                debug(Log.VERBOSE, "id ${requestCode} permission ${permission} denied")
-                deniedPermRunnable.get(requestCode)?.run()
+                debug(Log.VERBOSE, "requestCode $requestCode permission $permission denied")
+                if (--deniedTaskCount + grantedTaskCount == 0) { // 请求权限结束
+                    deniedActions[requestCode]?.run()
+                }
             }
         }
     }
@@ -251,7 +305,7 @@ open class BaseActivity : AppCompatActivity() {
             toast(message)
     }
 
-    private fun toast(message: String) {
+    fun toast(message: String) {
         GlobalScope.launch(Dispatchers.Main) {
             Toast.makeText(this@BaseActivity, message, Toast.LENGTH_SHORT).show()
         }

@@ -12,18 +12,18 @@ class CustomCrashHandler : Thread.UncaughtExceptionHandler {
         val stackTraceInfo = getStackTraceInfo(e)
         GlobalScope.launch(Dispatchers.IO) {
             saveToFile(stackTraceInfo)
-            android.os.Process.killProcess(android.os.Process.myPid());
+            android.os.Process.killProcess(android.os.Process.myPid())
         }
     }
 
     private fun getStackTraceInfo(e: Throwable?): String? {
         val writer = StringWriter()
         val printWriter: PrintWriter? = PrintWriter(writer)
-        try {
+        return try {
             e?.printStackTrace(printWriter)
-            return writer.toString()
+            writer.toString()
         } catch (exception: Exception) {
-            return null
+            null
         } finally {
             printWriter?.close()
         }
@@ -51,7 +51,7 @@ class CustomCrashHandler : Thread.UncaughtExceptionHandler {
     }
 
     companion object {
-        val TAG = CustomCrashHandler.javaClass.simpleName
+        val TAG = CustomCrashHandler::class.java.simpleName ?: "CustomCrashHandler"
         val logFilePath =
             "${Environment.getExternalStorageDirectory()}${File.separator}Android${File.separator}data${File.separator}cn.jinelei.rainbow${File.separator}crashLog"
         val instance = CustomCrashHandler()
