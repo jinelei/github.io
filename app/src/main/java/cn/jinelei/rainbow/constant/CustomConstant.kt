@@ -11,7 +11,8 @@ const val REQUEST_CODE_WRITE_EXTERNAL_STORAGE = 0x04
 const val REQUEST_CODE_ACCESS_NETWORK_STATE = 0x05
 
 //首选项
-const val PRE_NAME_USER = "PRE_NAME_USER"
+const val PRE_NAME_MINE = "PRE_NAME_MINE"
+//const val PRE_NAME_MINE = "cn.jinelei.rainbow_preferences"
 const val PRE_KEY_DEBUG = "PRE_KEY_DEBUG"
 const val PRE_KEY_LANGUAGE = "PRE_KEY_LANGUAGE"
 

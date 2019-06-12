@@ -3,20 +3,25 @@ package cn.jinelei.rainbow.app
 import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Context
+import android.util.Log
 import cn.jinelei.rainbow.BuildConfig
 import cn.jinelei.rainbow.app.handler.CustomCrashHandler
+import cn.jinelei.rainbow.constant.PRE_KEY_DEBUG
+import cn.jinelei.rainbow.constant.PRE_NAME_MINE
 import com.facebook.stetho.Stetho
 
 @Suppress("UNCHECKED_CAST")
 class BaseApp : Application() {
 
+    //    初始化数据
     private fun initData() {
+        if (!existPreference(PRE_NAME_MINE, PRE_KEY_DEBUG))
+            savePreference(PRE_NAME_MINE, PRE_KEY_DEBUG, Log.DEBUG)
     }
 
     //    销毁相关数据
     private fun destroyData() {
     }
-
 
     override fun onCreate() {
         super.onCreate()
@@ -55,6 +60,10 @@ class BaseApp : Application() {
             is String -> preference.edit().putString(key, defaultValue).commit()
             else -> preference.edit().putString(key, defaultValue.toString()).commit()
         }
+    }
+
+    fun existPreference(name: String, key: String): Boolean {
+        return getSharedPreferences(name, Context.MODE_PRIVATE).contains(key)
     }
 
     companion object {

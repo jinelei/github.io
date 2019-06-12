@@ -20,7 +20,7 @@ import cn.jinelei.rainbow.R
 import cn.jinelei.rainbow.app.BaseApp
 import cn.jinelei.rainbow.constant.DEFAULT_HIDE_LOADING_TIMEOUT
 import cn.jinelei.rainbow.constant.PRE_KEY_DEBUG
-import cn.jinelei.rainbow.constant.PRE_NAME_USER
+import cn.jinelei.rainbow.constant.PRE_NAME_MINE
 import cn.jinelei.rainbow.ui.view.LoadingDialog
 import cn.jinelei.rainbow.util.getCrc16
 import kotlinx.coroutines.*
@@ -236,7 +236,7 @@ open class BaseActivity : AppCompatActivity() {
 
     fun debug(level: Int, message: String) {
         val debug = (applicationContext as BaseApp).readPreference(
-            name = PRE_NAME_USER,
+            name = PRE_NAME_MINE,
             key = PRE_KEY_DEBUG,
             defaultValue = 0
         )

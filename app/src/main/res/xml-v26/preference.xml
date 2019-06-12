@@ -11,7 +11,7 @@
             android:entries="@array/debug_level"
             android:entryValues="@array/debug_level_value"
             android:dialogTitle="@string/select_debug_level"
-            android:defaultValue="@string/default_debug_level_value"
+            android:defaultValue="@integer/default_debug_level_value"
             android:title="@string/toast_level"/>
 
     <SwitchPreference

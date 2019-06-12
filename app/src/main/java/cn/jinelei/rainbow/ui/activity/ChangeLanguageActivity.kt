@@ -11,7 +11,7 @@ import android.view.View.VISIBLE
 import cn.jinelei.rainbow.R
 import cn.jinelei.rainbow.app.BaseApp
 import cn.jinelei.rainbow.constant.PRE_KEY_LANGUAGE
-import cn.jinelei.rainbow.constant.PRE_NAME_USER
+import cn.jinelei.rainbow.constant.PRE_NAME_MINE
 import cn.jinelei.rainbow.ui.common.BaseRecyclerAdapter
 import kotlinx.android.synthetic.main.activity_change_language.*
 import kotlinx.android.synthetic.main.include_top_navigation.*
@@ -34,7 +34,7 @@ class ChangeLanguageActivity : AppCompatActivity() {
 
     private fun changeLocaleType(t: Locale) {
         (applicationContext as BaseApp).savePreference(
-            name = PRE_NAME_USER,
+            name = PRE_NAME_MINE,
             key = PRE_KEY_LANGUAGE,
             defaultValue = t.language
         )
@@ -64,7 +64,7 @@ class ChangeLanguageActivity : AppCompatActivity() {
     private fun initView() {
         setContentView(R.layout.activity_change_language)
         val sLanguage = (applicationContext as BaseApp).readPreference(
-            PRE_NAME_USER,
+            PRE_NAME_MINE,
             PRE_KEY_LANGUAGE,
             Locale.getDefault().language
         )

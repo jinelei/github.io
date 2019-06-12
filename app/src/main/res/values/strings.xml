@@ -35,6 +35,7 @@
         <item>5</item>
         <item>6</item>
     </string-array>
+    <string name="default_debug_level_value" translatable="false">2</string>
     <integer name="default_debug_level_value">2</integer>
     <string name="change_language">change language</string>
     <string name="add_device">add device</string>
