@@ -17,8 +17,6 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
 class MainActivity : BaseActivity() {
-    val TAG = javaClass.simpleName
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         initView()
@@ -45,19 +43,22 @@ class MainActivity : BaseActivity() {
 
     private fun initData() {
         GlobalScope.launch(Dispatchers.IO) {
-            customRequestPermission(
+            setNecessaryPermission(
                 listOf(
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE
-                ), Runnable {
-                    GlobalScope.launch(Dispatchers.Main) {
-                        Toast.makeText(this@MainActivity, "grant write log", Toast.LENGTH_SHORT).show()
+                    Manifest.permission.ACCESS_NETWORK_STATE,
+                    Manifest.permission.ACCESS_WIFI_STATE,
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                ),
+                null,
+                Runnable { toast(getString(R.string.write_log_need_write_permission)) },
+                Runnable {
+                    alertDialogBuilder.let {
+                        it.setTitle(getString(R.string.request_permission))
+                        it.setView(TextView(this@MainActivity).apply { text = getString(R.string.request_permission) })
+                        it.create()
+                        it.show()
                     }
-                }, Runnable {
-                    alertDialogBuilder?.setTitle(getString(R.string.request_permission))
-                        ?.setView(TextView(this@MainActivity).also {
-                            it.text = getString(R.string.request_permission)
-                        })
-                        ?.create()?.show()
                 }
             )
         }
@@ -83,4 +84,14 @@ class MainActivity : BaseActivity() {
         super.onRestoreInstanceState(savedInstanceState)
     }
 
+    companion object {
+        val TAG = DiscoveryFragment::class.java.simpleName ?: "MainActivity"
+        val instance by lazy { Holder.INSTANCE }
+
+    }
+
+    private object Holder {
+        val INSTANCE = MainActivity()
+
+    }
 }

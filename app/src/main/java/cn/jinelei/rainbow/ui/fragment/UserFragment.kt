@@ -28,19 +28,14 @@ import kotlinx.android.synthetic.main.user_fragment.view.*
 
 
 class UserFragment : BaseFragment() {
-    private val TAG = javaClass.simpleName
     private lateinit var rvListRecyclerView: RecyclerView
     private lateinit var rvGridRecyclerView: RecyclerView
     private lateinit var ivUserHeaderIcon: ImageView
     private lateinit var tvUserHeaderInfo: TextView
-    private val mListMenuDataSet: MutableList<ListMenuItem> = mutableListOf()
-    private val mGridMenuDataSet: MutableList<ListMenuItem> = mutableListOf()
+    private val mMenuDataSet: MutableList<MenuItem> = mutableListOf()
+    private val mGridMenuDataSet: MutableList<MenuItem> = mutableListOf()
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.user_fragment, container, false).apply {
             initData()
             initView(this)
@@ -55,7 +50,7 @@ class UserFragment : BaseFragment() {
             layoutManager = LinearLayoutManager(activity)
             adapter = BaseRecyclerAdapter(
                 itemLayoutId = R.layout.list_menu_layout,
-                dataList = mListMenuDataSet
+                dataList = mMenuDataSet
             ) {
                 onBindViewHolder { holder, position ->
                     holder.iv_list_item_icon.setImageResource(getItem(position).resourceId)
@@ -100,42 +95,42 @@ class UserFragment : BaseFragment() {
         mGridMenuDataSet.apply {
             clear()
             add(
-                ListMenuItem(
+                MenuItem(
                     View.OnClickListener { (activity as BaseActivity).debug(Log.VERBOSE, "verbose") },
                     "verbose",
                     R.mipmap.ic_test
                 )
             )
             add(
-                ListMenuItem(
+                MenuItem(
                     View.OnClickListener { (activity as BaseActivity).debug(Log.DEBUG, "debug") },
                     "debug",
                     R.mipmap.ic_test
                 )
             )
             add(
-                ListMenuItem(
+                MenuItem(
                     View.OnClickListener { (activity as BaseActivity).debug(Log.INFO, "info") },
                     "info",
                     R.mipmap.ic_test
                 )
             )
             add(
-                ListMenuItem(
+                MenuItem(
                     View.OnClickListener { (activity as BaseActivity).debug(Log.WARN, "warn") },
                     "warn",
                     R.mipmap.ic_test
                 )
             )
             add(
-                ListMenuItem(
+                MenuItem(
                     View.OnClickListener { (activity as BaseActivity).debug(Log.ERROR, "error") },
                     "error",
                     R.mipmap.ic_test
                 )
             )
             add(
-                ListMenuItem(
+                MenuItem(
                     View.OnClickListener {
                         if (!isFastClick(it)) startActivity(Intent(activity, DeviceScanActivity::class.java))
                     },
@@ -143,10 +138,10 @@ class UserFragment : BaseFragment() {
                 )
             )
         }
-        mListMenuDataSet.apply {
+        mMenuDataSet.apply {
             clear()
             add(
-                ListMenuItem(
+                MenuItem(
                     View.OnClickListener {
                         if (!isFastClick(it)) startActivity(
                             Intent(
@@ -160,7 +155,7 @@ class UserFragment : BaseFragment() {
                 )
             )
             add(
-                ListMenuItem(
+                MenuItem(
                     View.OnClickListener {
                         if (!isFastClick(it)) startActivity(
                             Intent(
@@ -176,10 +171,14 @@ class UserFragment : BaseFragment() {
         }
     }
 
-    class ListMenuItem(var callback: View.OnClickListener, var title: String, var resourceId: Int)
+    class MenuItem(var callback: View.OnClickListener, var title: String, var resourceId: Int)
 
     companion object {
-        val instance = UserFragment()
         val name = "UserFragment"
+        val instance by lazy { Holder.INSTANCE }
+    }
+
+    private object Holder {
+        val INSTANCE = UserFragment()
     }
 }

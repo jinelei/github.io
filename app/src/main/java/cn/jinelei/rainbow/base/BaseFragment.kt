@@ -7,11 +7,17 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import cn.jinelei.rainbow.app.BaseApp
 
 open class BaseFragment : Fragment() {
+    private lateinit var mBaseApp: BaseApp
+    private lateinit var mBaseActivity: BaseActivity
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.v(this.javaClass.simpleName, Thread.currentThread().stackTrace[2].methodName)
+        mBaseApp = this.activity?.application as BaseApp
+        mBaseActivity = this.activity as BaseActivity
     }
 
     override fun onStart() {

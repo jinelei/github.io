@@ -13,7 +13,6 @@ import cn.jinelei.rainbow.base.BaseFragment
 import kotlinx.android.synthetic.main.home_fragment.view.*
 
 class HomeFragment : BaseFragment() {
-    private val TAG = javaClass.simpleName
     val fragments: ArrayList<Fragment> = arrayListOf(
         TestFragment(),
         TestFragment(),
@@ -57,9 +56,12 @@ class HomeFragment : BaseFragment() {
     }
 
     companion object {
-        val instance = HomeFragment()
-        val name = "HomeFragment"
+        val TAG = HomeFragment::class.java.simpleName ?: "HomeFragment"
+        val instance by lazy { Holder.INSTANCE }
+    }
 
+    private object Holder {
+        val INSTANCE = HomeFragment()
     }
 
 }

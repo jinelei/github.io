@@ -5,18 +5,14 @@ import android.app.NotificationManager
 import android.content.Context
 import android.content.pm.PackageManager
 import android.net.wifi.WifiManager
-import android.os.Build
 import android.os.Bundle
 import android.os.PersistableBundle
 import android.support.v4.app.ActivityCompat
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
-import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
-import android.widget.TextView
 import android.widget.Toast
-import cn.jinelei.rainbow.R
 import cn.jinelei.rainbow.app.BaseApp
 import cn.jinelei.rainbow.constant.DEFAULT_HIDE_LOADING_TIMEOUT
 import cn.jinelei.rainbow.constant.PRE_KEY_DEBUG
@@ -24,13 +20,10 @@ import cn.jinelei.rainbow.constant.PRE_NAME_MINE
 import cn.jinelei.rainbow.ui.view.LoadingDialog
 import cn.jinelei.rainbow.util.getCrc16
 import kotlinx.coroutines.*
-import java.nio.charset.Charset
-import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
 
 
 open class BaseActivity : AppCompatActivity() {
-    private lateinit var mBaseApp: BaseApp
+    protected lateinit var mBaseApp: BaseApp
     // 公共的管理器
     lateinit var mWifiManager: WifiManager    //    wifi管理器
     lateinit var mNotificationManager: NotificationManager    //    通知管理器
@@ -43,27 +36,27 @@ open class BaseActivity : AppCompatActivity() {
     private var currentFragment: Fragment? = null // 当前的Fragment
     private var previewFragment: Fragment? = null // 上一个Fragment
     //权限相关
-    private val grantedPermRunnable = HashMap<Int, Runnable>()    //    已经授权应该执行的任务
-    private val deniedPermRunnable = HashMap<Int, Runnable>()    //    拒绝授权应该执行的任务
-    private val deniedActions = mutableMapOf<Int, Runnable>()
-    private val grantedActions = mutableMapOf<Int, Runnable>()
+    private val grantedActions = mutableMapOf<Int, Runnable>()    //    已经授权应该执行的任务
+    private val deniedActions = mutableMapOf<Int, Runnable>()    //    拒绝授权应该执行的任务
     private var grantedTaskCount = 0    //    已经授权的数量
     private var deniedTaskCount = 0    //    已经拒绝的数量
 
     //    初始化数据
     private fun initData() {
-        loadingDialog = LoadingDialog(this)
-        mWifiManager = applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
-        mNotificationManager = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        alertDialogBuilder = AlertDialog.Builder(this)
-        fragmentManager = supportFragmentManager
         mBaseApp = this.application as BaseApp
+        loadingDialog = LoadingDialog(mBaseApp)
+        mWifiManager = mBaseApp.getSystemService(Context.WIFI_SERVICE) as WifiManager
+        mNotificationManager = mBaseApp.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        alertDialogBuilder = AlertDialog.Builder(mBaseApp)
+        fragmentManager = supportFragmentManager
+        grantedActions.clear()
+        deniedActions.clear()
     }
 
     //    销毁相关数据
     private fun destroyData() {
-        grantedPermRunnable.clear()
-        deniedPermRunnable.clear()
+        grantedActions.clear()
+        deniedActions.clear()
         loadingDialog.dismiss()
         loadingDialogTimeoutJob = null
     }
@@ -166,61 +159,11 @@ open class BaseActivity : AppCompatActivity() {
                     }
                 } else {
                     debug(Log.VERBOSE, "permission $permission denied")
-                    ActivityCompat.requestPermissions(this, listOf(permission).toTypedArray(), requestCode);
+                    ActivityCompat.requestPermissions(this, listOf(permission).toTypedArray(), requestCode)
                     if (--deniedTaskCount + grantedTaskCount == 0) { // 请求权限结束
                         deniedAction?.run()
                     }
                 }
-            }
-        }
-    }
-
-    protected fun customRequestPermission(
-        permissions: List<String>,
-        grantedRun: Runnable?,
-        deniedRun: Runnable?
-    ) {
-        val needUserAgreePermission = ArrayList<String>()
-        for (permission in permissions) {
-            val id = getCrc16(permission.toByteArray(Charset.defaultCharset()))
-            if (grantedRun != null)
-                grantedPermRunnable[id] = grantedRun
-            if (deniedRun != null)
-                deniedPermRunnable[id] = deniedRun
-            if (Build.VERSION.SDK_INT > 23) {
-                if (PackageManager.PERMISSION_GRANTED == ContextCompat.checkSelfPermission(this, permission)) {
-                    debug(Log.VERBOSE, "id $id permission $permission granted")
-                    ActivityCompat.requestPermissions(this, arrayOf(permission), id)
-                    grantedRun?.run()
-                    return
-                } else {
-                    debug(Log.VERBOSE, "id $id permission $permission denied, try alert dialog")
-                    if (ActivityCompat.shouldShowRequestPermissionRationale(this, permission)) {
-                        needUserAgreePermission.add(permission)
-                    } else {
-                        needUserAgreePermission.add(permission)
-                    }
-                }
-            } else {
-                debug(Log.VERBOSE, "id $id permission $permission granted")
-                grantedRun?.run()
-            }
-        }
-        if (needUserAgreePermission.isNotEmpty()) {
-            val textView = TextView(this)
-            textView.text = needUserAgreePermission.reduce { acc, s -> "$acc\n$s" }
-            GlobalScope.launch(Dispatchers.Main) {
-                alertDialogBuilder.setTitle(getString(R.string.please_grant_application_permission))
-                    ?.setView(textView)
-                    ?.setPositiveButton(getString(R.string.ok)) { _, _ ->
-                        requestPermissions(
-                            needUserAgreePermission.toTypedArray(),
-                            getCrc16(needUserAgreePermission[0].toByteArray(Charset.defaultCharset()))
-                        )
-                    }
-                    ?.setNegativeButton(getString(R.string.cancel)) { _, _ -> deniedRun?.run() }
-                    ?.create()
-                    ?.show()
             }
         }
     }
@@ -248,6 +191,7 @@ open class BaseActivity : AppCompatActivity() {
         }
     }
 
+    //    切换Fragment
     fun switchFragmentTo(containerId: Int, targetFragment: Fragment) {
         debug(
             Log.VERBOSE,
@@ -275,6 +219,7 @@ open class BaseActivity : AppCompatActivity() {
         }
     }
 
+    //    回退Fragment
     fun restorePreviewFragment(recyclerCurrent: Boolean = false) {
         if (previewFragment != null && currentFragment != null) {
             fragmentManager.beginTransaction().also {
@@ -289,7 +234,7 @@ open class BaseActivity : AppCompatActivity() {
     }
 
     fun debug(level: Int, message: String) {
-        val debug = (applicationContext as BaseApp).readPreference(
+        val debug = mBaseApp.readPreference(
             name = PRE_NAME_MINE,
             key = PRE_KEY_DEBUG,
             defaultValue = 0
@@ -311,6 +256,7 @@ open class BaseActivity : AppCompatActivity() {
         }
     }
 
+    //    显示加载框
     fun showLoading(timeout: Long = DEFAULT_HIDE_LOADING_TIMEOUT) {
         GlobalScope.launch(Dispatchers.Main) {
             if (!loadingDialog.isShowing) {
@@ -329,6 +275,7 @@ open class BaseActivity : AppCompatActivity() {
         }
     }
 
+    //    隐藏加载框
     fun hideLoading() {
         GlobalScope.launch(Dispatchers.Main) {
             if (loadingDialog.isShowing) {

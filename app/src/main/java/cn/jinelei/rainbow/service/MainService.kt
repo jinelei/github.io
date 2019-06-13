@@ -8,11 +8,6 @@ import android.util.Log
 import org.greenrobot.eventbus.EventBus
 
 class MainService : Service() {
-    companion object {
-        val TAG: String = MainService::class.java.simpleName
-        val instance = MainService()
-    }
-
     override fun onBind(intent: Intent): IBinder {
         return MainBinder()
     }
@@ -33,6 +28,15 @@ class MainService : Service() {
                 Log.d(TAG, "test task");
             }).start()
         }
+    }
+
+    companion object {
+        val TAG: String = MainService::class.java.simpleName ?: "MainService"
+        val instance by lazy { Holder.INSTANCE }
+    }
+
+    private object Holder {
+        val INSTANCE = MainService()
     }
 
 }

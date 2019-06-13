@@ -54,6 +54,12 @@ class CustomCrashHandler : Thread.UncaughtExceptionHandler {
         val TAG = CustomCrashHandler::class.java.simpleName ?: "CustomCrashHandler"
         val logFilePath =
             "${Environment.getExternalStorageDirectory()}${File.separator}Android${File.separator}data${File.separator}cn.jinelei.rainbow${File.separator}crashLog"
-        val instance = CustomCrashHandler()
+        val instance by lazy { Holder.INSTANCE }
     }
+
+    private object Holder {
+        val INSTANCE = CustomCrashHandler()
+    }
+
+
 }

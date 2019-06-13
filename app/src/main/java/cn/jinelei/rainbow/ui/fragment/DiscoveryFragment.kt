@@ -13,7 +13,6 @@ import kotlinx.android.synthetic.main.discovery_card_layout.*
 import kotlinx.android.synthetic.main.discovery_fragment.view.*
 
 class DiscoveryFragment : BaseFragment() {
-    private val TAG = javaClass.simpleName
     private val mDataSet: MutableList<DiscoveryCardItem> = mutableListOf()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -144,10 +143,16 @@ class DiscoveryFragment : BaseFragment() {
         }
     }
 
+    class DiscoveryCardItem(val backgroundRes: Int?, val titleRes: Int?, val callback: View.OnClickListener?) {}
+
     companion object {
-        val instance = DiscoveryFragment()
-        val name = "DiscoveryFragment"
+        val TAG = DiscoveryFragment::class.java.simpleName ?: "DiscoveryFragment"
+        val instance by lazy { Holder.INSTANCE }
+
     }
 
-    class DiscoveryCardItem(val backgroundRes: Int?, val titleRes: Int?, val callback: View.OnClickListener?) {}
+    private object Holder {
+        val INSTANCE = DiscoveryFragment()
+
+    }
 }

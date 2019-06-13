@@ -6,11 +6,12 @@ import android.support.v7.preference.PreferenceFragmentCompat
 import android.util.Log
 import cn.jinelei.rainbow.R
 import cn.jinelei.rainbow.app.BaseApp
+import cn.jinelei.rainbow.base.BasePreferenceFragmentCompat
 import cn.jinelei.rainbow.constant.PRE_KEY_DEBUG
 import cn.jinelei.rainbow.constant.PRE_NAME_MINE
 
 
-class SetupFragment : PreferenceFragmentCompat() {
+class SetupFragment : BasePreferenceFragmentCompat() {
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.preference)
@@ -38,7 +39,7 @@ class SetupFragment : PreferenceFragmentCompat() {
     }
 
     private fun saveDebugLevel(level: Int) {
-        (activity?.applicationContext as BaseApp).savePreference(
+        mBaseApp.savePreference(
             name = PRE_NAME_MINE,
             key = PRE_KEY_DEBUG,
             defaultValue = level
@@ -46,7 +47,7 @@ class SetupFragment : PreferenceFragmentCompat() {
     }
 
     private fun readDebugLevel(): Int {
-        return (activity?.applicationContext as BaseApp).readPreference(
+        return mBaseApp.readPreference(
             name = PRE_NAME_MINE,
             key = PRE_KEY_DEBUG,
             defaultValue = Log.VERBOSE
@@ -59,7 +60,12 @@ class SetupFragment : PreferenceFragmentCompat() {
     }
 
     companion object {
-        val instance = SetupFragment()
+        val TAG = SetupFragment::class.java.simpleName ?: "SetupFragment"
+        val instance by lazy { Holder.INSTANCE }
+    }
+
+    private object Holder {
+        val INSTANCE = SetupFragment()
     }
 
 }

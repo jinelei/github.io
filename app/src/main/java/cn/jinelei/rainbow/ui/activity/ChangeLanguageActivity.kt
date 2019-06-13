@@ -10,6 +10,7 @@ import android.view.View.GONE
 import android.view.View.VISIBLE
 import cn.jinelei.rainbow.R
 import cn.jinelei.rainbow.app.BaseApp
+import cn.jinelei.rainbow.base.BaseActivity
 import cn.jinelei.rainbow.constant.PRE_KEY_LANGUAGE
 import cn.jinelei.rainbow.constant.PRE_NAME_MINE
 import cn.jinelei.rainbow.ui.common.BaseRecyclerAdapter
@@ -20,20 +21,20 @@ import kotlinx.android.synthetic.main.language_item_layout.*
 import java.util.*
 import java.util.function.Consumer
 
-class ChangeLanguageActivity : AppCompatActivity() {
+class ChangeLanguageActivity : BaseActivity() {
     var iCurrentLocaleIdx: Int = 0
 
     private val allSupportLocales = arrayListOf(
-        LanguageItem(R.mipmap.ic_option, "跟随系统", Consumer { changeLocaleType(Locale.getDefault()) }),
-        LanguageItem(R.mipmap.ic_option, Locale.ENGLISH.language, Consumer { changeLocaleType(Locale.ENGLISH) }),
+        LanguageItem(R.mipmap.ic_option, "跟随系统", Runnable { changeLocaleType(Locale.getDefault()) }),
+        LanguageItem(R.mipmap.ic_option, Locale.ENGLISH.language, Runnable { changeLocaleType(Locale.ENGLISH) }),
         LanguageItem(
             R.mipmap.ic_option,
             Locale.SIMPLIFIED_CHINESE.language,
-            Consumer { changeLocaleType(Locale.SIMPLIFIED_CHINESE) })
+            Runnable { changeLocaleType(Locale.SIMPLIFIED_CHINESE) })
     )
 
     private fun changeLocaleType(t: Locale) {
-        (applicationContext as BaseApp).savePreference(
+        mBaseApp.savePreference(
             name = PRE_NAME_MINE,
             key = PRE_KEY_LANGUAGE,
             defaultValue = t.language
@@ -54,16 +55,14 @@ class ChangeLanguageActivity : AppCompatActivity() {
         this@ChangeLanguageActivity.finish()
     }
 
-    @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         initView()
     }
 
-    @RequiresApi(Build.VERSION_CODES.N)
     private fun initView() {
         setContentView(R.layout.activity_change_language)
-        val sLanguage = (applicationContext as BaseApp).readPreference(
+        val sLanguage = mBaseApp.readPreference(
             PRE_NAME_MINE,
             PRE_KEY_LANGUAGE,
             Locale.getDefault().language
@@ -79,7 +78,7 @@ class ChangeLanguageActivity : AppCompatActivity() {
                 onBindViewHolder { holder, position ->
                     holder.iv_icon.setImageResource(getItem(position).resId)
                     holder.tv_nav_title.text = getItem(position).locale
-                    holder.layout_language_item.setOnClickListener { getItem(position).callback.accept(getItem(position).locale) }
+                    holder.layout_language_item.setOnClickListener { getItem(position).callback.run() }
                     holder.iv_rta.visibility = when (iCurrentLocaleIdx == position) {
                         true -> VISIBLE
                         false -> GONE
@@ -94,6 +93,6 @@ class ChangeLanguageActivity : AppCompatActivity() {
         }
     }
 
-    class LanguageItem(val resId: Int, val locale: String, val callback: Consumer<String>) {}
+    class LanguageItem(val resId: Int, val locale: String, val callback: Runnable) {}
 
 }
