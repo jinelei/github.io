@@ -29,29 +29,32 @@ import cn.jinelei.rainbow.ui.activity.*
 import cn.jinelei.rainbow.ui.common.BaseRecyclerAdapter
 import cn.jinelei.rainbow.util.isFastClick
 import kotlinx.android.synthetic.main.grid_menu_layout.*
-import kotlinx.android.synthetic.main.list_menu_layout.*
 import kotlinx.android.synthetic.main.include_top_navigation.view.*
+import kotlinx.android.synthetic.main.list_menu_layout.*
 import kotlinx.android.synthetic.main.user_fragment.view.*
 
 
 class UserFragment : BaseFragment() {
-    private val ACTION_MAINSERVICE = "android.intent.action.MainService"
     private lateinit var rvListRecyclerView: RecyclerView
     private lateinit var rvGridRecyclerView: RecyclerView
     private lateinit var ivUserHeaderIcon: ImageView
     private lateinit var tvUserHeaderInfo: TextView
     private val mMenuDataSet: MutableList<MenuItem> = mutableListOf()
     private val mGridMenuDataSet: MutableList<MenuItem> = mutableListOf()
-    private var mBinderQuery: IBinderQuery? = null
+    private var mBluetoothService: IBluetoothService? = null
     private var mTestService: ITestService? = null
-    private var mControllerInterface: IBluetoothService? = null
     private val connection = object : ServiceConnection {
         override fun onServiceDisconnected(name: ComponentName?) {
             mTestService = null
+            mBluetoothService = null
         }
 
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-            mBinderQuery = IBinderQuery.Stub.asInterface(service)
+            val mBinderQuery = IBinderQuery.Stub.asInterface(service)
+            mBluetoothService =
+                IBluetoothService.Stub.asInterface(mBinderQuery.queryBinder(BINDER_REQUEST_CODE_BLUETOOTH))
+            mTestService =
+                ITestService.Stub.asInterface(mBinderQuery.queryBinder(BINDER_REQUEST_CODE_TEST))
         }
     }
 
@@ -158,8 +161,7 @@ class UserFragment : BaseFragment() {
             add(
                 MenuItem(
                     View.OnClickListener {
-                        ITestService.Stub.asInterface(mBinderQuery?.queryBinder(BINDER_REQUEST_CODE_TEST))
-                            .test("binder test")
+                        mTestService?.test("binder test")
                     },
                     "binder test",
                     R.mipmap.ic_test
@@ -168,8 +170,7 @@ class UserFragment : BaseFragment() {
             add(
                 MenuItem(
                     View.OnClickListener {
-                        IBluetoothService.Stub.asInterface(mBinderQuery?.queryBinder(BINDER_REQUEST_CODE_BLUETOOTH))
-                            .init(0, "init")
+                        mBluetoothService?.init(0, "init")
                     },
                     "binder bt",
                     R.mipmap.ic_test
@@ -231,12 +232,4 @@ class UserFragment : BaseFragment() {
 
     class MenuItem(var callback: View.OnClickListener, var title: String, var resourceId: Int)
 
-    companion object {
-        val name = "UserFragment"
-        val instance by lazy { Holder.INSTANCE }
-    }
-
-    private object Holder {
-        val INSTANCE = UserFragment()
-    }
 }
