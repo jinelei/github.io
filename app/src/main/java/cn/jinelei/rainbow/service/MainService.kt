@@ -5,38 +5,25 @@ import android.content.Intent
 import android.os.Binder
 import android.os.IBinder
 import android.util.Log
+import cn.jinelei.rainbow.ITestService
 import org.greenrobot.eventbus.EventBus
 
 class MainService : Service() {
+    private lateinit var mTestService: TestService
     override fun onBind(intent: Intent): IBinder {
-        return MainBinder()
+        return mTestService
     }
 
     override fun onCreate() {
         super.onCreate()
-        EventBus.getDefault().register(this)
+        mTestService = TestService()
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        EventBus.getDefault().unregister(this)
-    }
-
-    class MainBinder : Binder() {
-        fun testTask() {
-            Thread(Runnable {
-                Log.d(TAG, "test task");
-            }).start()
+    class TestService : ITestService.Stub() {
+        override fun test(aString: String?) {
+            Log.d(TestService::class.java.simpleName, "test() receive: $aString")
         }
-    }
 
-    companion object {
-        val TAG: String = MainService::class.java.simpleName ?: "MainService"
-        val instance by lazy { Holder.INSTANCE }
-    }
-
-    private object Holder {
-        val INSTANCE = MainService()
     }
 
 }

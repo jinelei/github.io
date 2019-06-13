@@ -31,8 +31,13 @@
 
         <service
                 android:name=".service.MainService"
+                android:process=":service"
                 android:enabled="true"
                 android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MainService"/>
+                <category android:name="android.intent.category.default"/>
+            </intent-filter>
         </service>
 
         <meta-data

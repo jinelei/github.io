@@ -1,7 +1,11 @@
 package cn.jinelei.rainbow.ui.fragment
 
+import android.content.ComponentName
+import android.content.Context.BIND_AUTO_CREATE
 import android.content.Intent
+import android.content.ServiceConnection
 import android.os.Bundle
+import android.os.IBinder
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
@@ -12,9 +16,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import cn.jinelei.rainbow.ITestService
 import cn.jinelei.rainbow.R
 import cn.jinelei.rainbow.base.BaseActivity
 import cn.jinelei.rainbow.base.BaseFragment
+import cn.jinelei.rainbow.service.MainService
 import cn.jinelei.rainbow.ui.activity.*
 import cn.jinelei.rainbow.ui.common.BaseRecyclerAdapter
 import cn.jinelei.rainbow.util.isFastClick
@@ -25,18 +31,36 @@ import kotlinx.android.synthetic.main.user_fragment.view.*
 
 
 class UserFragment : BaseFragment() {
+    private val ACTION_MAINSERVICE = "android.intent.action.MainService"
     private lateinit var rvListRecyclerView: RecyclerView
     private lateinit var rvGridRecyclerView: RecyclerView
     private lateinit var ivUserHeaderIcon: ImageView
     private lateinit var tvUserHeaderInfo: TextView
     private val mMenuDataSet: MutableList<MenuItem> = mutableListOf()
     private val mGridMenuDataSet: MutableList<MenuItem> = mutableListOf()
+    private var mITestService: ITestService? = null
+    private val connection = object : ServiceConnection {
+        override fun onServiceDisconnected(name: ComponentName?) {
+            Log.d(UserFragment::class.java.simpleName, "onServiceDisconnected")
+            mITestService = null
+        }
+
+        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+            mITestService = ITestService.Stub.asInterface(service)
+            Log.d(UserFragment::class.java.simpleName, "onServiceConnected mITestService: $mITestService")
+        }
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.user_fragment, container, false).apply {
             initData()
             initView(this)
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        destroyData()
     }
 
     private fun initView(view: View) {
@@ -89,6 +113,7 @@ class UserFragment : BaseFragment() {
     }
 
     private fun initData() {
+        activity?.bindService(Intent(activity, MainService::class.java), connection, BIND_AUTO_CREATE)
         mGridMenuDataSet.apply {
             clear()
             add(
@@ -123,6 +148,16 @@ class UserFragment : BaseFragment() {
                 MenuItem(
                     View.OnClickListener { (activity as BaseActivity).debug(Log.ERROR, "error") },
                     "error",
+                    R.mipmap.ic_test
+                )
+            )
+            add(
+                MenuItem(
+                    View.OnClickListener {
+                        mITestService?.test("asdfasdf")
+                        Log.d(UserFragment::class.java.simpleName, "binder click mITestService: $mITestService")
+                    },
+                    "binder",
                     R.mipmap.ic_test
                 )
             )
@@ -174,6 +209,10 @@ class UserFragment : BaseFragment() {
                 )
             )
         }
+    }
+
+    private fun destroyData() {
+        activity?.unbindService(connection)
     }
 
     class MenuItem(var callback: View.OnClickListener, var title: String, var resourceId: Int)
