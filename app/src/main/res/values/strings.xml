@@ -9,8 +9,8 @@
     <string name="request_permission">request permission</string>
     <string name="ok">ok</string>
     <string name="cancel">cancel</string>
-    <string name="please_open_wifi_switch">please open wifi switch</string>
-    <string name="wifi_already_closed">wifi already closed</string>
+    <string name="please_open_wifi_switch">please open WiFi switch</string>
+    <string name="wifi_already_closed">WiFi already closed</string>
     <string name="nothing_click_to_refresh">there is nothing\nclick to refresh</string>
     <string name="please_grant_application_permission">please grant application some permission</string>
     <string name="write_log_need_write_permission">write log need write permission</string>
@@ -40,11 +40,21 @@
     <string name="change_language">change language</string>
     <string name="add_device">add device</string>
     <string name="user_info">user info</string>
-    <string name="scan_wifi_need_open_wifi">scan wifi need open wifi</string>
+    <string name="scan_wifi_need_open_wifi">scan WiFi need open WiFi</string>
     <string name="open">open</string>
-    <string name="failed_to_turn_on_wifi__please_turn_on_wifi_manually">failed to turn on wifi, please turn on wifi
+    <string name="failed_to_turn_on_wifi__please_turn_on_wifi_manually">failed to turn on WiFi, please turn on WiFi
     </string>
-    <string name="failed_to_turn_on_wifi_please_turn_on_wifi_permissions_manually">failed to turn on wifi, please turn
-        on wifi permissions manually
+    <string name="failed_to_turn_on_wifi_please_turn_on_wifi_permissions_manually">failed to turn on WiFi, please turn
+        on WiFi permissions manually
     </string>
+    <string name="follow_system">follow system</string>
+    <string name="scan_wifi">scan WiFi</string>
+    <string name="failed_to_turn_on_bluetooth_please_turn_on_bluetooth_permissions_manually">failed to turn on bluetooth
+        please turn on bluetooth permissions manually
+    </string>
+    <string name="failed_to_turn_on_bluetooth__please_turn_on_bluetooth_manually">failed to turn on bluetooth, please
+        turn on bluetooth manually
+    </string>
+    <string name="bluetooth_already_closed">bluetooth already closed</string>
+    <string name="scan_bluetooth_need_open_bluetooth">scan bluetooth need open bluetooth</string>
 </resources>

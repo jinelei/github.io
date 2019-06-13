@@ -2,6 +2,7 @@ package cn.jinelei.rainbow.base
 
 import android.app.AlertDialog
 import android.app.NotificationManager
+import android.bluetooth.BluetoothManager
 import android.content.Context
 import android.content.pm.PackageManager
 import android.net.wifi.WifiManager
@@ -26,6 +27,7 @@ open class BaseActivity : AppCompatActivity() {
     protected lateinit var mContext: Context
     // 公共的管理器
     lateinit var mWifiManager: WifiManager    //    wifi管理器
+    lateinit var mBluetoothManager: BluetoothManager    //    蓝牙管理器
     lateinit var mNotificationManager: NotificationManager    //    通知管理器
     // 弹窗相关
     private lateinit var loadingDialog: LoadingDialog    //    加载中弹窗
@@ -47,6 +49,7 @@ open class BaseActivity : AppCompatActivity() {
         mContext = this
         loadingDialog = LoadingDialog(mContext)
         mWifiManager = mBaseApp.getSystemService(Context.WIFI_SERVICE) as WifiManager
+        mBluetoothManager = mBaseApp.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
         mNotificationManager = mBaseApp.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         alertDialogBuilder = AlertDialog.Builder(mContext)
         fragmentManager = supportFragmentManager

@@ -1,5 +1,6 @@
 package cn.jinelei.rainbow.ui.common
 
+import android.service.autofill.Dataset
 import android.support.annotation.LayoutRes
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
@@ -27,14 +28,20 @@ open class BaseRecyclerAdapter<M>(
         this.onBindViewHolder = onBindViewHolder
     }
 
-    fun setData(list: Collection<M>?): Boolean {
-        var result = false
-        if (list != null) {
-            dataList.clear()
-            result = dataList.addAll(list)
-            notifyDataSetChanged()
-        }
-        return result
+    fun append(m: M) {
+        val idx = dataList.size
+        dataList.add(m)
+        notifyItemInserted(idx)
+    }
+
+    fun clear() {
+        dataList.clear()
+        notifyDataSetChanged()
+    }
+
+    fun reset(data: MutableList<M>) {
+        dataList = data
+        notifyDataSetChanged()
     }
 
     fun getItem(position: Int) = dataList[position]

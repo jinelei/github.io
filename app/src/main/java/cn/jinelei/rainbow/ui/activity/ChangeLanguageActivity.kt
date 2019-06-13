@@ -24,14 +24,7 @@ import java.util.function.Consumer
 class ChangeLanguageActivity : BaseActivity() {
     var iCurrentLocaleIdx: Int = 0
 
-    private val allSupportLocales = arrayListOf(
-        LanguageItem(R.mipmap.ic_option, "跟随系统", Runnable { changeLocaleType(Locale.getDefault()) }),
-        LanguageItem(R.mipmap.ic_option, Locale.ENGLISH.language, Runnable { changeLocaleType(Locale.ENGLISH) }),
-        LanguageItem(
-            R.mipmap.ic_option,
-            Locale.SIMPLIFIED_CHINESE.language,
-            Runnable { changeLocaleType(Locale.SIMPLIFIED_CHINESE) })
-    )
+    private val allSupportLocales = mutableListOf<LanguageItem>()
 
     private fun changeLocaleType(t: Locale) {
         mBaseApp.savePreference(
@@ -57,6 +50,7 @@ class ChangeLanguageActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        initData()
         initView()
     }
 
@@ -90,6 +84,29 @@ class ChangeLanguageActivity : BaseActivity() {
         iv_nav_left.apply {
             setImageResource(R.mipmap.ic_back)
             setOnClickListener { finish() }
+        }
+    }
+
+    private fun initData() {
+        allSupportLocales.let {
+            it.add(
+                LanguageItem(
+                    R.mipmap.ic_option,
+                    getString(R.string.follow_system),
+                    Runnable { changeLocaleType(Locale.getDefault()) })
+            )
+            it.add(
+                LanguageItem(
+                    R.mipmap.ic_option,
+                    Locale.ENGLISH.language,
+                    Runnable { changeLocaleType(Locale.ENGLISH) })
+            )
+            it.add(
+                LanguageItem(
+                    R.mipmap.ic_option,
+                    Locale.SIMPLIFIED_CHINESE.language,
+                    Runnable { changeLocaleType(Locale.SIMPLIFIED_CHINESE) })
+            )
         }
     }
 

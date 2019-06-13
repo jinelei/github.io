@@ -9,8 +9,8 @@
     <string name="request_permission">请求权限</string>
     <string name="ok">确定</string>
     <string name="cancel">取消</string>
-    <string name="please_open_wifi_switch">请打开WIFI开关</string>
-    <string name="wifi_already_closed">WIFI已经关闭</string>
+    <string name="please_open_wifi_switch">请打开WiFi开关</string>
+    <string name="wifi_already_closed">WiFi已经关闭</string>
     <string name="nothing_click_to_refresh">这里什么都没有哦！\n点击刷新</string>
     <string name="please_grant_application_permission">请给应用授权</string>
     <string name="write_log_need_write_permission">write log need write permission</string>
@@ -24,9 +24,17 @@
     <string name="change_language">切换语言</string>
     <string name="add_device">添加设备</string>
     <string name="user_info">用户信息</string>
-    <string name="scan_wifi_need_open_wifi">扫描需要打开wifi开关</string>
+    <string name="scan_wifi_need_open_wifi">扫描需要打开WiFi开关</string>
     <string name="open">打开</string>
-    <string name="failed_to_turn_on_wifi__please_turn_on_wifi_manually">打开wifi失败，请手动开启WiFi</string>
-    <string name="failed_to_turn_on_wifi_please_turn_on_wifi_permissions_manually">打开wifi失败，请手动开启WiFi权限
+    <string name="failed_to_turn_on_wifi__please_turn_on_wifi_manually">打开WiFi失败，请手动开启WiFi</string>
+    <string name="failed_to_turn_on_wifi_please_turn_on_wifi_permissions_manually">打开WiFi失败，请手动开启WiFi权限
     </string>
+    <string name="follow_system">跟随系统</string>
+    <string name="scan_wifi">扫描WiFi</string>
+    <string name="failed_to_turn_on_bluetooth_please_turn_on_bluetooth_permissions_manually">打开蓝牙失败，请手动开启蓝牙权限
+    </string>
+    <string name="failed_to_turn_on_bluetooth__please_turn_on_bluetooth_manually">打开蓝牙失败，请手动开启蓝牙
+    </string>
+    <string name="bluetooth_already_closed">蓝牙已经关闭</string>
+    <string name="scan_bluetooth_need_open_bluetooth">扫描需要打开蓝牙开关</string>
 </resources>

@@ -15,10 +15,7 @@ import android.widget.TextView
 import cn.jinelei.rainbow.R
 import cn.jinelei.rainbow.base.BaseActivity
 import cn.jinelei.rainbow.base.BaseFragment
-import cn.jinelei.rainbow.ui.activity.ChangeLanguageActivity
-import cn.jinelei.rainbow.ui.activity.DeviceScanActivity
-import cn.jinelei.rainbow.ui.activity.SetupActivity
-import cn.jinelei.rainbow.ui.activity.UserInfoActivity
+import cn.jinelei.rainbow.ui.activity.*
 import cn.jinelei.rainbow.ui.common.BaseRecyclerAdapter
 import cn.jinelei.rainbow.util.isFastClick
 import kotlinx.android.synthetic.main.grid_menu_layout.*
@@ -76,7 +73,7 @@ class UserFragment : BaseFragment() {
         }
         view.iv_nav_right.apply {
             setImageResource(R.mipmap.ic_add)
-            setOnClickListener { if (!isFastClick(it)) startActivity(Intent(activity, DeviceScanActivity::class.java)) }
+            setOnClickListener { if (!isFastClick(it)) startActivity(Intent(activity, ScanDeviceActivity::class.java)) }
         }
         view.tv_nav_title
             .apply { text = resources.getString(R.string.navigation_user) }
@@ -132,9 +129,17 @@ class UserFragment : BaseFragment() {
             add(
                 MenuItem(
                     View.OnClickListener {
-                        if (!isFastClick(it)) startActivity(Intent(activity, DeviceScanActivity::class.java))
+                        if (!isFastClick(it)) startActivity(Intent(activity, ScanDeviceActivity::class.java))
                     },
                     resources.getString(R.string.scan_device), R.mipmap.ic_add
+                )
+            )
+            add(
+                MenuItem(
+                    View.OnClickListener {
+                        if (!isFastClick(it)) startActivity(Intent(activity, ScanWifiActivity::class.java))
+                    },
+                    resources.getString(R.string.scan_wifi), R.mipmap.ic_add
                 )
             )
         }
