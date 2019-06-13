@@ -16,10 +16,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import cn.jinelei.rainbow.IBinderQuery
 import cn.jinelei.rainbow.ITestService
 import cn.jinelei.rainbow.R
 import cn.jinelei.rainbow.base.BaseActivity
 import cn.jinelei.rainbow.base.BaseFragment
+import cn.jinelei.rainbow.bluetooth.IBluetoothService
+import cn.jinelei.rainbow.constant.BINDER_REQUEST_CODE_BLUETOOTH
+import cn.jinelei.rainbow.constant.BINDER_REQUEST_CODE_TEST
 import cn.jinelei.rainbow.service.MainService
 import cn.jinelei.rainbow.ui.activity.*
 import cn.jinelei.rainbow.ui.common.BaseRecyclerAdapter
@@ -38,16 +42,16 @@ class UserFragment : BaseFragment() {
     private lateinit var tvUserHeaderInfo: TextView
     private val mMenuDataSet: MutableList<MenuItem> = mutableListOf()
     private val mGridMenuDataSet: MutableList<MenuItem> = mutableListOf()
-    private var mITestService: ITestService? = null
+    private var mBinderQuery: IBinderQuery? = null
+    private var mTestService: ITestService? = null
+    private var mControllerInterface: IBluetoothService? = null
     private val connection = object : ServiceConnection {
         override fun onServiceDisconnected(name: ComponentName?) {
-            Log.d(UserFragment::class.java.simpleName, "onServiceDisconnected")
-            mITestService = null
+            mTestService = null
         }
 
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-            mITestService = ITestService.Stub.asInterface(service)
-            Log.d(UserFragment::class.java.simpleName, "onServiceConnected mITestService: $mITestService")
+            mBinderQuery = IBinderQuery.Stub.asInterface(service)
         }
     }
 
@@ -154,10 +158,20 @@ class UserFragment : BaseFragment() {
             add(
                 MenuItem(
                     View.OnClickListener {
-                        mITestService?.test("asdfasdf")
-                        Log.d(UserFragment::class.java.simpleName, "binder click mITestService: $mITestService")
+                        ITestService.Stub.asInterface(mBinderQuery?.queryBinder(BINDER_REQUEST_CODE_TEST))
+                            .test("binder test")
                     },
-                    "binder",
+                    "binder test",
+                    R.mipmap.ic_test
+                )
+            )
+            add(
+                MenuItem(
+                    View.OnClickListener {
+                        IBluetoothService.Stub.asInterface(mBinderQuery?.queryBinder(BINDER_REQUEST_CODE_BLUETOOTH))
+                            .init(0, "init")
+                    },
+                    "binder bt",
                     R.mipmap.ic_test
                 )
             )
