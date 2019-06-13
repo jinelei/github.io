@@ -12,7 +12,6 @@ import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
-import android.widget.Toast
 import cn.jinelei.rainbow.app.BaseApp
 import cn.jinelei.rainbow.constant.DEFAULT_HIDE_LOADING_TIMEOUT
 import cn.jinelei.rainbow.constant.PRE_KEY_DEBUG
@@ -24,6 +23,7 @@ import kotlinx.coroutines.*
 
 open class BaseActivity : AppCompatActivity() {
     protected lateinit var mBaseApp: BaseApp
+    protected lateinit var mContext: Context
     // 公共的管理器
     lateinit var mWifiManager: WifiManager    //    wifi管理器
     lateinit var mNotificationManager: NotificationManager    //    通知管理器
@@ -44,10 +44,11 @@ open class BaseActivity : AppCompatActivity() {
     //    初始化数据
     private fun initData() {
         mBaseApp = this.application as BaseApp
-        loadingDialog = LoadingDialog(mBaseApp)
+        mContext = this
+        loadingDialog = LoadingDialog(mContext)
         mWifiManager = mBaseApp.getSystemService(Context.WIFI_SERVICE) as WifiManager
         mNotificationManager = mBaseApp.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        alertDialogBuilder = AlertDialog.Builder(mBaseApp)
+        alertDialogBuilder = AlertDialog.Builder(mContext)
         fragmentManager = supportFragmentManager
         grantedActions.clear()
         deniedActions.clear()
@@ -63,14 +64,14 @@ open class BaseActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
         super.onCreate(savedInstanceState, persistentState)
-        debug(Log.VERBOSE, Thread.currentThread().stackTrace[2].methodName)
         initData()
+        debug(Log.VERBOSE, Thread.currentThread().stackTrace[2].methodName)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        debug(Log.VERBOSE, Thread.currentThread().stackTrace[2].methodName)
         initData()
+        debug(Log.VERBOSE, Thread.currentThread().stackTrace[2].methodName)
     }
 
     override fun onStart() {
@@ -247,13 +248,7 @@ open class BaseActivity : AppCompatActivity() {
             Log.ERROR -> Log.e(this.javaClass.simpleName, message)
         }
         if (level >= debug)
-            toast(message)
-    }
-
-    fun toast(message: String) {
-        GlobalScope.launch(Dispatchers.Main) {
-            Toast.makeText(this@BaseActivity, message, Toast.LENGTH_SHORT).show()
-        }
+            mBaseApp.toast(message)
     }
 
     //    显示加载框

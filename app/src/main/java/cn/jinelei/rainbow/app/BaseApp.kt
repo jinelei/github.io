@@ -4,15 +4,17 @@ import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import cn.jinelei.rainbow.BuildConfig
 import cn.jinelei.rainbow.app.handler.CustomCrashHandler
 import cn.jinelei.rainbow.constant.PRE_KEY_DEBUG
 import cn.jinelei.rainbow.constant.PRE_NAME_MINE
 import com.facebook.stetho.Stetho
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
-@Suppress("UNCHECKED_CAST")
 class BaseApp : Application() {
-
     //    初始化数据
     private fun initData() {
         if (!existPreference(PRE_NAME_MINE, PRE_KEY_DEBUG))
@@ -64,6 +66,12 @@ class BaseApp : Application() {
 
     fun existPreference(name: String, key: String): Boolean {
         return getSharedPreferences(name, Context.MODE_PRIVATE).contains(key)
+    }
+
+    fun toast(message: String) {
+        GlobalScope.launch(Dispatchers.Main) {
+            Toast.makeText(applicationContext, message, Toast.LENGTH_SHORT).show()
+        }
     }
 
 }

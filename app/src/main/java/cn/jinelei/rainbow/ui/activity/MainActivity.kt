@@ -51,7 +51,7 @@ class MainActivity : BaseActivity() {
                     Manifest.permission.ACCESS_COARSE_LOCATION
                 ),
                 null,
-                Runnable { toast(getString(R.string.write_log_need_write_permission)) },
+                Runnable { mBaseApp.toast(getString(R.string.write_log_need_write_permission)) },
                 Runnable {
                     alertDialogBuilder.let {
                         it.setTitle(getString(R.string.request_permission))

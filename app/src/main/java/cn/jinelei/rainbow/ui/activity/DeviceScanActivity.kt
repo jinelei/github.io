@@ -21,6 +21,8 @@ import kotlinx.android.synthetic.main.activity_device_scan.*
 import kotlinx.android.synthetic.main.include_top_navigation.*
 import kotlinx.android.synthetic.main.wifi_info_layout.*
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -77,35 +79,40 @@ class DeviceScanActivity : BaseActivity() {
         debug(Log.VERBOSE, "start detect wifi")
         showLoading()
         val scanResults = mWifiManager.scanResults
-        rvDeviceScanResult.apply {
-            visibility = when (scanResults.size == 0) {
-                true -> View.INVISIBLE
-                false -> View.VISIBLE
-            }
-            adapter = BaseRecyclerAdapter(
-                itemLayoutId = R.layout.wifi_info_layout,
-                dataList = scanResults.sortedWith(compareBy { Math.abs(it.level) }).toMutableList()
-            ) {
-                onBindViewHolder { holder, position ->
-                    holder.tv_ssid.text = getItem(position).SSID
-                    holder.tv_bssid.text = getItem(position).BSSID
-                    holder.tv_level.text = getItem(position).level.toString()
-                    holder.iv_frequency.let {
-                        if (getItem(position).frequency in 4901..5899)
-                            it.setImageResource(R.mipmap.ic_5ghz)
-                        else
-                            it.setImageResource(R.mipmap.ic_2_4ghz)
+        GlobalScope.launch(IO) {
+            delay(2000)
+            hideLoading()
+            GlobalScope.launch(Main) {
+                rvDeviceScanResult.apply {
+                    visibility = when (scanResults.size == 0) {
+                        true -> View.INVISIBLE
+                        false -> View.VISIBLE
+                    }
+                    adapter = BaseRecyclerAdapter(
+                        itemLayoutId = R.layout.wifi_info_layout,
+                        dataList = scanResults.sortedWith(compareBy { Math.abs(it.level) }).toMutableList()
+                    ) {
+                        onBindViewHolder { holder, position ->
+                            holder.tv_ssid.text = getItem(position).SSID
+                            holder.tv_bssid.text = getItem(position).BSSID
+                            holder.tv_level.text = getItem(position).level.toString()
+                            holder.iv_frequency.let {
+                                if (getItem(position).frequency in 4901..5899)
+                                    it.setImageResource(R.mipmap.ic_5ghz)
+                                else
+                                    it.setImageResource(R.mipmap.ic_2_4ghz)
+                            }
+                        }
+                    }
+                }
+                tvDeviceScanInfoNothing.let {
+                    it.visibility = when (scanResults.size) {
+                        0 -> View.VISIBLE
+                        else -> View.INVISIBLE
                     }
                 }
             }
         }
-        tvDeviceScanInfoNothing.let {
-            it.visibility = when (scanResults.size) {
-                0 -> View.VISIBLE
-                else -> View.INVISIBLE
-            }
-        }
-        hideLoading()
     }
 
     private fun scanDevice() {
@@ -118,7 +125,7 @@ class DeviceScanActivity : BaseActivity() {
                     Manifest.permission.ACCESS_COARSE_LOCATION
                 ),
                 Runnable { detectWifi() },
-                Runnable { toast(getString(R.string.failed_to_turn_on_wifi_please_turn_on_wifi_permissions_manually)) },
+                Runnable { mBaseApp.toast(getString(R.string.failed_to_turn_on_wifi_please_turn_on_wifi_permissions_manually)) },
                 Runnable { showExplainDialog() }
             )
         } else {
@@ -127,7 +134,7 @@ class DeviceScanActivity : BaseActivity() {
                     Manifest.permission.CHANGE_WIFI_STATE
                 ),
                 Runnable { showOpenWifiDialog() },
-                Runnable { toast(getString(R.string.failed_to_turn_on_wifi__please_turn_on_wifi_manually)) },
+                Runnable { mBaseApp.toast(getString(R.string.failed_to_turn_on_wifi__please_turn_on_wifi_manually)) },
                 Runnable { showExplainDialog() }
             )
         }
