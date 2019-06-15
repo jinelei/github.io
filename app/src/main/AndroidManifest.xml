@@ -28,6 +28,8 @@
         </activity>
         <activity android:name="cn.jinelei.rainbow.ui.activity.ScanDeviceActivity">
         </activity>
+        <activity android:name="cn.jinelei.rainbow.ui.activity.ScanWifiActivity">
+        </activity>
 
         <service
                 android:name=".service.MainService"

@@ -1,6 +1,5 @@
 package cn.jinelei.rainbow.ui.common
 
-import android.service.autofill.Dataset
 import android.support.annotation.LayoutRes
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
@@ -11,7 +10,7 @@ import kotlinx.android.extensions.LayoutContainer
 
 open class BaseRecyclerAdapter<M>(
     @LayoutRes val itemLayoutId: Int,
-    var dataList: MutableList<M> = mutableListOf(),
+    val dataSet: MutableList<M> = mutableListOf(),
     bind: (BaseRecyclerAdapter<M>.() -> Unit)? = null
 ) : RecyclerView.Adapter<BaseRecyclerAdapter.CommonViewHolder>() {
     init {
@@ -28,23 +27,27 @@ open class BaseRecyclerAdapter<M>(
         this.onBindViewHolder = onBindViewHolder
     }
 
-    fun append(m: M) {
-        val idx = dataList.size
-        dataList.add(m)
+    //    添加item
+    fun add(item: M) {
+        val idx = dataSet.size
+        dataSet.add(item)
         notifyItemInserted(idx)
     }
 
+    //    清除所有的item
     fun clear() {
-        dataList.clear()
+        dataSet.clear()
         notifyDataSetChanged()
     }
 
+    //    重置所有的item
     fun reset(data: MutableList<M>) {
-        dataList = data
+        dataSet.clear()
+        dataSet.addAll(data)
         notifyDataSetChanged()
     }
 
-    fun getItem(position: Int) = dataList[position]
+    fun getItem(position: Int) = dataSet[position]
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CommonViewHolder {
         val itemView = LayoutInflater.from(parent.context).inflate(itemLayoutId, parent, false)
@@ -59,7 +62,7 @@ open class BaseRecyclerAdapter<M>(
         return viewHolder
     }
 
-    override fun getItemCount() = dataList.size
+    override fun getItemCount() = dataSet.size
 
     override fun onBindViewHolder(holder: CommonViewHolder, position: Int) {
         if (onBindViewHolder != null) {

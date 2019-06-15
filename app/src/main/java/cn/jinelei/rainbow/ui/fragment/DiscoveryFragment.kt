@@ -129,7 +129,7 @@ class DiscoveryFragment : BaseFragment() {
             layoutManager = LinearLayoutManager(activity)
             adapter = BaseRecyclerAdapter(
                 itemLayoutId = R.layout.discovery_card_layout,
-                dataList = mDataSet
+                dataSet = mDataSet
             ) {
                 onBindViewHolder { holder, position ->
                     if (getItem(position).titleRes!! > 0)

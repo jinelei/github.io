@@ -24,7 +24,6 @@ import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.greenrobot.eventbus.EventBus
 
 class ScanWifiActivity : BaseActivity() {
     private lateinit var rvWifiScanResult: RecyclerView
@@ -43,7 +42,6 @@ class ScanWifiActivity : BaseActivity() {
     }
 
     private fun initView() {
-        EventBus.getDefault().register(this)
         setContentView(R.layout.activity_scan_wifi)
         rvWifiScanResult = rv_wifi_scan_info.apply {
             layoutManager = LinearLayoutManager(this@ScanWifiActivity)
@@ -85,7 +83,7 @@ class ScanWifiActivity : BaseActivity() {
                     }
                     adapter = BaseRecyclerAdapter(
                         itemLayoutId = R.layout.wifi_info_layout,
-                        dataList = scanResults.sortedWith(compareBy { Math.abs(it.level) }).toMutableList()
+                        dataSet = scanResults.sortedWith(compareBy { Math.abs(it.level) }).toMutableList()
                     ) {
                         onBindViewHolder { holder, position ->
                             holder.tv_name.text = getItem(position).SSID
@@ -187,7 +185,6 @@ class ScanWifiActivity : BaseActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        EventBus.getDefault().unregister(this)
     }
 
 }

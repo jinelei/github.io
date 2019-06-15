@@ -10,16 +10,19 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
+import android.support.v7.widget.DefaultItemAnimator
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.View
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
+import android.widget.ImageView
 import android.widget.TextView
 import cn.jinelei.rainbow.R
 import cn.jinelei.rainbow.base.BaseActivity
 import cn.jinelei.rainbow.constant.DEFAULT_BLUETOOTH_SCAN_TIMEOUT
-import cn.jinelei.rainbow.constant.DEFAULT_HIDE_LOADING_TIMEOUT
 import cn.jinelei.rainbow.constant.REQUEST_CODE_OPEN_BT
 import cn.jinelei.rainbow.constant.WifiScanMessageEvent
 import cn.jinelei.rainbow.ui.common.BaseRecyclerAdapter
@@ -39,7 +42,8 @@ class ScanDeviceActivity : BaseActivity() {
     private lateinit var rvDeviceScanResult: RecyclerView
     private lateinit var tvDeviceScanTitle: TextView
     private lateinit var tvDeviceScanInfoNothing: TextView
-    private val scanDevices = mutableListOf<BluetoothDevice>()
+    private lateinit var ivNavRight: ImageView
+    private lateinit var animation: Animation
     private var scanning = false
     private var autoStopScanJob: Job? = null
 
@@ -69,6 +73,7 @@ class ScanDeviceActivity : BaseActivity() {
     }
 
     private fun initData() {
+        animation = AnimationUtils.loadAnimation(mContext, R.anim.loading_anim);
     }
 
     private fun initView() {
@@ -82,9 +87,10 @@ class ScanDeviceActivity : BaseActivity() {
                     DividerItemDecoration.VERTICAL
                 )
             )
+            itemAnimator = DefaultItemAnimator()
             adapter = BaseRecyclerAdapter(
                 itemLayoutId = R.layout.device_info_layout,
-                dataList = scanDevices
+                dataSet = mutableListOf<BluetoothDevice>()
             ) {
                 onBindViewHolder { holder, position ->
                     holder.tv_name.text = getItem(position).name
@@ -104,8 +110,8 @@ class ScanDeviceActivity : BaseActivity() {
         tvDeviceScanTitle = tv_nav_title.apply {
             text = resources.getString(R.string.scan_device)
         }
-        iv_nav_right.apply {
-            setImageResource(R.mipmap.ic_discovery)
+        ivNavRight = iv_nav_right.apply {
+            setImageResource(R.mipmap.ic_query)
             setOnClickListener { if (!isFastClick(tvDeviceScanInfoNothing)) prepareScanDevice() }
         }
         iv_nav_left.apply {
@@ -130,46 +136,41 @@ class ScanDeviceActivity : BaseActivity() {
     private fun addDevice(device: BluetoothDevice) {
         if (device.name.isNullOrBlank())
             return
-        if (scanDevices.filter { device -> device.address == device.address }.isEmpty()) {
-            scanDevices.add(device)
-            (rvDeviceScanResult.adapter as BaseRecyclerAdapter<BluetoothDevice>).reset(scanDevices)
-            rvDeviceScanResult.visibility = when (scanDevices.size) {
-                0 -> View.INVISIBLE
-                else -> View.VISIBLE
-            }
-            tvDeviceScanInfoNothing.visibility = when (scanDevices.size) {
-                0 -> View.VISIBLE
-                else -> View.INVISIBLE
-            }
+        if ((rvDeviceScanResult.adapter as BaseRecyclerAdapter<BluetoothDevice>).dataSet.filter { dev: BluetoothDevice -> dev.address == device.address }.isEmpty()) {
+            (rvDeviceScanResult.adapter as BaseRecyclerAdapter<BluetoothDevice>).add(device)
+            rvDeviceScanResult.visibility =
+                when ((rvDeviceScanResult.adapter as BaseRecyclerAdapter<BluetoothDevice>).dataSet.size) {
+                    0 -> View.INVISIBLE
+                    else -> View.VISIBLE
+                }
+            tvDeviceScanInfoNothing.visibility =
+                when ((rvDeviceScanResult.adapter as BaseRecyclerAdapter<BluetoothDevice>).dataSet.size) {
+                    0 -> View.VISIBLE
+                    else -> View.INVISIBLE
+                }
         }
     }
 
     //    重置设备列表
     private fun resetDevice() {
-        scanDevices.clear()
         (rvDeviceScanResult.adapter as BaseRecyclerAdapter<BluetoothDevice>).clear()
-        rvDeviceScanResult.visibility = when (scanDevices.size) {
-            0 -> View.INVISIBLE
-            else -> View.VISIBLE
-        }
-        tvDeviceScanInfoNothing.visibility = when (scanDevices.size) {
-            0 -> View.VISIBLE
-            else -> View.INVISIBLE
-        }
+        rvDeviceScanResult.visibility =
+            when ((rvDeviceScanResult.adapter as BaseRecyclerAdapter<BluetoothDevice>).dataSet.size) {
+                0 -> View.INVISIBLE
+                else -> View.VISIBLE
+            }
+        tvDeviceScanInfoNothing.visibility =
+            when ((rvDeviceScanResult.adapter as BaseRecyclerAdapter<BluetoothDevice>).dataSet.size) {
+                0 -> View.VISIBLE
+                else -> View.INVISIBLE
+            }
     }
 
     //    准备开始扫描设备
     private fun prepareScanDevice() {
         debug(Log.DEBUG, "scanning: $scanning enabled: ${mBluetoothManager.adapter.isEnabled}")
         if (scanning) {
-            mBluetoothManager.adapter.bluetoothLeScanner.stopScan(mScanCallback)
-            autoStopScanJob?.let {
-                if (it.isActive && !it.isCompleted && !it.isCancelled) {
-                    debug(Log.DEBUG, "cancel auto stop scan job")
-                    it.cancel()
-                }
-            }
-            scanning = false
+            stopScanDevice()
         } else {
             if (mBluetoothManager.adapter.isEnabled) {
                 setNecessaryPermission(
@@ -178,15 +179,10 @@ class ScanDeviceActivity : BaseActivity() {
                         Manifest.permission.BLUETOOTH_ADMIN
                     ),
                     Runnable {
-                        debug(Log.VERBOSE, "start detect bt")
-                        resetDevice()
-                        mBluetoothManager.adapter.bluetoothLeScanner.startScan(mScanCallback)
-                        scanning = true
+                        startScanDevice()
                         autoStopScanJob = GlobalScope.launch(IO) {
                             delay(DEFAULT_BLUETOOTH_SCAN_TIMEOUT)
-                            scanning = false
-                            debug(Log.DEBUG, "run auto stop scanning: $scanning")
-                            mBluetoothManager.adapter.bluetoothLeScanner.stopScan(mScanCallback)
+                            stopScanDevice()
                         }
                     },
                     Runnable { mBaseApp.toast(getString(R.string.failed_to_turn_on_bluetooth_please_turn_on_bluetooth_permissions_manually)) },
@@ -206,6 +202,32 @@ class ScanDeviceActivity : BaseActivity() {
                 )
             }
         }
+    }
+
+    private fun stopScanDevice() {
+        mBluetoothManager.adapter.bluetoothLeScanner.stopScan(mScanCallback)
+        autoStopScanJob?.let {
+            if (it.isActive && !it.isCompleted && !it.isCancelled) {
+                debug(Log.DEBUG, "cancel auto stop scan job")
+                it.cancel()
+            }
+        }
+        ivNavRight.let {
+            it.setImageDrawable(resources.getDrawable(R.mipmap.ic_query))
+            it.clearAnimation()
+        }
+        scanning = false
+    }
+
+    private fun startScanDevice() {
+        debug(Log.VERBOSE, "start detect bt")
+        resetDevice()
+        mBluetoothManager.adapter.bluetoothLeScanner.startScan(mScanCallback)
+        ivNavRight.let {
+            it.setImageDrawable(resources.getDrawable(R.mipmap.ic_loading))
+            it.startAnimation(animation)
+        }
+        scanning = true
     }
 
     //    打开解释权限对话框

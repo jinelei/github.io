@@ -1,15 +1,11 @@
 package cn.jinelei.rainbow.ui.activity
 
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
-import android.support.annotation.RequiresApi
-import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import cn.jinelei.rainbow.R
-import cn.jinelei.rainbow.app.BaseApp
 import cn.jinelei.rainbow.base.BaseActivity
 import cn.jinelei.rainbow.constant.PRE_KEY_LANGUAGE
 import cn.jinelei.rainbow.constant.PRE_NAME_MINE
@@ -19,7 +15,6 @@ import kotlinx.android.synthetic.main.include_top_navigation.*
 import kotlinx.android.synthetic.main.include_top_navigation.tv_nav_title
 import kotlinx.android.synthetic.main.language_item_layout.*
 import java.util.*
-import java.util.function.Consumer
 
 class ChangeLanguageActivity : BaseActivity() {
     var iCurrentLocaleIdx: Int = 0
@@ -67,7 +62,7 @@ class ChangeLanguageActivity : BaseActivity() {
             layoutManager = LinearLayoutManager(this@ChangeLanguageActivity)
             adapter = BaseRecyclerAdapter(
                 itemLayoutId = R.layout.language_item_layout,
-                dataList = allSupportLocales
+                dataSet = allSupportLocales
             ) {
                 onBindViewHolder { holder, position ->
                     holder.iv_icon.setImageResource(getItem(position).resId)

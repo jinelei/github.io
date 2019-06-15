@@ -78,7 +78,7 @@ class UserFragment : BaseFragment() {
             layoutManager = LinearLayoutManager(activity)
             adapter = BaseRecyclerAdapter(
                 itemLayoutId = R.layout.list_menu_layout,
-                dataList = mMenuDataSet
+                dataSet = mMenuDataSet
             ) {
                 onBindViewHolder { holder, position ->
                     holder.iv_list_item_icon.setImageResource(getItem(position).resourceId)
@@ -93,7 +93,7 @@ class UserFragment : BaseFragment() {
             layoutManager = GridLayoutManager(activity, 5)
             adapter = BaseRecyclerAdapter(
                 itemLayoutId = R.layout.grid_menu_layout,
-                dataList = mGridMenuDataSet
+                dataSet = mGridMenuDataSet
             ) {
                 onBindViewHolder { holder, position ->
                     holder.iv_grid_item_icon.setImageResource(getItem(position).resourceId)
@@ -232,4 +232,12 @@ class UserFragment : BaseFragment() {
 
     class MenuItem(var callback: View.OnClickListener, var title: String, var resourceId: Int)
 
+    companion object {
+        val TAG = UserFragment::class.java.simpleName ?: "UserFragment"
+        val instance by lazy { Holder.INSTANCE }
+    }
+
+    private object Holder {
+        val INSTANCE = UserFragment()
+    }
 }
