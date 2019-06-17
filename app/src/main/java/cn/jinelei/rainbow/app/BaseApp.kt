@@ -2,7 +2,11 @@ package cn.jinelei.rainbow.app
 
 import android.annotation.SuppressLint
 import android.app.Application
+import android.app.NotificationManager
+import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothManager
 import android.content.Context
+import android.net.wifi.WifiManager
 import android.util.Log
 import android.widget.Toast
 import cn.jinelei.rainbow.BuildConfig
@@ -15,10 +19,19 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
 class BaseApp : Application() {
+    // 公共的管理器
+    lateinit var mWifiManager: WifiManager    //    wifi管理器
+    lateinit var mNotificationManager: NotificationManager    //    通知管理器
+    lateinit var mBluetoothManager: BluetoothManager    //    蓝牙管理器
+    lateinit var mBluetoothAdapter: BluetoothAdapter   //    蓝牙适配器
     //    初始化数据
     private fun initData() {
         if (!existPreference(PRE_NAME_MINE, PRE_KEY_DEBUG))
             savePreference(PRE_NAME_MINE, PRE_KEY_DEBUG, Log.DEBUG)
+        mBluetoothManager = getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
+        mBluetoothAdapter = mBluetoothManager.adapter
+        mWifiManager = getSystemService(Context.WIFI_SERVICE) as WifiManager
+        mNotificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     }
 
     //    销毁相关数据

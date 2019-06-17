@@ -37,4 +37,5 @@
     </string>
     <string name="bluetooth_already_closed">蓝牙已经关闭</string>
     <string name="scan_bluetooth_need_open_bluetooth">扫描需要打开蓝牙开关</string>
+    <string name="all_uuid_service">所有服务</string>
 </resources>

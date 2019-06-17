@@ -13,6 +13,12 @@ open class BaseRecyclerAdapter<M>(
     val dataSet: MutableList<M> = mutableListOf(),
     bind: (BaseRecyclerAdapter<M>.() -> Unit)? = null
 ) : RecyclerView.Adapter<BaseRecyclerAdapter.CommonViewHolder>() {
+
+    constructor(
+        @LayoutRes itemLayoutId: Int,
+        bind: (BaseRecyclerAdapter<M>.() -> Unit)? = null
+    ) : this(itemLayoutId, mutableListOf<M>(), bind)
+
     init {
         if (bind != null) {
             apply(bind)
@@ -28,7 +34,7 @@ open class BaseRecyclerAdapter<M>(
     }
 
     //    添加item
-    fun add(item: M) {
+    fun append(item: M) {
         val idx = dataSet.size
         dataSet.add(item)
         notifyItemInserted(idx)

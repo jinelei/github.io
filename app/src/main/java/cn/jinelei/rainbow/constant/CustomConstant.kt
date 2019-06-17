@@ -16,3 +16,6 @@ const val PRE_NAME_MINE = "PRE_NAME_MINE"
 const val PRE_KEY_DEBUG = "PRE_KEY_DEBUG"
 const val PRE_KEY_LANGUAGE = "PRE_KEY_LANGUAGE"
 
+//  默认值
+const val DEFAULT_MTU_SIZE = 20
+

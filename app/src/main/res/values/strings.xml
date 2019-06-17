@@ -57,4 +57,5 @@
     </string>
     <string name="bluetooth_already_closed">bluetooth already closed</string>
     <string name="scan_bluetooth_need_open_bluetooth">scan bluetooth need open bluetooth</string>
+    <string name="all_uuid_service">all uuid service</string>
 </resources>

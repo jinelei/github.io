@@ -25,10 +25,6 @@ import kotlinx.coroutines.*
 open class BaseActivity : AppCompatActivity() {
     protected lateinit var mBaseApp: BaseApp
     protected lateinit var mContext: Context
-    // 公共的管理器
-    lateinit var mWifiManager: WifiManager    //    wifi管理器
-    lateinit var mBluetoothManager: BluetoothManager    //    蓝牙管理器
-    lateinit var mNotificationManager: NotificationManager    //    通知管理器
     // 弹窗相关
     private lateinit var loadingDialog: LoadingDialog    //    加载中弹窗
     lateinit var alertDialogBuilder: AlertDialog.Builder    //    请求权限的弹窗
@@ -48,9 +44,6 @@ open class BaseActivity : AppCompatActivity() {
         mBaseApp = this.application as BaseApp
         mContext = this
         loadingDialog = LoadingDialog(mContext)
-        mWifiManager = mBaseApp.getSystemService(Context.WIFI_SERVICE) as WifiManager
-        mBluetoothManager = mBaseApp.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
-        mNotificationManager = mBaseApp.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         alertDialogBuilder = AlertDialog.Builder(mContext)
         fragmentManager = supportFragmentManager
         grantedActions.clear()

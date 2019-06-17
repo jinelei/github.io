@@ -38,7 +38,7 @@ class ScanWifiActivity : BaseActivity() {
     }
 
     private fun initData() {
-        mWifiInfo = mWifiManager.connectionInfo
+        mWifiInfo = mBaseApp.mWifiManager.connectionInfo
     }
 
     private fun initView() {
@@ -71,7 +71,7 @@ class ScanWifiActivity : BaseActivity() {
     private fun detectWifi() {
         debug(Log.VERBOSE, "start detect wifi")
         showLoading()
-        val scanResults = mWifiManager.scanResults
+        val scanResults = mBaseApp.mWifiManager.scanResults
         GlobalScope.launch(IO) {
             delay(2000)
             hideLoading()
@@ -109,7 +109,7 @@ class ScanWifiActivity : BaseActivity() {
     }
 
     private fun scanWifi() {
-        if (mWifiManager.isWifiEnabled) {
+        if (mBaseApp.mWifiManager.isWifiEnabled) {
             setNecessaryPermission(
                 listOf(
                     Manifest.permission.ACCESS_NETWORK_STATE,
@@ -148,7 +148,7 @@ class ScanWifiActivity : BaseActivity() {
             setPositiveButton(
                 getString(R.string.open)
             ) { _, _ ->
-                mWifiManager.isWifiEnabled = true
+                mBaseApp.mWifiManager.isWifiEnabled = true
             }
             setNegativeButton(getString(R.string.cancel)) { _, _ -> finish() }
             create()
