@@ -35,7 +35,7 @@ class MainActivity : BaseActivity() {
                     switchFragmentTo(R.id.frame_main, UserFragment.instance)
                 R.id.navigation_discovery ->
                     switchFragmentTo(R.id.frame_main, DiscoveryFragment.instance)
-                else -> debug(Log.ERROR, "invalid switch fragment: ${menuItem.itemId}")
+                else -> mBaseApp.debug(Log.ERROR, "invalid switch fragment: ${menuItem.itemId}")
             }
             true
         }

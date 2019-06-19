@@ -1,11 +1,8 @@
 package cn.jinelei.rainbow.base
 
 import android.app.AlertDialog
-import android.app.NotificationManager
-import android.bluetooth.BluetoothManager
 import android.content.Context
 import android.content.pm.PackageManager
-import android.net.wifi.WifiManager
 import android.os.Bundle
 import android.os.PersistableBundle
 import android.support.v4.app.ActivityCompat
@@ -15,15 +12,13 @@ import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import cn.jinelei.rainbow.app.BaseApp
 import cn.jinelei.rainbow.constant.DEFAULT_HIDE_LOADING_TIMEOUT
-import cn.jinelei.rainbow.constant.PRE_KEY_DEBUG
-import cn.jinelei.rainbow.constant.PRE_NAME_MINE
 import cn.jinelei.rainbow.ui.view.LoadingDialog
 import cn.jinelei.rainbow.util.getCrc16
 import kotlinx.coroutines.*
 
 
 open class BaseActivity : AppCompatActivity() {
-    protected lateinit var mBaseApp: BaseApp
+    lateinit var mBaseApp: BaseApp
     protected lateinit var mContext: Context
     // 弹窗相关
     private lateinit var loadingDialog: LoadingDialog    //    加载中弹窗
@@ -61,64 +56,64 @@ open class BaseActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
         super.onCreate(savedInstanceState, persistentState)
         initData()
-        debug(Log.VERBOSE, Thread.currentThread().stackTrace[2].methodName)
+        mBaseApp.debug(Log.VERBOSE, Thread.currentThread().stackTrace[2].methodName)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         initData()
-        debug(Log.VERBOSE, Thread.currentThread().stackTrace[2].methodName)
+        mBaseApp.debug(Log.VERBOSE, Thread.currentThread().stackTrace[2].methodName)
     }
 
     override fun onStart() {
         super.onStart()
-        debug(Log.VERBOSE, Thread.currentThread().stackTrace[2].methodName)
+        mBaseApp.debug(Log.VERBOSE, Thread.currentThread().stackTrace[2].methodName)
     }
 
     override fun onResume() {
         super.onResume()
-        debug(Log.VERBOSE, Thread.currentThread().stackTrace[2].methodName)
+        mBaseApp.debug(Log.VERBOSE, Thread.currentThread().stackTrace[2].methodName)
     }
 
     override fun onPause() {
         super.onPause()
-        debug(Log.VERBOSE, Thread.currentThread().stackTrace[2].methodName)
+        mBaseApp.debug(Log.VERBOSE, Thread.currentThread().stackTrace[2].methodName)
     }
 
     override fun onStop() {
         super.onStop()
-        debug(Log.VERBOSE, Thread.currentThread().stackTrace[2].methodName)
+        mBaseApp.debug(Log.VERBOSE, Thread.currentThread().stackTrace[2].methodName)
     }
 
     override fun onRestart() {
         super.onRestart()
-        debug(Log.VERBOSE, Thread.currentThread().stackTrace[2].methodName)
+        mBaseApp.debug(Log.VERBOSE, Thread.currentThread().stackTrace[2].methodName)
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        debug(Log.VERBOSE, Thread.currentThread().stackTrace[2].methodName)
+        mBaseApp.debug(Log.VERBOSE, Thread.currentThread().stackTrace[2].methodName)
         destroyData()
     }
 
     override fun onSaveInstanceState(outState: Bundle?, outPersistentState: PersistableBundle?) {
         super.onSaveInstanceState(outState, outPersistentState)
-        debug(Log.VERBOSE, Thread.currentThread().stackTrace[2].methodName)
+        mBaseApp.debug(Log.VERBOSE, Thread.currentThread().stackTrace[2].methodName)
     }
 
     override fun onSaveInstanceState(outState: Bundle?) {
         super.onSaveInstanceState(outState)
-        debug(Log.VERBOSE, Thread.currentThread().stackTrace[2].methodName)
+        mBaseApp.debug(Log.VERBOSE, Thread.currentThread().stackTrace[2].methodName)
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
         super.onRestoreInstanceState(savedInstanceState)
-        debug(Log.VERBOSE, Thread.currentThread().stackTrace[2].methodName)
+        mBaseApp.debug(Log.VERBOSE, Thread.currentThread().stackTrace[2].methodName)
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
         super.onRestoreInstanceState(savedInstanceState, persistentState)
-        debug(Log.VERBOSE, Thread.currentThread().stackTrace[2].methodName)
+        mBaseApp.debug(Log.VERBOSE, Thread.currentThread().stackTrace[2].methodName)
     }
 
     //    设置必要权限
@@ -139,7 +134,7 @@ open class BaseActivity : AppCompatActivity() {
                 deniedActions[requestCode] = deniedAction
             val grantResult = ActivityCompat.checkSelfPermission(this, permission)
             if (PackageManager.PERMISSION_GRANTED == grantResult) { // 已经获得授权
-                debug(Log.VERBOSE, "permission $permission granted")
+                mBaseApp.debug(Log.VERBOSE, "permission $permission granted")
                 if (deniedTaskCount + --grantedTaskCount == 0) { // 请求权限结束
                     if (grantedTaskCount == 0) { // 完全授权成功
                         grantedAction?.run()
@@ -148,14 +143,14 @@ open class BaseActivity : AppCompatActivity() {
             } else { // 没有授权
                 if (ActivityCompat.shouldShowRequestPermissionRationale(this, permission)) {
                     // 弹窗解释
-                    debug(Log.VERBOSE, "permission $permission explain")
+                    mBaseApp.debug(Log.VERBOSE, "permission $permission explain")
                     --deniedTaskCount
                     if (couldShowExplainAction) {
                         couldShowExplainAction = false
                         explainAction?.run()
                     }
                 } else {
-                    debug(Log.VERBOSE, "permission $permission denied")
+                    mBaseApp.debug(Log.VERBOSE, "permission $permission denied")
                     ActivityCompat.requestPermissions(this, listOf(permission).toTypedArray(), requestCode)
                     if (--deniedTaskCount + grantedTaskCount == 0) { // 请求权限结束
                         deniedAction?.run()
@@ -173,14 +168,14 @@ open class BaseActivity : AppCompatActivity() {
             val result = resultIterator.next()
             val permission = permissionIterator.next()
             if (result == PackageManager.PERMISSION_GRANTED) {
-                debug(Log.VERBOSE, "requestCode $requestCode permission $permission granted")
+                mBaseApp.debug(Log.VERBOSE, "requestCode $requestCode permission $permission granted")
                 if (deniedTaskCount + --grantedTaskCount == 0) { // 请求权限结束
                     if (grantedTaskCount == 0) { // 完全授权成功
                         grantedActions[requestCode]?.run()
                     }
                 }
             } else {
-                debug(Log.VERBOSE, "requestCode $requestCode permission $permission denied")
+                mBaseApp.debug(Log.VERBOSE, "requestCode $requestCode permission $permission denied")
                 if (--deniedTaskCount + grantedTaskCount == 0) { // 请求权限结束
                     deniedActions[requestCode]?.run()
                 }
@@ -190,7 +185,7 @@ open class BaseActivity : AppCompatActivity() {
 
     //    切换Fragment
     fun switchFragmentTo(containerId: Int, targetFragment: Fragment) {
-        debug(
+        mBaseApp.debug(
             Log.VERBOSE,
             "${currentFragment?.javaClass?.simpleName} to ${targetFragment::class.java.simpleName}"
         )
@@ -230,28 +225,11 @@ open class BaseActivity : AppCompatActivity() {
         }
     }
 
-    fun debug(level: Int, message: String) {
-        val debug = mBaseApp.readPreference(
-            name = PRE_NAME_MINE,
-            key = PRE_KEY_DEBUG,
-            defaultValue = 0
-        )
-        when (level) {
-            Log.VERBOSE -> Log.v(this.javaClass.simpleName, message)
-            Log.DEBUG -> Log.d(this.javaClass.simpleName, message)
-            Log.INFO -> Log.i(this.javaClass.simpleName, message)
-            Log.WARN -> Log.w(this.javaClass.simpleName, message)
-            Log.ERROR -> Log.e(this.javaClass.simpleName, message)
-        }
-        if (level >= debug)
-            mBaseApp.toast(message)
-    }
-
     //    显示加载框
     fun showLoading(timeout: Long = DEFAULT_HIDE_LOADING_TIMEOUT) {
         GlobalScope.launch(Dispatchers.Main) {
             if (!loadingDialog.isShowing) {
-                debug(Log.VERBOSE, "show loading dialog and set timeout: $timeout")
+                mBaseApp.debug(Log.VERBOSE, "show loading dialog and set timeout: $timeout")
                 loadingDialog.show()
             }
         }
@@ -259,7 +237,7 @@ open class BaseActivity : AppCompatActivity() {
             delay(timeout)
             GlobalScope.launch(Dispatchers.Main) {
                 if (loadingDialog.isShowing) {
-                    debug(Log.VERBOSE, "dismiss loading dialog in timeout job")
+                    mBaseApp.debug(Log.VERBOSE, "dismiss loading dialog in timeout job")
                     loadingDialog.dismiss()
                 }
             }
@@ -270,12 +248,12 @@ open class BaseActivity : AppCompatActivity() {
     fun hideLoading() {
         GlobalScope.launch(Dispatchers.Main) {
             if (loadingDialog.isShowing) {
-                debug(Log.VERBOSE, "dismiss loading dialog")
+                mBaseApp.debug(Log.VERBOSE, "dismiss loading dialog")
                 loadingDialog.dismiss()
             }
         }
         if (loadingDialogTimeoutJob?.isActive == true) {
-            debug(Log.VERBOSE, "cancel loading dialog timeout job")
+            mBaseApp.debug(Log.VERBOSE, "cancel loading dialog timeout job")
             loadingDialogTimeoutJob?.cancel()
         }
     }

@@ -86,5 +86,22 @@ class BaseApp : Application() {
             Toast.makeText(applicationContext, message, Toast.LENGTH_SHORT).show()
         }
     }
+    
+    fun debug(level: Int, message: String) {
+        val debug = readPreference(
+            name = PRE_NAME_MINE,
+            key = PRE_KEY_DEBUG,
+            defaultValue = 0
+        )
+        when (level) {
+            Log.VERBOSE -> Log.v(this.javaClass.simpleName, message)
+            Log.DEBUG -> Log.d(this.javaClass.simpleName, message)
+            Log.INFO -> Log.i(this.javaClass.simpleName, message)
+            Log.WARN -> Log.w(this.javaClass.simpleName, message)
+            Log.ERROR -> Log.e(this.javaClass.simpleName, message)
+        }
+        if (level >= debug)
+            toast(message)
+    }
 
 }

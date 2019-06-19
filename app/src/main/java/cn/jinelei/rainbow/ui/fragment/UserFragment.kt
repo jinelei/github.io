@@ -125,35 +125,35 @@ class UserFragment : BaseFragment() {
             clear()
             add(
                 MenuItem(
-                    View.OnClickListener { (activity as BaseActivity).debug(Log.VERBOSE, "verbose") },
+                    View.OnClickListener { (activity as BaseActivity).mBaseApp.debug(Log.VERBOSE, "verbose") },
                     "verbose",
                     R.mipmap.ic_test
                 )
             )
             add(
                 MenuItem(
-                    View.OnClickListener { (activity as BaseActivity).debug(Log.DEBUG, "debug") },
+                    View.OnClickListener { (activity as BaseActivity).mBaseApp.debug(Log.DEBUG, "debug") },
                     "debug",
                     R.mipmap.ic_test
                 )
             )
             add(
                 MenuItem(
-                    View.OnClickListener { (activity as BaseActivity).debug(Log.INFO, "info") },
+                    View.OnClickListener { (activity as BaseActivity).mBaseApp.debug(Log.INFO, "info") },
                     "info",
                     R.mipmap.ic_test
                 )
             )
             add(
                 MenuItem(
-                    View.OnClickListener { (activity as BaseActivity).debug(Log.WARN, "warn") },
+                    View.OnClickListener { (activity as BaseActivity).mBaseApp.debug(Log.WARN, "warn") },
                     "warn",
                     R.mipmap.ic_test
                 )
             )
             add(
                 MenuItem(
-                    View.OnClickListener { (activity as BaseActivity).debug(Log.ERROR, "error") },
+                    View.OnClickListener { (activity as BaseActivity).mBaseApp.debug(Log.ERROR, "error") },
                     "error",
                     R.mipmap.ic_test
                 )

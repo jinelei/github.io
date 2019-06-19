@@ -69,7 +69,7 @@ class ScanWifiActivity : BaseActivity() {
     }
 
     private fun detectWifi() {
-        debug(Log.VERBOSE, "start detect wifi")
+        mBaseApp.debug(Log.VERBOSE, "start detect wifi")
         showLoading()
         val scanResults = mBaseApp.mWifiManager.scanResults
         GlobalScope.launch(IO) {

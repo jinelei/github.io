@@ -1,25 +1,12 @@
 package cn.jinelei.rainbow.bluetooth;
 
 import cn.jinelei.rainbow.bluetooth.IConnectionCallback;
+import android.bluetooth.BluetoothDevice;
 
 interface IBluetoothService {
 
-    /**
-     * Init IPCController.
-     * @param cmd_type Only support SDK Controller CMD_8 or CMD_9
-     * @param tagName Controller Tag
-     */
-    int init(int cmd_type, in String tagName);
 
-    /**
-     * Send bytes to device.
-     * @param tagName Controller Tag, use your IPCController init tag.
-     * @param cmd command string, like "yahooweather yahooweather 1 0 0 "
-     * @param dataBuffer byte type of data, like "".getBytes()
-     * @param priority default PRIORITY_NORMAL#0, if set as PRIORITY_HIGH#1, this session
-     *        will get top priority to send.
-     */
-    long sendBytes(in String tagName, String cmd, in byte[] data, int priority);
+    long sendBytes(in BluetoothDevice device, String cmd, in byte[] data, int priority);
 
     /**
      * Return connection state.
@@ -32,25 +19,21 @@ interface IBluetoothService {
      * @see STATE_CONNECTED#5
      * @see STATE_DISCONNECTING#6
      */
-    int getConnectionState();
+    int getConnectionState(in BluetoothDevice device);
 
     /**
      * Destroy the IPCController.
      */
-    void close(String tagName);
+    void close(in BluetoothDevice device);
 
     /**
      * register IControllerCallback for the "tagName" IPCController.
      */
-    void registerConnectionCallback(in String tagName, in IConnectionCallback callback);
+    void registerConnectionCallback(in BluetoothDevice device, in IConnectionCallback callback);
 
     /**
      * unregister IControllerCallback for the "tagName" IPCController.
      */
-    void unregisterConnectionCallback(in String tagName, in IConnectionCallback callback);
+    void unregisterConnectionCallback(in BluetoothDevice device, in IConnectionCallback callback);
 
-    /**
-     * get SmartDevice APK remote Bluetooth device Name.
-     */
-    String getRemoteDeviceName();
 }
