@@ -34,7 +34,6 @@
 
         <service
                 android:name=".service.MainService"
-                android:process=":service"
                 android:enabled="true"
                 android:exported="true">
             <intent-filter>

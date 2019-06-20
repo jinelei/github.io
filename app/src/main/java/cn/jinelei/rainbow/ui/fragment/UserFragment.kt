@@ -170,7 +170,7 @@ class UserFragment : BaseFragment() {
             add(
                 MenuItem(
                     View.OnClickListener {
-                        mBluetoothService?.init(0, "init")
+//                        mBluetoothService?.init(0, "init")
                     },
                     "binder bt",
                     R.mipmap.ic_test

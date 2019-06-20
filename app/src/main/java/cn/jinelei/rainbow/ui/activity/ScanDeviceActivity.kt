@@ -6,9 +6,15 @@ import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothDevice.*
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattService
+import android.bluetooth.le.ScanCallback
+import android.bluetooth.le.ScanResult
+import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
+import android.content.ServiceConnection
 import android.net.Uri
 import android.os.Bundle
+import android.os.IBinder
 import android.provider.Settings
 import android.support.v7.widget.DefaultItemAnimator
 import android.support.v7.widget.DividerItemDecoration
@@ -19,11 +25,13 @@ import android.view.View
 import android.view.animation.AnimationUtils
 import android.widget.ImageView
 import android.widget.TextView
+import cn.jinelei.rainbow.IBinderQuery
 import cn.jinelei.rainbow.R
 import cn.jinelei.rainbow.base.BaseActivity
-import cn.jinelei.rainbow.constant.BtScanResult
-import cn.jinelei.rainbow.constant.DEFAULT_BLUETOOTH_SCAN_TIMEOUT
-import cn.jinelei.rainbow.constant.REQUEST_CODE_OPEN_BT
+import cn.jinelei.rainbow.bluetooth.IBluetoothService
+import cn.jinelei.rainbow.bluetooth.IConnectionCallback
+import cn.jinelei.rainbow.constant.*
+import cn.jinelei.rainbow.service.MainService
 import cn.jinelei.rainbow.ui.common.BaseRecyclerAdapter
 import cn.jinelei.rainbow.util.isFastClick
 import kotlinx.android.synthetic.main.activity_scan_device.*
@@ -46,7 +54,52 @@ class ScanDeviceActivity : BaseActivity() {
 	private var scanning = false
 	private var autoStopScanJob: Job? = null
 	private var mBluetoothGatt: BluetoothGatt? = null
+	private var mBluetoothService: IBluetoothService? = null
 	
+	private var mScanCallback: ScanCallback = object : ScanCallback() {
+		override fun onScanFailed(errorCode: Int) {
+			mBaseApp.debug(Log.DEBUG, "onScanFailed errorCode: $errorCode")
+			EventBus.getDefault().post(BtScanStatus())
+		}
+		
+		override fun onScanResult(callbackType: Int, result: ScanResult?) {
+			result?.let {
+				mBaseApp.debug(Log.VERBOSE, "onScanResult $it.toString()}")
+				EventBus.getDefault().post(BtScanResult(it.device))
+			}
+		}
+		
+		override fun onBatchScanResults(results: MutableList<ScanResult>?) {
+			super.onBatchScanResults(results)
+			mBaseApp.debug(Log.DEBUG, "onBatchScanResults ${results?.size}")
+			EventBus.getDefault().post(BtBatchScanResults(results))
+		}
+	}
+	private val connection = object : ServiceConnection {
+		override fun onServiceDisconnected(name: ComponentName?) {
+			mBluetoothService = null
+		}
+		
+		override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+			val mBinderQuery = IBinderQuery.Stub.asInterface(service)
+			mBluetoothService =
+				IBluetoothService.Stub.asInterface(mBinderQuery.queryBinder(BINDER_REQUEST_CODE_BLUETOOTH))
+		}
+	}
+	private val mConnectionCallback = object : IConnectionCallback {
+		override fun onConnectionStateChange(newStatus: Int, oldState: Int) {
+			TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+		}
+		
+		override fun asBinder(): IBinder {
+			TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+		}
+		
+		override fun onBytesReceived(dataBuffer: ByteArray?) {
+			TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+		}
+		
+	}
 	
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
@@ -56,11 +109,11 @@ class ScanDeviceActivity : BaseActivity() {
 	
 	private fun initData() {
 		EventBus.getDefault().register(this)
+		bindService(Intent(this@ScanDeviceActivity, MainService::class.java), connection, Context.BIND_AUTO_CREATE)
 		prepareScanDevice()
 	}
 	
 	private fun initView() {
-		EventBus.getDefault().register(this)
 		setContentView(R.layout.activity_scan_device)
 		rvDeviceScanResult = rv_device_scan_info.apply {
 			layoutManager = LinearLayoutManager(this@ScanDeviceActivity)
@@ -175,21 +228,10 @@ class ScanDeviceActivity : BaseActivity() {
 	
 	//    连接蓝牙
 	private fun connectGatt(device: BluetoothDevice) {
-		mBluetoothGatt?.let {
-			mBaseApp.debug(Log.DEBUG, "disconnecting from GATT server. name: ${mBluetoothGatt?.device?.name}")
-			it.close()
-			it.disconnect()
-		}
-		mBaseApp.debug(Log.DEBUG, "connectGatt: device ${device.name}")
-		val remoteDevice = mBaseApp.mBluetoothAdapter.getRemoteDevice(device.address.toUpperCase().trim())
-		mBaseApp.debug(
-			Log.VERBOSE,
-			"remote name: ${remoteDevice.name}, address: ${remoteDevice.address}, bondState: ${remoteDevice.bondState}"
-		)
-		remoteDevice.createBond()
-		mBluetoothGatt = remoteDevice.connectGatt(this, false, mGattCallback)
+		mBluetoothService?.registerConnectionCallback(device, mConnectionCallback)
+		mBluetoothService?.connect(device)
+		stopScanDevice()
 	}
-	
 	
 	
 	//    重置设备列表
@@ -306,6 +348,7 @@ class ScanDeviceActivity : BaseActivity() {
 	fun addSingleDevice(mBtScanResult: BtScanResult) {
 		if (mBtScanResult.device.name.isNullOrBlank())
 			return
+		val device = mBtScanResult.device
 		if ((rvDeviceScanResult.adapter as BaseRecyclerAdapter<BluetoothDevice>).dataSet.filter { dev: BluetoothDevice -> dev.address == device.address }.isEmpty()) {
 			(rvDeviceScanResult.adapter as BaseRecyclerAdapter<BluetoothDevice>).append(device)
 			rvDeviceScanResult.visibility =

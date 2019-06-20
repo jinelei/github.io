@@ -5,8 +5,7 @@ import android.bluetooth.BluetoothDevice;
 
 interface IBluetoothService {
 
-
-    long sendBytes(in BluetoothDevice device, String cmd, in byte[] data, int priority);
+    long sendBytes(in BluetoothDevice device, in byte[] data, int priority, boolean isAck);
 
     /**
      * Return connection state.
@@ -21,19 +20,12 @@ interface IBluetoothService {
      */
     int getConnectionState(in BluetoothDevice device);
 
-    /**
-     * Destroy the IPCController.
-     */
-    void close(in BluetoothDevice device);
+    void disconnect(in BluetoothDevice device);
 
-    /**
-     * register IControllerCallback for the "tagName" IPCController.
-     */
+    void connect(in BluetoothDevice device);
+
     void registerConnectionCallback(in BluetoothDevice device, in IConnectionCallback callback);
 
-    /**
-     * unregister IControllerCallback for the "tagName" IPCController.
-     */
     void unregisterConnectionCallback(in BluetoothDevice device, in IConnectionCallback callback);
 
 }
