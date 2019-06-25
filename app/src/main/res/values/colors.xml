@@ -8,4 +8,5 @@
     <color name="colorForegroundColor">#FFFFFF</color>
     <color name="tab_checked">#ED6A2C</color>
     <color name="tab_unchecked">#757575</color>
+    <color name="colorBlack">#FF000000</color>
 </resources>

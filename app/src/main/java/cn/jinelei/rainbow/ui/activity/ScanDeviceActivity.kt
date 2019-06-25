@@ -1,20 +1,15 @@
 package cn.jinelei.rainbow.ui.activity
 
 import android.Manifest
-import android.bluetooth.BluetoothAdapter
-import android.bluetooth.BluetoothDevice
+import android.bluetooth.*
 import android.bluetooth.BluetoothDevice.*
-import android.bluetooth.BluetoothGatt
-import android.bluetooth.BluetoothGattService
 import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
 import android.content.ComponentName
-import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.net.Uri
-import android.os.Bundle
-import android.os.IBinder
+import android.os.*
 import android.provider.Settings
 import android.support.v7.widget.DefaultItemAnimator
 import android.support.v7.widget.DividerItemDecoration
@@ -31,7 +26,6 @@ import cn.jinelei.rainbow.base.BaseActivity
 import cn.jinelei.rainbow.bluetooth.IBluetoothService
 import cn.jinelei.rainbow.bluetooth.IConnectionCallback
 import cn.jinelei.rainbow.constant.*
-import cn.jinelei.rainbow.service.MainService
 import cn.jinelei.rainbow.ui.common.BaseRecyclerAdapter
 import cn.jinelei.rainbow.util.isFastClick
 import kotlinx.android.synthetic.main.activity_scan_device.*
@@ -44,7 +38,25 @@ import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 import java.lang.Runnable
+import java.util.*
 
+val RX_SERVICE_UUIDS = listOf<UUID>(
+	UUID.fromString("C3E6FEA0-E966-1000-8000-BE99C223DF6A"),
+	UUID.fromString("b75c49d2-04a3-4071-a0b5-35853eb08307"),
+	UUID.fromString("0783B03E-8535-B5A0-7140-A304D2495CB7")
+)
+
+val RX_CHAR_UUIDS = listOf<UUID>(
+	UUID.fromString("C3E6FEA1-E966-1000-8000-BE99C223DF6A"),
+	UUID.fromString("C3E6FEA2-E966-1000-8000-BE99C223DF6A")
+)
+
+val TX_CHAR_UUIDS = listOf<UUID>(
+	UUID.fromString("C3E6FEA1-E966-1000-8000-BE99C223DF6A"),
+	UUID.fromString("0783b03e-8535-b5a0-7140-a304d2495cb8")
+)
+
+val DESC = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb")
 
 class ScanDeviceActivity : BaseActivity() {
 	private lateinit var rvDeviceScanResult: RecyclerView
@@ -55,6 +67,13 @@ class ScanDeviceActivity : BaseActivity() {
 	private var autoStopScanJob: Job? = null
 	private var mBluetoothGatt: BluetoothGatt? = null
 	private var mBluetoothService: IBluetoothService? = null
+	
+	private var mRxService: BluetoothGattService? = null
+	private var mRxServiceUUID: UUID? = null
+	private var mRxChar: BluetoothGattCharacteristic? = null
+	private var mRxCharUUID: UUID? = null
+	private var mTxChar: BluetoothGattCharacteristic? = null
+	private var mTxCharUUID: UUID? = null
 	
 	private var mScanCallback: ScanCallback = object : ScanCallback() {
 		override fun onScanFailed(errorCode: Int) {
@@ -109,7 +128,6 @@ class ScanDeviceActivity : BaseActivity() {
 	
 	private fun initData() {
 		EventBus.getDefault().register(this)
-		bindService(Intent(this@ScanDeviceActivity, MainService::class.java), connection, Context.BIND_AUTO_CREATE)
 		prepareScanDevice()
 	}
 	
@@ -215,7 +233,9 @@ class ScanDeviceActivity : BaseActivity() {
 							itemLayoutId = R.layout.device_uuid_layout,
 							dataSet = services
 						) {
-							tv_name.text = mBluetoothGatt.device.address
+							onBindViewHolder { holder, position ->
+								holder.tv_name.text = getItem(position).uuid.toString()
+							}
 						}
 					}
 					it.setView(rvUuidService)
@@ -226,13 +246,150 @@ class ScanDeviceActivity : BaseActivity() {
 		}
 	}
 	
-	//    连接蓝牙
-	private fun connectGatt(device: BluetoothDevice) {
-		mBluetoothService?.registerConnectionCallback(device, mConnectionCallback)
-		mBluetoothService?.connect(device)
-		stopScanDevice()
+	private val mBluetoothGattCallback: BluetoothGattCallback = object : BluetoothGattCallback() {
+		override fun onCharacteristicChanged(gatt: BluetoothGatt?, characteristic: BluetoothGattCharacteristic?) {
+			super.onCharacteristicChanged(gatt, characteristic)
+		}
+		
+		override fun onCharacteristicRead(
+			gatt: BluetoothGatt?,
+			characteristic: BluetoothGattCharacteristic?,
+			status: Int
+		) {
+			super.onCharacteristicRead(gatt, characteristic, status)
+		}
+		
+		override fun onReadRemoteRssi(gatt: BluetoothGatt?, rssi: Int, status: Int) {
+			super.onReadRemoteRssi(gatt, rssi, status)
+		}
+		
+		override fun onCharacteristicWrite(
+			gatt: BluetoothGatt?,
+			characteristic: BluetoothGattCharacteristic?,
+			status: Int
+		) {
+			super.onCharacteristicWrite(gatt, characteristic, status)
+		}
+		
+		override fun onServicesDiscovered(gatt: BluetoothGatt?, status: Int) {
+			mBaseApp.debug(Log.VERBOSE, "onServicesDiscovered gatt: ${gatt?.device?.address} status: $status")
+			gatt?.let {
+				mBluetoothGatt = gatt
+				mRxService = null
+				mRxServiceUUID = null
+				for (gattService: BluetoothGattService in it.services) {
+					if (RX_SERVICE_UUIDS.contains(gattService.uuid)) {
+						mRxService = gattService
+						mRxServiceUUID = gattService.uuid
+						break
+					}
+				}
+				if (mRxService == null || mRxServiceUUID == null) {
+					mHandler.sendEmptyMessage(HANDLER_ERROR_SERVICE)
+					mLoadingHandler.sendEmptyMessage(HANLDER_LOADINGDIALOG_HIDE)
+					return
+				}
+				mRxChar = null
+				mRxCharUUID = null
+				for (characteristics: BluetoothGattCharacteristic in mRxService!!.characteristics) {
+					if (TX_CHAR_UUIDS.contains(characteristics.uuid)) {
+						mRxChar = characteristics
+						mRxCharUUID = characteristics.uuid
+					}
+				}
+				if (mRxChar == null || mRxCharUUID == null) {
+					mHandler.sendEmptyMessage(HANDLER_ERROR_SERVICE)
+					mLoadingHandler.sendEmptyMessage(HANLDER_LOADINGDIALOG_HIDE)
+					return
+				}
+				mTxChar = null
+				mTxCharUUID = null
+				for (characteristics: BluetoothGattCharacteristic in mRxService!!.characteristics) {
+					if (TX_CHAR_UUIDS.contains(characteristics.uuid)) {
+						mTxChar = characteristics
+						mTxCharUUID = characteristics.uuid
+					}
+				}
+				if (mTxChar == null || mTxCharUUID == null) {
+					mHandler.sendEmptyMessage(HANDLER_ERROR_SERVICE)
+					mLoadingHandler.sendEmptyMessage(HANLDER_LOADINGDIALOG_HIDE)
+					return
+				}
+				gatt.setCharacteristicNotification(mRxChar, true)
+				gatt.setCharacteristicNotification(mTxChar, true)
+				for (descriptor: BluetoothGattDescriptor in mTxChar!!.descriptors) {
+					if (descriptor.uuid != null && descriptor.uuid.equals(DESC)) {
+						when (descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE)) {
+							true -> {
+								gatt.writeDescriptor(descriptor)
+							}
+							false -> {
+								gatt.disconnect()
+							}
+						}
+					}
+				}
+				gatt.readRemoteRssi()
+				mBaseApp.debug(Log.VERBOSE, "")
+				mHandler.sendEmptyMessage(HANDLER_CONNECTED)
+			}
+		}
+		
+		override fun onPhyUpdate(gatt: BluetoothGatt?, txPhy: Int, rxPhy: Int, status: Int) {
+			super.onPhyUpdate(gatt, txPhy, rxPhy, status)
+		}
+		
+		override fun onMtuChanged(gatt: BluetoothGatt?, mtu: Int, status: Int) {
+			super.onMtuChanged(gatt, mtu, status)
+		}
+		
+		override fun onReliableWriteCompleted(gatt: BluetoothGatt?, status: Int) {
+			super.onReliableWriteCompleted(gatt, status)
+		}
+		
+		override fun onDescriptorWrite(gatt: BluetoothGatt?, descriptor: BluetoothGattDescriptor?, status: Int) {
+			super.onDescriptorWrite(gatt, descriptor, status)
+		}
+		
+		override fun onDescriptorRead(gatt: BluetoothGatt?, descriptor: BluetoothGattDescriptor?, status: Int) {
+			super.onDescriptorRead(gatt, descriptor, status)
+		}
+		
+		override fun onPhyRead(gatt: BluetoothGatt?, txPhy: Int, rxPhy: Int, status: Int) {
+			super.onPhyRead(gatt, txPhy, rxPhy, status)
+		}
+		
+		override fun onConnectionStateChange(gatt: BluetoothGatt?, status: Int, newState: Int) {
+			mBaseApp.debug(
+				Log.VERBOSE,
+				"onConnectionStateChange gatt: ${gatt?.device?.address} status: $status, newState: $newState"
+			)
+			mLoadingHandler.sendEmptyMessage(HANLDER_LOADINGDIALOG_HIDE)
+			when (newState) {
+				BluetoothProfile.STATE_DISCONNECTED -> {
+					mBaseApp.debug(
+						Log.VERBOSE,
+						"STATE_DISCONNECTED gatt: ${gatt?.device?.address}"
+					)
+				}
+				BluetoothProfile.STATE_CONNECTED -> {
+					mBaseApp.debug(
+						Log.VERBOSE,
+						"STATE_CONNECTED startDiscoverServices: ${gatt?.discoverServices()}"
+					)
+				}
+			}
+		}
 	}
 	
+	//    连接蓝牙
+	private fun connectGatt(device: BluetoothDevice) {
+		mLoadingHandler.sendEmptyMessage(HANLDER_LOADINGDIALOG_SHOW)
+		device.connectGatt(this@ScanDeviceActivity, false, mBluetoothGattCallback)
+//		mBluetoothService?.registerConnectionCallback(device, mConnectionCallback)
+//		mBluetoothService?.connect(device)
+//		stopScanDevice()
+	}
 	
 	//    重置设备列表
 	private fun resetDevice() {
@@ -289,6 +446,7 @@ class ScanDeviceActivity : BaseActivity() {
 		}
 	}
 	
+	//    停止扫描
 	private fun stopScanDevice() {
 		mBaseApp.mBluetoothAdapter.bluetoothLeScanner.stopScan(mScanCallback)
 		autoStopScanJob?.let {
@@ -304,6 +462,7 @@ class ScanDeviceActivity : BaseActivity() {
 		scanning = false
 	}
 	
+	//    开始扫描
 	private fun startScanDevice() {
 		mBaseApp.debug(Log.VERBOSE, "start detect bt")
 		resetDevice()
@@ -364,4 +523,26 @@ class ScanDeviceActivity : BaseActivity() {
 		}
 	}
 	
+	private val HANDLER_START_SCAN = 10
+	private val HANDLER_STOP_SCAN = 11
+	private val HANDLER_ERROR_SERVICE = 30
+	private val HANDLER_CONNECTED = 40
+	private val mHandler = object : Handler(Looper.getMainLooper()) {
+		override fun handleMessage(msg: Message?) {
+			when (msg?.what) {
+				HANDLER_START_SCAN -> {
+				
+				}
+				HANDLER_STOP_SCAN -> {
+				
+				}
+				HANDLER_ERROR_SERVICE -> {
+					mBaseApp.toast("unsupport device")
+				}
+				HANDLER_CONNECTED -> {
+					mBaseApp.toast("连接成功")
+				}
+			}
+		}
+	}
 }
