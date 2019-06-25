@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <declare-styleable name="DrawView">
-        <attr name="defaultRadius" format="integer"/>
-        <attr name="itemBackground" format="reference|color"/>
+        <attr name="defaultRadius" format="float"/>
+        <attr name="defaultLineHeight" format="float"/>
+        <attr name="defaultLinkOffsetX" format="float"/>
+        <attr name="defaultLinkOffsetY" format="float"/>
+        <attr name="defaultStartX" format="float"/>
+        <attr name="defaultStartY" format="float"/>
     </declare-styleable>
 </resources>

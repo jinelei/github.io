@@ -2,7 +2,6 @@ package cn.jinelei.rainbow.ui.fragment
 
 
 import android.content.Context
-import android.content.res.TypedArray
 import android.graphics.*
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
@@ -35,7 +34,7 @@ class TestFragment : BaseFragment() {
 		savedInstanceState: Bundle?
 	): View? {
 		val view = inflater.inflate(R.layout.fragment_test, container, false)
-		dvTest = view.findViewById<DrawView>(R.id.dv_test)
+		dvTest = view.findViewById(R.id.dv_test)
 		view.findViewById<FloatingActionButton>(R.id.fab_refresh).apply {
 			setOnClickListener {
 				Log.v(TestFragment::class.java.simpleName, "refresh")
@@ -50,7 +49,7 @@ class TestFragment : BaseFragment() {
 		var count = 10
 		var lastType = 0
 		sleepDataList.clear()
-		while (--count > 0) {
+		while (sleepDataList.size < count) {
 			var tmp = Random.nextInt(0, 4)
 			if (lastType != tmp) {
 				sleepDataList.add(SleepData(10 * Random.nextInt(3, 10), tmp))
@@ -74,26 +73,22 @@ class SleepData(val width: Int, val type: Int) {
 
 class DrawView(context: Context?, attrs: AttributeSet?) : View(context, attrs) {
 	private var defaultRadius: Float = 20F           // 默认圆角半径
-	private val DEF_LINE_HEIGHT = 80F     // 默认Y轴高度
-	private val DEF_CHANGE_INTERVAL = 60F  // 贝塞尔曲线变化区间
-	private val DEF_CHANGE_HEIGHT = 60F  // 贝塞尔曲线变化高度，和贝塞尔曲线变化区间共同构成圆角弧度
-	private val DEF_START_X = 100F
-	private val DEF_START_Y = 100F
-	private val DEF_LINK_OFFSET_X = 5F      // 默认X偏移量
-	private val DEF_LINK_OFFSET_Y = 100F     // 默认Y偏移量
-	
-	val FIRST_TO_DOWN = 0  // 第一个向下一层
-	val DOWN_TO_UP = 1
-	val UP_TO_UP = 2
-	val UP_TO_DOWN = 3
-	val DOWN_TO_DOWN = 4
-	private var lastPos: MPoint? = null
+	private var defaultLineHeight = 80F     // 默认数据显示段高度
+	private var defaultLinkOffsetX = 5F      // 默认X偏移量
+	private var defaultLinkOffsetY = 100F     // 默认Y偏移量
+	private var defaultStartX = 100F
+	private var defaultStartY = 100F
 	
 	init {
 		//初始化的时候获取自定义的属性，获取的是主布局中自己赋给自定义属性的值，第二个参数是如果你没有赋值，就是用默认值。
 		context?.obtainStyledAttributes(attrs, R.styleable.DrawView)?.let {
 			it?.let {
 				defaultRadius = it.getFloat(R.styleable.DrawView_defaultRadius, defaultRadius)
+				defaultLineHeight = it.getFloat(R.styleable.DrawView_defaultLineHeight, defaultLineHeight)
+				defaultLinkOffsetX = it.getFloat(R.styleable.DrawView_defaultLinkOffsetX, defaultLinkOffsetX)
+				defaultLinkOffsetY = it.getFloat(R.styleable.DrawView_defaultLinkOffsetY, defaultLinkOffsetY)
+				defaultStartX = it.getFloat(R.styleable.DrawView_defaultStartX, defaultStartX)
+				defaultStartY = it.getFloat(R.styleable.DrawView_defaultStartY, defaultStartY)
 				it.recycle();//释放资源
 			}
 		}
@@ -138,18 +133,11 @@ class DrawView(context: Context?, attrs: AttributeSet?) : View(context, attrs) {
 		return p2
 	}
 	
-	fun mMoveTo(path: Path, pos: MPoint) {
-		Log.v(TestFragment::class.java.simpleName, "mMoveTo: $pos")
-		path.moveTo(pos.x, pos.y)
-		lastPos = pos
-	}
-	
 	fun mLineTo(path: Path, pos: MPoint): MPoint {
 		Log.v(TestFragment::class.java.simpleName, "mLineTo: $pos")
 		path.lineTo(pos.x, pos.y)
 		return pos
 	}
-	
 	
 	override fun onDraw(canvas: Canvas?) {
 		if (canvas == null)
@@ -166,9 +154,9 @@ class DrawView(context: Context?, attrs: AttributeSet?) : View(context, attrs) {
 		}
 		canvas.drawPath(Path().apply {
 			var lastPos =
-				MPoint(DEF_START_X, DEF_START_Y + (DEF_LINE_HEIGHT + DEF_LINK_OFFSET_Y) * sleepDataList[0].type)
+				MPoint(defaultStartX, defaultStartY + (defaultLineHeight + defaultLinkOffsetY) * sleepDataList[0].type)
 			var firstPos =
-				MPoint(DEF_START_X, DEF_START_Y + (DEF_LINE_HEIGHT + DEF_LINK_OFFSET_Y) * sleepDataList[0].type)
+				MPoint(defaultStartX, defaultStartY + (defaultLineHeight + defaultLinkOffsetY) * sleepDataList[0].type)
 			var lastSleepData: SleepData? = null
 			for (index in 0 until sleepDataList.size) {
 				var sleepData = sleepDataList[index]
@@ -181,7 +169,7 @@ class DrawView(context: Context?, attrs: AttributeSet?) : View(context, attrs) {
 					moveTo(firstPos.x, firstPos.y)
 					lastPos = mArcTo(this, tmpPos, lastPos, 4)
 					// 绘制左侧数据区高度
-					lastPos = MPoint(lastPos.x, lastPos.y + DEF_LINE_HEIGHT)
+					lastPos = MPoint(lastPos.x, lastPos.y + defaultLineHeight)
 					lastPos = mLineTo(this, lastPos)
 					// 绘制左下角半圆角
 					tmpPos = MPoint(lastPos.x + calcRadius(sleepData.width), lastPos.y + calcRadius(sleepData.width))
@@ -206,8 +194,8 @@ class DrawView(context: Context?, attrs: AttributeSet?) : View(context, attrs) {
 					lastPos = mArcTo(this, lastPos, tmpPos, 1)
 					// 绘制连接线，根据changedLine
 					tmpPos = MPoint(
-						lastPos.x + DEF_LINK_OFFSET_X,
-						lastPos.y + (DEF_LINK_OFFSET_Y + DEF_LINE_HEIGHT) * changedLine
+						lastPos.x + defaultLinkOffsetX,
+						lastPos.y + (defaultLinkOffsetY + defaultLineHeight) * changedLine
 					)
 					if (Math.abs(changedLine) > 1) {
 						tmpPos.y = tmpPos.y + (defaultRadius * 2) * (Math.abs(changedLine) - 1)
@@ -226,8 +214,8 @@ class DrawView(context: Context?, attrs: AttributeSet?) : View(context, attrs) {
 					lastPos = mArcTo(this, lastPos, tmpPos, 2)
 					// 绘制连接线，根据changedLine
 					tmpPos = MPoint(
-						lastPos.x + DEF_LINK_OFFSET_X,
-						lastPos.y + (DEF_LINK_OFFSET_Y + DEF_LINE_HEIGHT) * changedLine
+						lastPos.x + defaultLinkOffsetX,
+						lastPos.y + (defaultLinkOffsetY + defaultLineHeight) * changedLine
 					)
 					if (Math.abs(changedLine) > 1) {
 						tmpPos.y = tmpPos.y - (defaultRadius * 2) * (Math.abs(changedLine) - 1)
@@ -246,7 +234,7 @@ class DrawView(context: Context?, attrs: AttributeSet?) : View(context, attrs) {
 					tmpPos = MPoint(lastPos.x + calcRadius(sleepData.width), lastPos.y - calcRadius(sleepData.width))
 					lastPos = mArcTo(this, lastPos, tmpPos, 2)
 					// 绘制左侧数据区高度
-					lastPos = MPoint(lastPos.x, lastPos.y - DEF_LINE_HEIGHT)
+					lastPos = MPoint(lastPos.x, lastPos.y - defaultLineHeight)
 					lastPos = mLineTo(this, lastPos)
 					// 绘制右上角半圆角
 					tmpPos = MPoint(lastPos.x - calcRadius(sleepData.width), lastPos.y - calcRadius(sleepData.width))
@@ -267,7 +255,7 @@ class DrawView(context: Context?, attrs: AttributeSet?) : View(context, attrs) {
 				Log.v(TestFragment::class.java.simpleName, "reverse index: $tmpIdx, $sleepData")
 				if (lastSleepData == null) return
 				val changedLine = lastSleepData.type - sleepData.type
-				var tmpPos: MPoint = MPoint(DEF_START_X, DEF_START_Y)
+				var tmpPos: MPoint = MPoint(defaultStartX, defaultStartY)
 				if (changedLine > 0) { // 逆着X轴，上升
 					// 绘制连接线右侧半圆
 					tmpPos =
@@ -275,8 +263,8 @@ class DrawView(context: Context?, attrs: AttributeSet?) : View(context, attrs) {
 					lastPos = mArcTo(this, lastPos, tmpPos, 3)
 					// 绘制连接线，根据changedLine
 					tmpPos = MPoint(
-						lastPos.x - DEF_LINK_OFFSET_X,
-						lastPos.y - (DEF_LINK_OFFSET_Y + DEF_LINE_HEIGHT) * changedLine
+						lastPos.x - defaultLinkOffsetX,
+						lastPos.y - (defaultLinkOffsetY + defaultLineHeight) * changedLine
 					)
 					if (Math.abs(changedLine) > 1) {
 						tmpPos.y = tmpPos.y - (defaultRadius * 2) * (Math.abs(changedLine) - 1)
@@ -294,8 +282,8 @@ class DrawView(context: Context?, attrs: AttributeSet?) : View(context, attrs) {
 					lastPos = mArcTo(this, lastPos, tmpPos, 4)
 					// 绘制连接线，根据changedLine
 					tmpPos = MPoint(
-						lastPos.x - DEF_LINK_OFFSET_X,
-						lastPos.y - (DEF_LINK_OFFSET_Y + DEF_LINE_HEIGHT) * changedLine
+						lastPos.x - defaultLinkOffsetX,
+						lastPos.y - (defaultLinkOffsetY + defaultLineHeight) * changedLine
 					)
 					if (Math.abs(changedLine) > 1) {
 						tmpPos.y = tmpPos.y + (defaultRadius * 2) * (Math.abs(changedLine) - 1)
@@ -343,337 +331,8 @@ class DrawView(context: Context?, attrs: AttributeSet?) : View(context, attrs) {
 			return defaultRadius
 		}
 	}
-
-//	fun mArcTo(path: Path, pos: MPoint) {
-//		path.addArc()
-//	}
-
-//	fun mCubicTo(path: Path, controlPos1: MPoint, controlPos2: MPoint, endPos: MPoint): MPoint {
-//		Log.v(
-//			TestFragment::class.java.simpleName,
-//			"mCubicTo: controlPos1: $controlPos1 controlPos2: $controlPos2 endPos: $endPos"
-//		)
-//		path.cubicTo(controlPos1.x, controlPos1.y, controlPos2.x, controlPos2.y, endPos.x, endPos.y)
-//		return endPos
-//	}
-	
-	/**
-	 * drawCubic1(this, lastPos, width, FIRST_TO_DOWN)
-	
-	lastPos.x = lastPos.x + width
-	lastPos.y = lastPos.y + DEF_LINE_HEIGHT * 2 + DEF_CHANGE_HEIGHT * 2 + DEF_LINK_HEIGHT
-	moveTo(lastPos.x, lastPos.y - DEF_LINE_HEIGHT)
-	lineTo(lastPos.x, lastPos.y - DEF_LINK_HEIGHT - DEF_LINK_HEIGHT - DEF_CHANGE_HEIGHT * 2)
-	width = Random.nextInt(10, 100)
-	drawCubic1(this, lastPos, width, DOWN_TO_UP)
-	
-	lastPos.x = lastPos.x + width
-	lastPos.y = lastPos.y - DEF_LINE_HEIGHT * 2 - DEF_CHANGE_HEIGHT * 2 - DEF_LINK_HEIGHT
-	moveTo(lastPos.x, lastPos.y + DEF_LINE_HEIGHT)
-	lineTo(lastPos.x, lastPos.y + DEF_LINE_HEIGHT + DEF_LINK_HEIGHT + DEF_CHANGE_HEIGHT * 2)
-	width = Random.nextInt(10, 100)
-	drawCubic1(this, lastPos, width, UP_TO_UP)
-	
-	lastPos.x = lastPos.x + width
-	lastPos.y = lastPos.y - DEF_LINE_HEIGHT * 2 - DEF_CHANGE_HEIGHT * 2 - DEF_LINK_HEIGHT
-	moveTo(lastPos.x, lastPos.y + DEF_LINE_HEIGHT)
-	lineTo(lastPos.x, lastPos.y + DEF_LINE_HEIGHT + DEF_LINK_HEIGHT + DEF_CHANGE_HEIGHT * 2)
-	width = Random.nextInt(10, 100)
-	drawCubic1(this, lastPos, width, UP_TO_DOWN)
-	
-	lastPos.x = lastPos.x + width
-	lastPos.y = lastPos.y + DEF_LINE_HEIGHT * 2 + DEF_CHANGE_HEIGHT * 2 + DEF_LINK_HEIGHT
-	moveTo(lastPos.x, lastPos.y - DEF_LINE_HEIGHT)
-	lineTo(lastPos.x, lastPos.y - DEF_LINE_HEIGHT - DEF_LINK_HEIGHT - DEF_CHANGE_HEIGHT * 2)
-	width = Random.nextInt(10, 100)
-	drawCubic1(this, lastPos, width, DOWN_TO_DOWN)
-	
-	lastPos.x = lastPos.x + width
-	lastPos.y = lastPos.y + DEF_LINE_HEIGHT * 2 + DEF_CHANGE_HEIGHT * 2 + DEF_LINK_HEIGHT
-	moveTo(lastPos.x, lastPos.y - DEF_LINE_HEIGHT)
-	lineTo(lastPos.x, lastPos.y - DEF_LINK_HEIGHT - DEF_LINK_HEIGHT - DEF_CHANGE_HEIGHT * 2)
-	width = Random.nextInt(10, 100)
-	drawCubic1(this, lastPos, width, DOWN_TO_UP)
-	
-	lastPos.x = lastPos.x + width
-	lastPos.y =
-	lastPos.y - (DEF_LINE_HEIGHT * 2 + DEF_CHANGE_HEIGHT * 2 + DEF_LINK_HEIGHT) * 2
-	moveTo(lastPos.x, lastPos.y + DEF_LINE_HEIGHT)
-	lineTo(
-	lastPos.x,
-	lastPos.y + (DEF_LINE_HEIGHT + DEF_LINK_HEIGHT + DEF_CHANGE_HEIGHT * 2) * 2
-	)
-	width = Random.nextInt(10, 100)
-	drawCubic1(this, lastPos, width, UP_TO_DOWN)
-	 */
-	
-	/**
-	 * startX: 开始X坐标，取中点
-	 * startY：开始Y坐标，取中点
-	 */
-	fun drawCubic1(path: Path?, pos: MPoint, width: Int, type: Int) {
-		path?.let {
-			var stopY: Float?
-			var controlPointOneX: Float?
-			var controlPointOneY: Float?
-			var controlPointTwoX: Float?
-			var controlPointTwoY: Float?
-			when (type) {
-				FIRST_TO_DOWN -> {
-					// 左侧竖线
-					it.moveTo(pos.x, pos.y - DEF_LINE_HEIGHT)
-					it.lineTo(pos.x, pos.y + DEF_LINE_HEIGHT)
-					// 上部曲线
-					controlPointOneX = pos.x
-					controlPointOneY = pos.y - DEF_LINE_HEIGHT - DEF_CHANGE_INTERVAL
-					controlPointTwoX = pos.x + width
-					controlPointTwoY = pos.y - DEF_LINE_HEIGHT - DEF_CHANGE_INTERVAL
-					stopY = pos.y - DEF_LINE_HEIGHT
-					it.moveTo(pos.x, pos.y - DEF_LINE_HEIGHT)
-					it.cubicTo(
-						controlPointOneX,
-						controlPointOneY,
-						controlPointTwoX,
-						controlPointTwoY,
-						pos.x + width,
-						stopY
-					)
-					// 下部曲线
-					controlPointOneY = pos.y + DEF_LINE_HEIGHT + DEF_CHANGE_INTERVAL
-					controlPointTwoY = pos.y + DEF_LINE_HEIGHT + DEF_CHANGE_HEIGHT - DEF_CHANGE_INTERVAL
-					stopY = pos.y + DEF_LINE_HEIGHT + DEF_CHANGE_HEIGHT
-					it.moveTo(pos.x, pos.y + DEF_LINE_HEIGHT)
-					it.cubicTo(
-						controlPointOneX,
-						controlPointOneY,
-						controlPointTwoX,
-						controlPointTwoY,
-						pos.x + width,
-						stopY
-					)
-					// 右侧竖线 + 连接线
-					it.moveTo(pos.x + width, pos.y - DEF_LINE_HEIGHT)
-					it.lineTo(pos.x + width, pos.y + DEF_LINE_HEIGHT + DEF_CHANGE_HEIGHT)
-				}
-				DOWN_TO_UP -> {
-					// 左侧竖线
-					it.moveTo(pos.x, pos.y - DEF_LINE_HEIGHT)
-					it.lineTo(pos.x, pos.y + DEF_LINE_HEIGHT)
-					// 上部曲线
-					controlPointOneX = pos.x
-					controlPointOneY = pos.y - DEF_LINE_HEIGHT + DEF_CHANGE_INTERVAL
-					controlPointTwoX = pos.x + width
-					controlPointTwoY = pos.y - DEF_LINE_HEIGHT + DEF_CHANGE_INTERVAL
-					it.moveTo(pos.x, pos.y - DEF_LINE_HEIGHT)
-					it.cubicTo(
-						controlPointOneX,
-						controlPointOneY,
-						controlPointTwoX,
-						controlPointTwoY,
-						pos.x + width,
-						pos.y - DEF_LINE_HEIGHT
-					)
-					// 下部曲线
-					controlPointOneY = pos.y + DEF_LINE_HEIGHT + DEF_CHANGE_INTERVAL
-					controlPointTwoY = pos.y + DEF_LINE_HEIGHT + DEF_CHANGE_INTERVAL
-					it.moveTo(pos.x, pos.y + DEF_LINE_HEIGHT)
-					it.cubicTo(
-						controlPointOneX,
-						controlPointOneY,
-						controlPointTwoX,
-						controlPointTwoY,
-						pos.x + width,
-						pos.y + DEF_LINE_HEIGHT
-					)
-					// 右侧竖线
-					it.moveTo(pos.x + width, pos.y - DEF_LINE_HEIGHT)
-					it.lineTo(pos.x + width, pos.y + DEF_LINE_HEIGHT)
-				}
-				UP_TO_UP -> {
-					// 左侧竖线
-					it.moveTo(pos.x, pos.y - DEF_LINE_HEIGHT)
-					it.lineTo(pos.x, pos.y + DEF_LINE_HEIGHT + DEF_CHANGE_HEIGHT)
-					// 上部曲线
-					controlPointOneX = pos.x
-					controlPointOneY = pos.y - DEF_LINE_HEIGHT - DEF_CHANGE_INTERVAL
-					controlPointTwoX = pos.x + width
-					controlPointTwoY = pos.y - DEF_LINE_HEIGHT + DEF_CHANGE_HEIGHT - DEF_CHANGE_INTERVAL
-					it.moveTo(pos.x, pos.y - DEF_LINE_HEIGHT)
-					it.cubicTo(
-						controlPointOneX,
-						controlPointOneY,
-						controlPointTwoX,
-						controlPointTwoY,
-						pos.x + width,
-						pos.y - DEF_LINE_HEIGHT - DEF_CHANGE_HEIGHT
-					)
-					// 下部曲线
-					controlPointOneY = pos.y + DEF_LINE_HEIGHT + DEF_CHANGE_HEIGHT - DEF_CHANGE_INTERVAL
-					controlPointTwoY = pos.y + DEF_LINE_HEIGHT + DEF_CHANGE_HEIGHT
-					it.moveTo(pos.x, pos.y + DEF_LINE_HEIGHT + DEF_CHANGE_HEIGHT)
-					it.cubicTo(
-						controlPointOneX,
-						controlPointOneY,
-						controlPointTwoX,
-						controlPointTwoY,
-						pos.x + width,
-						pos.y + DEF_LINE_HEIGHT
-					)
-					// 右侧竖线 + 连接线
-					it.moveTo(pos.x + width, pos.y - DEF_LINE_HEIGHT - DEF_CHANGE_HEIGHT)
-					it.lineTo(pos.x + width, pos.y + DEF_LINE_HEIGHT)
-				}
-				UP_TO_DOWN -> {
-					// 左侧竖线
-					it.moveTo(pos.x, pos.y - DEF_LINE_HEIGHT)
-					it.lineTo(pos.x, pos.y + DEF_LINE_HEIGHT)
-					// 上部曲线
-					controlPointOneX = pos.x
-					controlPointOneY = pos.y - DEF_LINE_HEIGHT - DEF_CHANGE_INTERVAL
-					controlPointTwoX = pos.x + width
-					controlPointTwoY = pos.y - DEF_LINE_HEIGHT - DEF_CHANGE_INTERVAL
-					it.moveTo(pos.x, pos.y - DEF_LINE_HEIGHT)
-					it.cubicTo(
-						controlPointOneX,
-						controlPointOneY,
-						controlPointTwoX,
-						controlPointTwoY,
-						pos.x + width,
-						pos.y - DEF_LINE_HEIGHT
-					)
-					// 下部曲线
-					controlPointOneY = pos.y + DEF_LINE_HEIGHT - DEF_CHANGE_INTERVAL
-					controlPointTwoY = pos.y + DEF_LINE_HEIGHT - DEF_CHANGE_INTERVAL
-					it.moveTo(pos.x, pos.y + DEF_LINE_HEIGHT)
-					it.cubicTo(
-						controlPointOneX,
-						controlPointOneY,
-						controlPointTwoX,
-						controlPointTwoY,
-						pos.x + width,
-						pos.y + DEF_LINE_HEIGHT
-					)
-					// 右侧竖线
-					it.moveTo(pos.x + width, pos.y - DEF_LINE_HEIGHT)
-					it.lineTo(pos.x + width, pos.y + DEF_LINE_HEIGHT)
-				}
-				DOWN_TO_DOWN -> {
-					// 左侧竖线
-					it.moveTo(pos.x, pos.y - DEF_LINE_HEIGHT - DEF_CHANGE_HEIGHT)
-					it.lineTo(pos.x, pos.y + DEF_LINE_HEIGHT)
-					// 上部曲线
-					controlPointOneX = pos.x
-					controlPointOneY = pos.y - DEF_LINE_HEIGHT + DEF_CHANGE_HEIGHT - DEF_CHANGE_INTERVAL
-					controlPointTwoX = pos.x + width
-					controlPointTwoY = pos.y - DEF_LINE_HEIGHT - DEF_CHANGE_HEIGHT
-					it.moveTo(pos.x, pos.y - DEF_LINE_HEIGHT - DEF_CHANGE_HEIGHT)
-					it.cubicTo(
-						controlPointOneX,
-						controlPointOneY,
-						controlPointTwoX,
-						controlPointTwoY,
-						pos.x + width,
-						pos.y - DEF_LINE_HEIGHT
-					)
-					// 下部曲线
-					controlPointOneY = pos.y + DEF_LINE_HEIGHT + DEF_CHANGE_HEIGHT
-					controlPointTwoY = pos.y + DEF_LINE_HEIGHT + DEF_CHANGE_HEIGHT - DEF_CHANGE_INTERVAL
-					it.moveTo(pos.x, pos.y + DEF_LINE_HEIGHT)
-					it.cubicTo(
-						controlPointOneX,
-						controlPointOneY,
-						controlPointTwoX,
-						controlPointTwoY,
-						pos.x + width,
-						pos.y + DEF_LINE_HEIGHT + DEF_CHANGE_HEIGHT
-					)
-					// 右侧竖线 + 连接线
-					it.moveTo(pos.x + width, pos.y - DEF_LINE_HEIGHT)
-					it.lineTo(pos.x + width, pos.y + DEF_LINE_HEIGHT + DEF_CHANGE_HEIGHT)
-				}
-			}
-		}
-	}
 	
 	override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
 		super.onMeasure(widthMeasureSpec, heightMeasureSpec)
 	}
 }
-
-
-//	fun drawLine(canvas: Canvas) {
-//		var paint = Paint().apply {
-//			color = Color.RED
-//			style = Paint.Style.STROKE;
-//			strokeWidth = 4F
-//		}
-//		var path = Path().apply {
-//			var lastPos = MPoint(DEF_START_X, DEF_START_Y)
-//			var path = Path()
-//			var lastSleepData: SleepData? = null
-//			for ((index, sleepData) in sleepDataList.withIndex()) {
-//				Log.v(TestFragment::class.java.simpleName, "index: $index, $sleepData")
-//				if (index == 0) {
-//
-//					lastPos = MPoint(
-//						DEF_START_X,
-//						DEF_START_Y + (DEF_LINE_HEIGHT + DEF_LINK_HEIGHT) * (sleepData.type + 1)
-//					)
-//					when (sleepData.type) {
-//						0 -> {
-//							lastPos = mLineTo(path, mMoveTo(path, lastPos).apply { y += DEF_LINE_HEIGHT })
-//						}
-//						1 -> {
-//							lastPos = mLineTo(
-//								path,
-//								mMoveTo(
-//									path,
-//									lastPos.apply {
-//										y = y + DEF_LINE_HEIGHT + DEF_LINE_HEIGHT
-//									}).apply { y += (DEF_LINE_HEIGHT + DEF_LINE_HEIGHT) + DEF_LINE_HEIGHT })
-//						}
-//						2 -> {
-//							lastPos = mLineTo(
-//								path,
-//								mMoveTo(
-//									path,
-//									lastPos.apply {
-//										y = y + (DEF_LINE_HEIGHT + DEF_LINK_HEIGHT) * 2
-//									}).apply { y += (DEF_LINE_HEIGHT + DEF_LINE_HEIGHT) * 2 + DEF_LINE_HEIGHT })
-//						}
-//						3 -> {
-//							lastPos = mLineTo(
-//								path,
-//								mMoveTo(
-//									path,
-//									lastPos.apply {
-//										y = y + (DEF_LINE_HEIGHT + DEF_LINK_HEIGHT) * 3
-//									}).apply { y += (DEF_LINE_HEIGHT + DEF_LINE_HEIGHT) * 3 + DEF_LINE_HEIGHT })
-//						}
-//					}
-//					lastSleepData = sleepData
-//				} else {
-//					val changedLine = sleepData.type - lastSleepData!!.type
-//					// 默认向下
-//					var controlPos1 = MPoint(lastPos.x, lastPos.y + DEF_CHANGE_INTERVAL)
-//					var controlPos2 = MPoint(
-//						lastPos.x + lastSleepData.width,
-//						lastPos.y + (DEF_CHANGE_HEIGHT) - DEF_CHANGE_INTERVAL
-//					)
-//					var endPos = MPoint(lastPos.x + lastSleepData.width, lastPos.y + DEF_CHANGE_HEIGHT)
-//					// 如果向上，更新坐标
-//					if (changedLine < 0) {
-//						controlPos2 = MPoint(lastPos.x + width, lastPos.y + DEF_CHANGE_INTERVAL)
-//						endPos = MPoint(lastPos.x + lastSleepData.width, lastPos.y)
-//					}
-//					lastPos = mCubicTo(path, controlPos1, controlPos2, endPos)
-//					lastPos = mLineTo(
-//						path,
-//						lastPos.apply { y += (DEF_LINK_HEIGHT + DEF_LINE_HEIGHT) * (changedLine + 1) })
-//					lastSleepData = sleepData
-//				}
-//			}
-//			path.close()
-//		}
-//		canvas.drawPath(path, paint)
-//	}
