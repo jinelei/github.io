@@ -48,13 +48,18 @@ class TestFragment : BaseFragment() {
 	private fun randomSleepData() {
 		var count = 10
 		var lastType = 0
+		var tmpType = 0
+		var lastWidth = 0
+		var tmpWidth = 0
 		sleepDataList.clear()
 		while (sleepDataList.size < count) {
-			var tmp = Random.nextInt(0, 4)
-			if (lastType != tmp) {
-				sleepDataList.add(SleepData(10 * Random.nextInt(3, 10), tmp))
-				lastType = tmp
-			}
+			while (tmpType == lastType || tmpType == 0)
+				tmpType = Random.nextInt(0, 4)
+			while (tmpWidth == lastWidth || tmpWidth == 0)
+				tmpWidth = 10 * Random.nextInt(0, 10)
+			sleepDataList.add(SleepData(tmpWidth, tmpType))
+			lastType = tmpType
+			lastWidth = tmpWidth
 		}
 	}
 	
@@ -153,10 +158,8 @@ class DrawView(context: Context?, attrs: AttributeSet?) : View(context, attrs) {
 			})
 		}
 		canvas.drawPath(Path().apply {
-			var lastPos =
-				MPoint(defaultStartX, defaultStartY + (defaultLineHeight + defaultLinkOffsetY) * sleepDataList[0].type)
-			var firstPos =
-				MPoint(defaultStartX, defaultStartY + (defaultLineHeight + defaultLinkOffsetY) * sleepDataList[0].type)
+			var lastPos = MPoint(0F, 0F)
+			var firstPos = MPoint(0F, 0F)
 			var lastSleepData: SleepData? = null
 			for (index in 0 until sleepDataList.size) {
 				var sleepData = sleepDataList[index]
@@ -164,10 +167,15 @@ class DrawView(context: Context?, attrs: AttributeSet?) : View(context, attrs) {
 				var tmpPos = MPoint(0F, 0F)
 				if (index == 0) {
 					// 绘制左上角半圆角
-					tmpPos = MPoint(lastPos.x + calcRadius(sleepData.width), lastPos.y - calcRadius(sleepData.width))
-					firstPos = tmpPos
+					firstPos =
+						MPoint(
+							defaultStartX + calcRadius(sleepData.width),
+							defaultStartY + (defaultRadius * 2 + defaultLinkOffsetY + defaultLineHeight) * sleepData.type
+						)
+					Log.v(TestFragment::class.java.simpleName, "first: $firstPos")
 					moveTo(firstPos.x, firstPos.y)
-					lastPos = mArcTo(this, tmpPos, lastPos, 4)
+					lastPos = MPoint(firstPos.x - calcRadius(sleepData.width), firstPos.y + calcRadius(sleepData.width))
+					lastPos = mArcTo(this, firstPos, lastPos, 4)
 					// 绘制左侧数据区高度
 					lastPos = MPoint(lastPos.x, lastPos.y + defaultLineHeight)
 					lastPos = mLineTo(this, lastPos)
