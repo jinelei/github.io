@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <declare-styleable name="DrawView">
+    <declare-styleable name="SleepChartView">
         <attr name="defaultRadius" format="float"/>
         <attr name="defaultLineHeight" format="float"/>
-        <attr name="defaultLinkOffsetX" format="float"/>
-        <attr name="defaultLinkOffsetY" format="float"/>
-        <attr name="defaultStartX" format="float"/>
-        <attr name="defaultStartY" format="float"/>
+        <attr name="defaultLinkWidth" format="float"/>
+        <attr name="defaultLinkHeight" format="float"/>
+        <attr name="defaultTypeCount" format="integer"/>
+        <attr name="paddingLeft" format="float"/>
+        <attr name="paddingRight" format="float"/>
+        <attr name="paddingTop" format="float"/>
+        <attr name="paddingBottom" format="float"/>
+        <attr name="paddingHorizontal" format="float"/>
+        <attr name="paddingVertical" format="float"/>
+        <attr name="padding" format="float"/>
     </declare-styleable>
 </resources>

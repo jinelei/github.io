@@ -9,21 +9,20 @@
         android:layout_height="match_parent"
         tools:context=".ui.fragment.TestFragment">
 
-    <cn.jinelei.rainbow.ui.fragment.DrawView
+    <cn.jinelei.rainbow.ui.view.SleepChartView
             android:id="@+id/dv_test"
             android:background="@color/colorBlack"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="200dp"
             app:defaultRadius="15"
             app:defaultLineHeight="80"
-            app:defaultLinkOffsetX="5"
-            app:defaultLinkOffsetY="80"
-            app:defaultStartX="100"
-            app:defaultStartY="100"
+            app:defaultLinkWidth="2"
+            app:defaultLinkHeight="80"
+            app:padding="20"
+            app:defaultTypeCount="3"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"/>
+            app:layout_constraintTop_toTopOf="parent"/>
 
     <android.support.design.widget.FloatingActionButton
             android:id="@+id/fab_refresh"
