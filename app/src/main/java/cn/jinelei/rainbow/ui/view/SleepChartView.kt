@@ -52,7 +52,7 @@ class SleepChartView(context: Context?, attrs: AttributeSet?) : View(context, at
 		this.invalidate()
 	}
 	
-	fun mArcTo(path: Path, p1: MPoint, p2: MPoint, type: Int): MPoint {
+	fun mArcTo(path: Path, p1: Point, p2: Point, type: Int): Point {
 		Log.v(SleepChartView::class.java.simpleName, "mArcTo: $p1 $p2 type: $type")
 		val radius = Math.max(Math.abs(p2.x - p1.x), Math.abs(p2.y - p1.y))
 		var minX = Math.min(p1.x, p2.x)
@@ -91,7 +91,7 @@ class SleepChartView(context: Context?, attrs: AttributeSet?) : View(context, at
 		return p2
 	}
 	
-	fun mLineTo(path: Path, pos: MPoint): MPoint {
+	fun mLineTo(path: Path, pos: Point): Point {
 		Log.v(SleepChartView::class.java.simpleName, "mLineTo: $pos")
 		path.lineTo(pos.x, pos.y)
 		return pos
@@ -110,7 +110,7 @@ class SleepChartView(context: Context?, attrs: AttributeSet?) : View(context, at
 		}
 	}
 	
-	fun initOffset() {
+	private fun initDefaultParameters() {
 		// 容器总宽度
 		val containerTotalWidth = width
 		// 容器总高度
@@ -131,191 +131,187 @@ class SleepChartView(context: Context?, attrs: AttributeSet?) : View(context, at
 		}
 	}
 	
-	override fun onDraw(canvas: Canvas?) {
-		if (canvas == null)
-			return
-		initOffset()
+	private fun drawSleepData(canvas: Canvas){
 		canvas.drawPath(Path().apply {
-			var lastPos = MPoint(0F, 0F)
-			var firstPos = MPoint(0F, 0F)
+			var lastPoint = Point(0F, 0F)
+			var firstPoint = Point(0F, 0F)
 			var lastSleepData: SleepData? = null
+			var currentSleepData: SleepData? = null
+			var tmpPoint: Point = Point(0F, 0F)
+			// 绘制下半部曲线
 			for (index in 0 until sleepDataList.size) {
-				var sleepData = sleepDataList[index]
-				Log.v(SleepChartView::class.java.simpleName, "index: $index, $sleepData")
-				var tmpPos = MPoint(0F, 0F)
+				currentSleepData = sleepDataList[index]
+				Log.v(SleepChartView::class.java.simpleName, "index: $index, $currentSleepData")
+				// 绘制开始左半部
 				if (index == 0) {
 					// 绘制左上角半圆角
-					firstPos =
-						MPoint(
+					firstPoint =
+						Point(
 							defaultPaddingLeft + defaultRadius,
-							defaultPaddingTop + (defaultRadius * 2 + defaultLinkHeight + defaultLineHeight) * sleepData.type
+							defaultPaddingTop + (defaultRadius * 2 + defaultLinkHeight + defaultLineHeight) * currentSleepData.type
 						)
-					Log.v(SleepChartView::class.java.simpleName, "first: $firstPos")
-					moveTo(firstPos.x, firstPos.y)
-					lastPos = MPoint(firstPos.x - defaultRadius, firstPos.y + defaultRadius)
-					lastPos = mArcTo(this, firstPos, lastPos, 4)
+					Log.v(SleepChartView::class.java.simpleName, "first: $firstPoint")
+					moveTo(firstPoint.x, firstPoint.y)
+					lastPoint = Point(firstPoint.x - defaultRadius, firstPoint.y + defaultRadius)
+					lastPoint = mArcTo(this, firstPoint, lastPoint, 4)
 					// 绘制左侧数据区高度
-					lastPos = MPoint(lastPos.x, lastPos.y + defaultLineHeight)
-					lastPos = mLineTo(this, lastPos)
+					lastPoint = Point(lastPoint.x, lastPoint.y + defaultLineHeight)
+					lastPoint = mLineTo(this, lastPoint)
 					// 绘制左下角半圆角
-					tmpPos = MPoint(lastPos.x + defaultRadius, lastPos.y + defaultRadius)
-					lastPos = mArcTo(this, lastPos, tmpPos, 3)
+					tmpPoint = Point(lastPoint.x + defaultRadius, lastPoint.y + defaultRadius)
+					lastPoint = mArcTo(this, lastPoint, tmpPoint, 3)
 				}
 				
 				// 绘制中部
 				if (lastSleepData == null) {
-					lastSleepData = sleepData
+					lastSleepData = currentSleepData
 					continue
 				}
-				val changedLine = sleepData.type - lastSleepData.type
+				val changedLine = currentSleepData.type - lastSleepData.type
 				if (changedLine > 0) { // 顺X轴，下降
 					// 绘制横线，缩短一个defaultLinkWidth
-					lastPos =
-						MPoint(
-							lastPos.x + lastSleepData.width * defaultScaleX - defaultLinkWidth,
-							lastPos.y
+					lastPoint =
+						Point(
+							lastPoint.x + lastSleepData.width * defaultScaleX - defaultLinkWidth,
+							lastPoint.y
 						)
-					lastPos = mLineTo(this, lastPos)
+					lastPoint = mLineTo(this, lastPoint)
 					// 左侧
-					tmpPos = MPoint(
-						lastPos.x + defaultRadius,
-						lastPos.y + defaultRadius
+					tmpPoint = Point(
+						lastPoint.x + defaultRadius,
+						lastPoint.y + defaultRadius
 					)
-					lastPos = mArcTo(this, lastPos, tmpPos, 1)
+					lastPoint = mArcTo(this, lastPoint, tmpPoint, 1)
 					// 绘制连接线，根据changedLine
-					tmpPos = MPoint(
-						lastPos.x,
-						lastPos.y + (defaultLinkHeight + defaultLineHeight) * changedLine
+					tmpPoint = Point(
+						lastPoint.x,
+						lastPoint.y + (defaultLinkHeight + defaultLineHeight) * changedLine
 					)
 					if (Math.abs(changedLine) > 1) {
-						tmpPos.y = tmpPos.y + (defaultRadius * 2) * (Math.abs(changedLine) - 1)
+						tmpPoint.y = tmpPoint.y + (defaultRadius * 2) * (Math.abs(changedLine) - 1)
 					}
-					lastPos = mLineTo(this, tmpPos)
+					lastPoint = mLineTo(this, tmpPoint)
 					// 右侧
-					tmpPos =
-						MPoint(lastPos.x + defaultRadius, lastPos.y + defaultRadius)
-					lastPos = mArcTo(this, lastPos, tmpPos, 3)
+					tmpPoint =
+						Point(lastPoint.x + defaultRadius, lastPoint.y + defaultRadius)
+					lastPoint = mArcTo(this, lastPoint, tmpPoint, 3)
 				} else { // 顺X轴，上升
 					// 绘制横线，扩大一个defaultLinkWidth
-					lastPos =
-						MPoint(
-							lastPos.x + lastSleepData.width * defaultScaleX + defaultLinkWidth,
-							lastPos.y
+					lastPoint =
+						Point(
+							lastPoint.x + lastSleepData.width * defaultScaleX + defaultLinkWidth,
+							lastPoint.y
 						)
-					lastPos = mLineTo(this, lastPos)
+					lastPoint = mLineTo(this, lastPoint)
 					// 左侧
-					tmpPos = MPoint(
-						lastPos.x + defaultRadius,
-						lastPos.y - defaultRadius
+					tmpPoint = Point(
+						lastPoint.x + defaultRadius,
+						lastPoint.y - defaultRadius
 					)
-					lastPos = mArcTo(this, lastPos, tmpPos, 2)
+					lastPoint = mArcTo(this, lastPoint, tmpPoint, 2)
 					// 绘制连接线，根据changedLine
-					tmpPos = MPoint(
-						lastPos.x,
-						lastPos.y + (defaultLinkHeight + defaultLineHeight) * changedLine
+					tmpPoint = Point(
+						lastPoint.x,
+						lastPoint.y + (defaultLinkHeight + defaultLineHeight) * changedLine
 					)
 					if (Math.abs(changedLine) > 1) {
-						tmpPos.y = tmpPos.y - (defaultRadius * 2) * (Math.abs(changedLine) - 1)
+						tmpPoint.y = tmpPoint.y - (defaultRadius * 2) * (Math.abs(changedLine) - 1)
 					}
-					lastPos = mLineTo(this, tmpPos)
+					lastPoint = mLineTo(this, tmpPoint)
 					// 右侧
-					tmpPos =
-						MPoint(lastPos.x + defaultRadius, lastPos.y - defaultRadius)
-					lastPos = mArcTo(this, lastPos, tmpPos, 4)
+					tmpPoint =
+						Point(lastPoint.x + defaultRadius, lastPoint.y - defaultRadius)
+					lastPoint = mArcTo(this, lastPoint, tmpPoint, 4)
 				}
-				
+
+				// 绘制结束右半部
 				if (index == sleepDataList.size - 1) { // 最后一个
 					// 绘制底部横线
-					lastPos = mLineTo(
+					lastPoint = mLineTo(
 						this,
-						MPoint(lastPos.x + sleepData.width * defaultScaleX, lastPos.y)
+						Point(lastPoint.x + currentSleepData.width * defaultScaleX, lastPoint.y)
 					)
 					// 绘制右下角半圆角
-					tmpPos = MPoint(lastPos.x + defaultRadius, lastPos.y - defaultRadius)
-					lastPos = mArcTo(this, lastPos, tmpPos, 2)
+					tmpPoint = Point(lastPoint.x + defaultRadius, lastPoint.y - defaultRadius)
+					lastPoint = mArcTo(this, lastPoint, tmpPoint, 2)
 					// 绘制左侧数据区高度
-					lastPos = MPoint(lastPos.x, lastPos.y - defaultLineHeight)
-					lastPos = mLineTo(this, lastPos)
+					lastPoint = Point(lastPoint.x, lastPoint.y - defaultLineHeight)
+					lastPoint = mLineTo(this, lastPoint)
 					// 绘制右上角半圆角
-					tmpPos = MPoint(lastPos.x - defaultRadius, lastPos.y - defaultRadius)
-					lastPos = mArcTo(this, lastPos, tmpPos, 1)
+					tmpPoint = Point(lastPoint.x - defaultRadius, lastPoint.y - defaultRadius)
+					lastPoint = mArcTo(this, lastPoint, tmpPoint, 1)
 				}
-				lastSleepData = sleepData
+				lastSleepData = currentSleepData
 			}
 			
-			Log.v(SleepChartView::class.java.simpleName, "reverse")
-			var tmpIdx = 0
-			var sleepData = SleepData(0, 0)
+			// 绘制上半部曲线
 			for (index in 1 until sleepDataList.size) {
-				tmpIdx = sleepDataList.size - 1 - index
-				sleepData = sleepDataList[tmpIdx]
-				Log.v(SleepChartView::class.java.simpleName, "reverse index: $tmpIdx, $sleepData")
+				var tmpIdx = sleepDataList.size - 1 - index
+				currentSleepData = sleepDataList[tmpIdx]
+				Log.v(SleepChartView::class.java.simpleName, "reverse index: $tmpIdx, $currentSleepData")
 				if (lastSleepData == null) return
-				val changedLine = lastSleepData.type - sleepData.type
-				var tmpPos: MPoint
+				val changedLine = lastSleepData.type - currentSleepData.type
 				if (changedLine > 0) { // 逆着X轴，上升
 					// 绘制横线
-					lastPos =
-						MPoint(
-							lastPos.x - lastSleepData.width * defaultScaleX + defaultLinkWidth,
-							lastPos.y
+					lastPoint =
+						Point(
+							lastPoint.x - lastSleepData.width * defaultScaleX + defaultLinkWidth,
+							lastPoint.y
 						)
-					lastPos = mLineTo(this, lastPos)
+					lastPoint = mLineTo(this, lastPoint)
 					// 绘制连接线右侧半圆
-					tmpPos =
-						MPoint(lastPos.x - defaultRadius, lastPos.y - defaultRadius)
-					lastPos = mArcTo(this, lastPos, tmpPos, 3)
+					tmpPoint =
+						Point(lastPoint.x - defaultRadius, lastPoint.y - defaultRadius)
+					lastPoint = mArcTo(this, lastPoint, tmpPoint, 3)
 					// 绘制连接线，根据changedLine
-					tmpPos = MPoint(
-						lastPos.x,
-						lastPos.y - (defaultLinkHeight + defaultLineHeight) * changedLine
+					tmpPoint = Point(
+						lastPoint.x,
+						lastPoint.y - (defaultLinkHeight + defaultLineHeight) * changedLine
 					)
 					if (Math.abs(changedLine) > 1) {
-						tmpPos.y = tmpPos.y - (defaultRadius * 2) * (Math.abs(changedLine) - 1)
+						tmpPoint.y = tmpPoint.y - (defaultRadius * 2) * (Math.abs(changedLine) - 1)
 					}
-					lastPos = mLineTo(this, tmpPos)
+					lastPoint = mLineTo(this, tmpPoint)
 					// 绘制连接线左侧半圆
-					tmpPos = MPoint(lastPos.x - defaultRadius, lastPos.y - defaultRadius)
-					lastPos = mArcTo(this, lastPos, tmpPos, 1)
+					tmpPoint = Point(lastPoint.x - defaultRadius, lastPoint.y - defaultRadius)
+					lastPoint = mArcTo(this, lastPoint, tmpPoint, 1)
 				} else {// 逆着X轴， 下降
 					// 绘制横线
-					lastPos =
-						MPoint(
-							lastPos.x - lastSleepData.width * defaultScaleX - defaultLinkWidth,
-							lastPos.y
+					lastPoint =
+						Point(
+							lastPoint.x - lastSleepData.width * defaultScaleX - defaultLinkWidth,
+							lastPoint.y
 						)
-					lastPos = mLineTo(this, lastPos)
+					lastPoint = mLineTo(this, lastPoint)
 					// 绘制连接线右侧半圆
-					tmpPos =
-						MPoint(lastPos.x - defaultRadius, lastPos.y + defaultRadius)
-					lastPos = mArcTo(this, lastPos, tmpPos, 4)
+					tmpPoint =
+						Point(lastPoint.x - defaultRadius, lastPoint.y + defaultRadius)
+					lastPoint = mArcTo(this, lastPoint, tmpPoint, 4)
 					// 绘制连接线，根据changedLine
-					tmpPos = MPoint(
-						lastPos.x,
-						lastPos.y - (defaultLinkHeight + defaultLineHeight) * changedLine
+					tmpPoint = Point(
+						lastPoint.x,
+						lastPoint.y - (defaultLinkHeight + defaultLineHeight) * changedLine
 					)
 					if (Math.abs(changedLine) > 1) {
-						tmpPos.y = tmpPos.y + (defaultRadius * 2) * (Math.abs(changedLine) - 1)
+						tmpPoint.y = tmpPoint.y + (defaultRadius * 2) * (Math.abs(changedLine) - 1)
 					}
-					lastPos = mLineTo(this, tmpPos)
+					lastPoint = mLineTo(this, tmpPoint)
 					// 绘制连接线左侧半圆
-					tmpPos = MPoint(lastPos.x - defaultRadius, lastPos.y + defaultRadius)
-					lastPos = mArcTo(this, lastPos, tmpPos, 2)
+					tmpPoint = Point(lastPoint.x - defaultRadius, lastPoint.y + defaultRadius)
+					lastPoint = mArcTo(this, lastPoint, tmpPoint, 2)
 				}
-				lastSleepData = sleepData
+				lastSleepData = currentSleepData
 			}
-			mLineTo(this, firstPos)
+			// 连回起点
+			mLineTo(this, firstPoint)
 			close()
 		}, Paint().apply {
-			var left = 100F
-			var top = 100F
-			var bottom = 400F
 			color = Color.RED
 			shader = LinearGradient(
-				left,
-				top,
-				left,
-				bottom,
+				0f,
+				0f,
+				0f,
+				height.toFloat(),
 				Color.parseColor("#febf22"),
 				Color.parseColor("#9127ed"),
 				Shader.TileMode.CLAMP
@@ -325,10 +321,11 @@ class SleepChartView(context: Context?, attrs: AttributeSet?) : View(context, at
 		})
 	}
 	
-	class MPoint(var x: Float, var y: Float) {
-		override fun toString(): String {
-			return "MPoint(x=$x, y=$y)"
-		}
+	override fun onDraw(canvas: Canvas?) {
+		if (canvas == null)
+			return
+		initDefaultParameters()
+		drawSleepData(canvas)
 	}
 	
 	override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -358,5 +355,11 @@ class SleepChartView(context: Context?, attrs: AttributeSet?) : View(context, at
 			result = specSize;
 		}
 		return result;
+	}
+	
+}
+class Point(var x: Float, var y: Float) {
+	override fun toString(): String {
+		return "Point(x=$x, y=$y)"
 	}
 }
