@@ -33,9 +33,8 @@ class TestFragment : BaseFragment() {
 	
 	private fun initSleepData(): List<SleepData> {
 		var sleepDataList = mutableListOf<SleepData>()
-		sleepDataList.add(SleepData(100, 2))
-		sleepDataList.add(SleepData(100, 1))
 		sleepDataList.add(SleepData(100, 0))
+		sleepDataList.add(SleepData(100, 1))
 		sleepDataList.add(SleepData(100, 2))
 		sleepDataList.add(SleepData(100, 1))
 		sleepDataList.add(SleepData(100, 0))
@@ -52,7 +51,7 @@ class TestFragment : BaseFragment() {
 		while (sleepDataList.size < count) {
 			while (tmpType == lastType)
 				tmpType = Random.nextInt(0, 3)
-			while (tmpWidth == lastWidth || tmpWidth < 30)
+			while (tmpWidth == lastWidth)
 				tmpWidth = 10 * Random.nextInt(0, 10)
 			sleepDataList.add(SleepData(tmpWidth, tmpType))
 			lastType = tmpType

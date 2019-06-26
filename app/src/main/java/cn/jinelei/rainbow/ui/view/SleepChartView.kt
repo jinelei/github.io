@@ -17,7 +17,7 @@ class SleepChartView(context: Context?, attrs: AttributeSet?) : View(context, at
 	private var defaultPaddingRight = 10F        //默认右内边距
 	private var defaultPaddingTop = 10F        //默认上内边距
 	private var defaultPaddingBottom = 10F        //默认下内边距
-	private var offsetX = 0F                // 自适应下，增长偏移量X
+	private var defaultScaleX = 0F                // 自适应下，宽度缩放系数
 	private var defaultTypeCount = 4            // 默认类型数量
 	private var sleepDataList: MutableList<SleepData> = mutableListOf()
 	
@@ -117,17 +117,16 @@ class SleepChartView(context: Context?, attrs: AttributeSet?) : View(context, at
 		val containerTotalHeight = height
 		if (containerTotalHeight != 0 && containerTotalWidth != 0) {
 			// 内容总宽度
-			val contentTotalWidth = sleepDataList.map { it.width.toFloat() }
-				.reduce { acc, fl -> acc + fl + defaultRadius + defaultLinkWidth } + defaultRadius * 2
+			val contentTotalWidth = sleepDataList.map { it.width.toFloat() }.reduce { acc, fl -> acc + fl }
 			// 内容总高度
 			val contentTotalHeight = defaultTypeCount * (defaultLinkHeight + defaultRadius)
-			offsetX =
-				(containerTotalWidth - defaultPaddingLeft - defaultPaddingRight - contentTotalWidth) / sleepDataList.size
+			defaultScaleX =
+				(containerTotalWidth - defaultPaddingLeft - defaultPaddingRight - defaultLinkWidth * (sleepDataList.size - 1) - (defaultRadius * 2) * sleepDataList.size) / contentTotalWidth
 			defaultLineHeight =
 				(containerTotalHeight - defaultPaddingTop - defaultPaddingBottom - contentTotalHeight) / defaultTypeCount + defaultRadius
 			Log.v(
 				SleepChartView::class.java.simpleName,
-				"defaultRadius $defaultRadius defaultLineHeight $defaultLineHeight defaultLinkWidth $defaultLinkWidth defaultLinkHeight $defaultLinkHeight defaultPaddingLeft $defaultPaddingLeft defaultPaddingRight $defaultPaddingRight defaultPaddingTop $defaultPaddingTop defaultPaddingBottom $defaultPaddingBottom offsetX $offsetX"
+				"defaultRadius $defaultRadius defaultLineHeight $defaultLineHeight defaultLinkWidth $defaultLinkWidth defaultLinkHeight $defaultLinkHeight defaultPaddingLeft $defaultPaddingLeft defaultPaddingRight $defaultPaddingRight defaultPaddingTop $defaultPaddingTop defaultPaddingBottom $defaultPaddingBottom defaultScaleX $defaultScaleX"
 			)
 		}
 	}
@@ -172,7 +171,10 @@ class SleepChartView(context: Context?, attrs: AttributeSet?) : View(context, at
 				if (changedLine > 0) { // 顺X轴，下降
 					// 绘制横线，缩短一个defaultLinkWidth
 					lastPos =
-						MPoint(lastPos.x + lastSleepData.width + offsetX - defaultRadius - defaultLinkWidth, lastPos.y)
+						MPoint(
+							lastPos.x + lastSleepData.width * defaultScaleX - defaultLinkWidth,
+							lastPos.y
+						)
 					lastPos = mLineTo(this, lastPos)
 					// 左侧
 					tmpPos = MPoint(
@@ -196,7 +198,10 @@ class SleepChartView(context: Context?, attrs: AttributeSet?) : View(context, at
 				} else { // 顺X轴，上升
 					// 绘制横线，扩大一个defaultLinkWidth
 					lastPos =
-						MPoint(lastPos.x + lastSleepData.width + offsetX - defaultRadius + defaultLinkWidth, lastPos.y)
+						MPoint(
+							lastPos.x + lastSleepData.width * defaultScaleX + defaultLinkWidth,
+							lastPos.y
+						)
 					lastPos = mLineTo(this, lastPos)
 					// 左侧
 					tmpPos = MPoint(
@@ -223,7 +228,7 @@ class SleepChartView(context: Context?, attrs: AttributeSet?) : View(context, at
 					// 绘制底部横线
 					lastPos = mLineTo(
 						this,
-						MPoint(lastPos.x + sleepData.width + offsetX - defaultRadius, lastPos.y)
+						MPoint(lastPos.x + sleepData.width * defaultScaleX, lastPos.y)
 					)
 					// 绘制右下角半圆角
 					tmpPos = MPoint(lastPos.x + defaultRadius, lastPos.y - defaultRadius)
@@ -251,7 +256,10 @@ class SleepChartView(context: Context?, attrs: AttributeSet?) : View(context, at
 				if (changedLine > 0) { // 逆着X轴，上升
 					// 绘制横线
 					lastPos =
-						MPoint(lastPos.x - lastSleepData.width - offsetX + defaultRadius + defaultLinkWidth, lastPos.y)
+						MPoint(
+							lastPos.x - lastSleepData.width * defaultScaleX + defaultLinkWidth,
+							lastPos.y
+						)
 					lastPos = mLineTo(this, lastPos)
 					// 绘制连接线右侧半圆
 					tmpPos =
@@ -272,7 +280,10 @@ class SleepChartView(context: Context?, attrs: AttributeSet?) : View(context, at
 				} else {// 逆着X轴， 下降
 					// 绘制横线
 					lastPos =
-						MPoint(lastPos.x - lastSleepData.width - offsetX + defaultRadius - defaultLinkWidth, lastPos.y)
+						MPoint(
+							lastPos.x - lastSleepData.width * defaultScaleX - defaultLinkWidth,
+							lastPos.y
+						)
 					lastPos = mLineTo(this, lastPos)
 					// 绘制连接线右侧半圆
 					tmpPos =
