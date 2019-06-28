@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.View
 import cn.jinelei.rainbow.R
 import cn.jinelei.rainbow.ui.fragment.SleepData
+import cn.jinelei.rainbow.util.Point
 
 class SleepChartView(context: Context?, attrs: AttributeSet?) : View(context, attrs) {
 	private var defaultRadius: Float = 20F           // 默认圆角半径
@@ -152,7 +153,8 @@ class SleepChartView(context: Context?, attrs: AttributeSet?) : View(context, at
 						)
 					Log.v(SleepChartView::class.java.simpleName, "first: $firstPoint")
 					moveTo(firstPoint.x, firstPoint.y)
-					lastPoint = Point(firstPoint.x - defaultRadius, firstPoint.y + defaultRadius)
+					lastPoint =
+						Point(firstPoint.x - defaultRadius, firstPoint.y + defaultRadius)
 					lastPoint = mArcTo(this, firstPoint, lastPoint, 4)
 					// 绘制左侧数据区高度
 					lastPoint = Point(lastPoint.x, lastPoint.y + defaultLineHeight)
@@ -358,8 +360,4 @@ class SleepChartView(context: Context?, attrs: AttributeSet?) : View(context, at
 	}
 	
 }
-class Point(var x: Float, var y: Float) {
-	override fun toString(): String {
-		return "Point(x=$x, y=$y)"
-	}
-}
+
