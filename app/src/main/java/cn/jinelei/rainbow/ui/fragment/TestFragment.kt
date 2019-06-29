@@ -27,7 +27,7 @@ class TestFragment : BaseFragment() {
 				dvTest.updateDataAndRefresh(randomSleepData(Random.nextInt(10, 20)))
 			}
 		}
-		dvTest.updateDataAndRefresh(initSleepData())
+		dvTest.updateDataAndRefresh(randomSleepData(Random.nextInt(10, 20)))
 		return view
 	}
 	

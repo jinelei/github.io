@@ -24,17 +24,20 @@
             android:layout_height="wrap_content">
 
         <!--用户头像-->
-        <ImageView
+        <cn.jinelei.rainbow.ui.view.CircleImageView
                 android:id="@+id/iv_user_avatar"
-                android:layout_width="@dimen/header_icon_size"
-                android:layout_height="@dimen/header_icon_size"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:layout_marginStart="20dp"
                 android:src="@mipmap/ic_launcher"
+                android:background=""
+                app:defaultBorderWidth="5"
+                app:defaultBorderColor="@color/colorAccent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp"
-                android:layout_marginStart="20dp"/>
+                android:layout_width="@dimen/header_icon_size"
+                android:layout_height="@dimen/header_icon_size"/>
 
         <!--用户信息-->
         <TextView
