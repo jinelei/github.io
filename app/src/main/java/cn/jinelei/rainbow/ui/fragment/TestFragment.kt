@@ -1,6 +1,7 @@
 package cn.jinelei.rainbow.ui.fragment
 
 
+import android.graphics.Color
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
 import android.util.Log
@@ -10,10 +11,15 @@ import android.view.ViewGroup
 import cn.jinelei.rainbow.R
 import cn.jinelei.rainbow.base.BaseFragment
 import cn.jinelei.rainbow.ui.view.SleepChartView
+import com.github.mikephil.charting.charts.BarChart
+import com.github.mikephil.charting.data.BarData
+import com.github.mikephil.charting.data.BarDataSet
+import com.github.mikephil.charting.data.BarEntry
 import kotlin.random.Random
 
 class TestFragment : BaseFragment() {
-	lateinit var dvTest: SleepChartView
+	private lateinit var dvTest: SleepChartView
+	private lateinit var bcTest: BarChart
 	
 	override fun onCreateView(
 		inflater: LayoutInflater, container: ViewGroup?,
@@ -21,6 +27,8 @@ class TestFragment : BaseFragment() {
 	): View? {
 		val view = inflater.inflate(R.layout.fragment_test, container, false)
 		dvTest = view.findViewById(R.id.dv_test)
+		bcTest = view.findViewById(R.id.bar_chart)
+		initBarData()
 		view.findViewById<FloatingActionButton>(R.id.fab_refresh).apply {
 			setOnClickListener {
 				Log.v(TestFragment::class.java.simpleName, "refresh")
@@ -29,6 +37,22 @@ class TestFragment : BaseFragment() {
 		}
 		dvTest.updateDataAndRefresh(randomSleepData(Random.nextInt(10, 20)))
 		return view
+	}
+	
+	fun initBarData() {
+		var yvalue = ArrayList<BarEntry>()
+		//敲黑板啦！！这里才是重点部分，可以添加一个float数组，让它变成StackBar
+		yvalue.add(BarEntry(0F, floatArrayOf(10f, 20f)))
+		yvalue.add(BarEntry(1F, floatArrayOf(20f, 30f)))
+		yvalue.add(BarEntry(2F, floatArrayOf(30f, 40f)))
+		var set = BarDataSet(yvalue, "")
+		set.setColors(Color.RED, Color.GRAY)
+		var xvalue = ArrayList<String>()
+		xvalue.add("第一季度")
+		xvalue.add("第二季度")
+		xvalue.add("第三季度")
+		xvalue.add("第四季度")
+		bcTest.data = BarData(set)
 	}
 	
 	private fun initSleepData(): List<SleepData> {

@@ -30,7 +30,6 @@
                 android:layout_marginBottom="8dp"
                 android:layout_marginStart="20dp"
                 android:src="@mipmap/ic_launcher"
-                android:background=""
                 app:defaultBorderWidth="5"
                 app:defaultBorderColor="@color/colorAccent"
                 app:layout_constraintTop_toTopOf="parent"
