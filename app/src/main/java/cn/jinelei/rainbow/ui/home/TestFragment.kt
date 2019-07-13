@@ -1,4 +1,4 @@
-package cn.jinelei.rainbow.ui.fragment
+package cn.jinelei.rainbow.ui.home
 
 
 import android.graphics.Color
@@ -10,7 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import cn.jinelei.rainbow.R
 import cn.jinelei.rainbow.base.BaseFragment
-import cn.jinelei.rainbow.ui.view.SleepChartView
+import cn.jinelei.rainbow.ui.base.components.SleepChartView
 import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.data.BarData
 import com.github.mikephil.charting.data.BarDataSet

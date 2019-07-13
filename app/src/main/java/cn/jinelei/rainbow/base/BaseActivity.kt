@@ -11,7 +11,7 @@ import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import cn.jinelei.rainbow.app.BaseApp
 import cn.jinelei.rainbow.constant.DEFAULT_HIDE_LOADING_TIMEOUT
-import cn.jinelei.rainbow.ui.view.LoadingDialog
+import cn.jinelei.rainbow.ui.base.components.LoadingDialog
 import cn.jinelei.rainbow.util.getCrc16
 import kotlinx.coroutines.*
 

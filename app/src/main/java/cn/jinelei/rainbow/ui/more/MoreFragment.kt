@@ -1,4 +1,4 @@
-package cn.jinelei.rainbow.ui.fragment
+package cn.jinelei.rainbow.ui.more
 
 import android.content.ComponentName
 import android.content.Context.BIND_AUTO_CREATE
@@ -10,6 +10,7 @@ import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.support.v7.widget.helper.ItemTouchHelper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -25,22 +26,23 @@ import cn.jinelei.rainbow.bluetooth.IBluetoothService
 import cn.jinelei.rainbow.constant.BINDER_REQUEST_CODE_BLUETOOTH
 import cn.jinelei.rainbow.constant.BINDER_REQUEST_CODE_TEST
 import cn.jinelei.rainbow.service.MainService
-import cn.jinelei.rainbow.ui.activity.*
-import cn.jinelei.rainbow.ui.common.BaseRecyclerAdapter
+import cn.jinelei.rainbow.ui.base.adapter.BaseRecyclerAdapter
+import cn.jinelei.rainbow.ui.base.callback.ItemTouchHelperAdapter
+import cn.jinelei.rainbow.ui.base.callback.ItemTouchHelperCallback
 import cn.jinelei.rainbow.util.isFastClick
 import kotlinx.android.synthetic.main.grid_menu_layout.*
 import kotlinx.android.synthetic.main.include_top_navigation.view.*
 import kotlinx.android.synthetic.main.list_menu_layout.*
-import kotlinx.android.synthetic.main.user_fragment.view.*
+import kotlinx.android.synthetic.main.more_fragment.view.*
 
 
-class UserFragment : BaseFragment() {
+class MoreFragment : BaseFragment() {
 	private lateinit var rvListRecyclerView: RecyclerView
 	private lateinit var rvGridRecyclerView: RecyclerView
 	private lateinit var ivUserHeaderIcon: ImageView
 	private lateinit var tvUserHeaderInfo: TextView
 	private val mMenuDataSet: MutableList<MenuItem> = mutableListOf()
-	private val mGridMenuDataSet: MutableList<MenuItem> = mutableListOf()
+	private val mAllMenuDataSet: MutableList<MenuItem> = mutableListOf()
 	private var mBluetoothService: IBluetoothService? = null
 	private var mTestService: ITestService? = null
 	private val connection = object : ServiceConnection {
@@ -59,7 +61,7 @@ class UserFragment : BaseFragment() {
 	}
 	
 	override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-		return inflater.inflate(R.layout.user_fragment, container, false).apply {
+		return inflater.inflate(R.layout.more_fragment, container, false).apply {
 			initData()
 			initView(this)
 		}
@@ -93,7 +95,7 @@ class UserFragment : BaseFragment() {
 			layoutManager = GridLayoutManager(activity, 5)
 			adapter = BaseRecyclerAdapter(
 				itemLayoutId = R.layout.grid_menu_layout,
-				dataSet = mGridMenuDataSet
+				dataSet = mAllMenuDataSet
 			) {
 				onBindViewHolder { holder, position ->
 					holder.iv_grid_item_icon.setImageResource(getItem(position).resourceId)
@@ -102,12 +104,27 @@ class UserFragment : BaseFragment() {
 				}
 			}
 		}
+		val helperCallback =
+			ItemTouchHelperCallback(
+				rvGridRecyclerView.adapter as ItemTouchHelperAdapter,
+				mContext = mBaseActivity,
+				isCanDrag = true,
+				isCanSwap = true
+			)
+		ItemTouchHelper(helperCallback).attachToRecyclerView(rvGridRecyclerView)
+		val helperCallback1 =
+			ItemTouchHelperCallback(
+				rvListRecyclerView.adapter as ItemTouchHelperAdapter,
+				mContext = mBaseActivity,
+				isCanDrag = true,
+				isCanSwap = true
+			)
+		ItemTouchHelper(helperCallback1).attachToRecyclerView(rvListRecyclerView)
 		view.iv_nav_right.apply {
 			setImageResource(R.mipmap.ic_add)
 			setOnClickListener { if (!isFastClick(it)) startActivity(Intent(activity, ScanDeviceActivity::class.java)) }
 		}
-		view.tv_nav_title
-			.apply { text = resources.getString(R.string.navigation_user) }
+		view.tv_nav_title.apply { text = resources.getString(R.string.navigation_more) }
 		ivUserHeaderIcon = view.iv_user_avatar.apply {
 			setImageResource(R.mipmap.ic_launcher)
 		}
@@ -121,80 +138,7 @@ class UserFragment : BaseFragment() {
 	
 	private fun initData() {
 		activity?.bindService(Intent(activity, MainService::class.java), connection, BIND_AUTO_CREATE)
-		mGridMenuDataSet.apply {
-			clear()
-			add(
-				MenuItem(
-					View.OnClickListener { (activity as BaseActivity).mBaseApp.debug(Log.VERBOSE, "verbose") },
-					"verbose",
-					R.mipmap.ic_test
-				)
-			)
-			add(
-				MenuItem(
-					View.OnClickListener { (activity as BaseActivity).mBaseApp.debug(Log.DEBUG, "debug") },
-					"debug",
-					R.mipmap.ic_test
-				)
-			)
-			add(
-				MenuItem(
-					View.OnClickListener { (activity as BaseActivity).mBaseApp.debug(Log.INFO, "info") },
-					"info",
-					R.mipmap.ic_test
-				)
-			)
-			add(
-				MenuItem(
-					View.OnClickListener { (activity as BaseActivity).mBaseApp.debug(Log.WARN, "warn") },
-					"warn",
-					R.mipmap.ic_test
-				)
-			)
-			add(
-				MenuItem(
-					View.OnClickListener { (activity as BaseActivity).mBaseApp.debug(Log.ERROR, "error") },
-					"error",
-					R.mipmap.ic_test
-				)
-			)
-			add(
-				MenuItem(
-					View.OnClickListener {
-						mTestService?.test("binder test")
-					},
-					"binder test",
-					R.mipmap.ic_test
-				)
-			)
-			add(
-				MenuItem(
-					View.OnClickListener {
-						//                        mBluetoothService?.init(0, "init")
-					},
-					"binder bt",
-					R.mipmap.ic_test
-				)
-			)
-			add(
-				MenuItem(
-					View.OnClickListener {
-						if (!isFastClick(it)) startActivity(Intent(activity, ScanDeviceActivity::class.java))
-					},
-					resources.getString(R.string.scan_device), R.mipmap.ic_add
-				)
-			)
-			add(
-				MenuItem(
-					View.OnClickListener {
-						if (!isFastClick(it)) startActivity(Intent(activity, ScanWifiActivity::class.java))
-					},
-					resources.getString(R.string.scan_wifi), R.mipmap.ic_add
-				)
-			)
-		}
 		mMenuDataSet.apply {
-			clear()
 			add(
 				MenuItem(
 					View.OnClickListener {
@@ -224,6 +168,59 @@ class UserFragment : BaseFragment() {
 				)
 			)
 		}
+		mAllMenuDataSet.apply {
+			add(
+				MenuItem(
+					View.OnClickListener { (activity as BaseActivity).mBaseApp.debug(Log.VERBOSE, "verbose") },
+					"verbose",
+					R.mipmap.ic_test
+				)
+			)
+			add(
+				MenuItem(
+					View.OnClickListener { (activity as BaseActivity).mBaseApp.debug(Log.DEBUG, "debug") },
+					"debug",
+					R.mipmap.ic_test
+				)
+			)
+			add(
+				MenuItem(
+					View.OnClickListener { (activity as BaseActivity).mBaseApp.debug(Log.INFO, "info") },
+					"info",
+					R.mipmap.ic_test
+				)
+			)
+			add(
+				MenuItem(
+					View.OnClickListener { (activity as BaseActivity).mBaseApp.debug(Log.WARN, "warn") },
+					"warn", R.mipmap.ic_test
+				)
+			)
+			add(
+				MenuItem(
+					View.OnClickListener { (activity as BaseActivity).mBaseApp.debug(Log.ERROR, "error") },
+					"error", R.mipmap.ic_test
+				)
+			)
+			add(
+				MenuItem(View.OnClickListener { mTestService?.test("binder test") }, "binder test", R.mipmap.ic_test)
+			)
+			add(
+				MenuItem(View.OnClickListener {
+					//                        mBluetoothService?.init(0, "init")
+				}, "binder bt", R.mipmap.ic_test)
+			)
+			add(
+				MenuItem(View.OnClickListener {
+					if (!isFastClick(it)) startActivity(Intent(activity, ScanDeviceActivity::class.java))
+				}, resources.getString(R.string.scan_device), R.mipmap.ic_add)
+			)
+			add(
+				MenuItem(View.OnClickListener {
+					if (!isFastClick(it)) startActivity(Intent(activity, ScanWifiActivity::class.java))
+				}, resources.getString(R.string.scan_wifi), R.mipmap.ic_add)
+			)
+		}
 	}
 	
 	private fun destroyData() {
@@ -233,11 +230,10 @@ class UserFragment : BaseFragment() {
 	class MenuItem(var callback: View.OnClickListener, var title: String, var resourceId: Int)
 	
 	companion object {
-		val TAG = UserFragment::class.java.simpleName ?: "UserFragment"
 		val instance by lazy { Holder.INSTANCE }
 	}
 	
 	private object Holder {
-		val INSTANCE = UserFragment()
+		val INSTANCE = MoreFragment()
 	}
 }

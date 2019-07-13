@@ -6,6 +6,7 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.VIBRATE"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.WRITE_CONTACTS"/>
     <uses-permission android:name="android.permission.READ_CONTACTS"/>
@@ -26,15 +27,15 @@
             android:theme="@style/AppTheme">
         <activity android:name=".TestActivity">
         </activity>
-        <activity android:name=".ui.activity.ChangeLanguageActivity">
+        <activity android:name=".ui.more.ChangeLanguageActivity">
         </activity>
-        <activity android:name=".ui.activity.UserInfoActivity">
+        <activity android:name=".ui.more.UserInfoActivity">
         </activity>
-        <activity android:name=".ui.activity.SetupActivity">
+        <activity android:name=".ui.more.SetupActivity">
         </activity>
-        <activity android:name=".ui.activity.ScanDeviceActivity">
+        <activity android:name=".ui.more.ScanDeviceActivity">
         </activity>
-        <activity android:name=".ui.activity.ScanWifiActivity">
+        <activity android:name=".ui.more.ScanWifiActivity">
         </activity>
 
         <service
@@ -52,7 +53,7 @@
                 android:name="com.amap.api.v2.apikey"
                 android:value="86acb5e297a5c8f39d6c7290fc5a8d4c"/>
 
-        <activity android:name=".ui.activity.MainActivity">
+        <activity android:name=".ui.base.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 

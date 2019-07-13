@@ -1,10 +1,9 @@
-package cn.jinelei.rainbow.ui.activity
+package cn.jinelei.rainbow.ui.more
 
 import android.os.Bundle
-import android.view.View
 import cn.jinelei.rainbow.R
 import cn.jinelei.rainbow.base.BaseActivity
-import cn.jinelei.rainbow.ui.fragment.SetupFragment
+import cn.jinelei.rainbow.ui.home.SetupFragment
 import kotlinx.android.synthetic.main.include_top_navigation.*
 
 class SetupActivity : BaseActivity() {

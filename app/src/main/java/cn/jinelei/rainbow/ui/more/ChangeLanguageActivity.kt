@@ -1,4 +1,4 @@
-package cn.jinelei.rainbow.ui.activity
+package cn.jinelei.rainbow.ui.more
 
 import android.content.Intent
 import android.os.Bundle
@@ -9,7 +9,8 @@ import cn.jinelei.rainbow.R
 import cn.jinelei.rainbow.base.BaseActivity
 import cn.jinelei.rainbow.constant.PRE_KEY_LANGUAGE
 import cn.jinelei.rainbow.constant.PRE_NAME_MINE
-import cn.jinelei.rainbow.ui.common.BaseRecyclerAdapter
+import cn.jinelei.rainbow.ui.base.MainActivity
+import cn.jinelei.rainbow.ui.base.adapter.BaseRecyclerAdapter
 import kotlinx.android.synthetic.main.activity_change_language.*
 import kotlinx.android.synthetic.main.include_top_navigation.*
 import kotlinx.android.synthetic.main.include_top_navigation.tv_nav_title
@@ -61,18 +62,18 @@ class ChangeLanguageActivity : BaseActivity() {
         this.rv_language.apply {
             layoutManager = LinearLayoutManager(this@ChangeLanguageActivity)
             adapter = BaseRecyclerAdapter(
-                itemLayoutId = R.layout.language_item_layout,
-                dataSet = allSupportLocales
+	            itemLayoutId = R.layout.language_item_layout,
+	            dataSet = allSupportLocales
             ) {
-                onBindViewHolder { holder, position ->
-                    holder.iv_icon.setImageResource(getItem(position).resId)
-                    holder.tv_nav_title.text = getItem(position).locale
-                    holder.layout_language_item.setOnClickListener { getItem(position).callback.run() }
-                    holder.iv_rta.visibility = when (iCurrentLocaleIdx == position) {
-                        true -> VISIBLE
-                        false -> GONE
-                    }
-                }
+	            onBindViewHolder { holder, position ->
+		            holder.iv_icon.setImageResource(getItem(position).resId)
+		            holder.tv_nav_title.text = getItem(position).locale
+		            holder.layout_language_item.setOnClickListener { getItem(position).callback.run() }
+		            holder.iv_rta.visibility = when (iCurrentLocaleIdx == position) {
+			            true -> VISIBLE
+			            false -> GONE
+		            }
+	            }
             }
         }
         tv_nav_title.text = resources.getString(R.string.change_language)
@@ -85,22 +86,22 @@ class ChangeLanguageActivity : BaseActivity() {
     private fun initData() {
         allSupportLocales.let {
             it.add(
-                LanguageItem(
-                    R.mipmap.ic_option,
-                    getString(R.string.follow_system),
-                    Runnable { changeLocaleType(Locale.getDefault()) })
+	            LanguageItem(
+		            R.mipmap.ic_option,
+		            getString(R.string.follow_system),
+		            Runnable { changeLocaleType(Locale.getDefault()) })
             )
             it.add(
-                LanguageItem(
-                    R.mipmap.ic_option,
-                    Locale.ENGLISH.language,
-                    Runnable { changeLocaleType(Locale.ENGLISH) })
+	            LanguageItem(
+		            R.mipmap.ic_option,
+		            Locale.ENGLISH.language,
+		            Runnable { changeLocaleType(Locale.ENGLISH) })
             )
             it.add(
-                LanguageItem(
-                    R.mipmap.ic_option,
-                    Locale.SIMPLIFIED_CHINESE.language,
-                    Runnable { changeLocaleType(Locale.SIMPLIFIED_CHINESE) })
+	            LanguageItem(
+		            R.mipmap.ic_option,
+		            Locale.SIMPLIFIED_CHINESE.language,
+		            Runnable { changeLocaleType(Locale.SIMPLIFIED_CHINESE) })
             )
         }
     }

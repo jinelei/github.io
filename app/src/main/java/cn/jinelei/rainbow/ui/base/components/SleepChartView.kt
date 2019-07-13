@@ -1,4 +1,4 @@
-package cn.jinelei.rainbow.ui.view
+package cn.jinelei.rainbow.ui.base.components
 
 import android.content.Context
 import android.graphics.*
@@ -6,7 +6,7 @@ import android.util.AttributeSet
 import android.util.Log
 import android.view.View
 import cn.jinelei.rainbow.R
-import cn.jinelei.rainbow.ui.fragment.SleepData
+import cn.jinelei.rainbow.ui.home.SleepData
 import cn.jinelei.rainbow.util.Point
 
 class SleepChartView(context: Context?, attrs: AttributeSet?) : View(context, attrs) {

@@ -1,4 +1,4 @@
-package cn.jinelei.rainbow.ui.activity
+package cn.jinelei.rainbow.ui.more
 
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle

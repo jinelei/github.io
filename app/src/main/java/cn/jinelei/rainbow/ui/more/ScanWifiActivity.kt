@@ -1,4 +1,4 @@
-package cn.jinelei.rainbow.ui.activity
+package cn.jinelei.rainbow.ui.more
 
 import android.Manifest
 import android.content.Intent
@@ -14,7 +14,7 @@ import android.view.View
 import android.widget.TextView
 import cn.jinelei.rainbow.R
 import cn.jinelei.rainbow.base.BaseActivity
-import cn.jinelei.rainbow.ui.common.BaseRecyclerAdapter
+import cn.jinelei.rainbow.ui.base.adapter.BaseRecyclerAdapter
 import kotlinx.android.synthetic.main.activity_scan_wifi.*
 import kotlinx.android.synthetic.main.include_top_navigation.*
 import kotlinx.android.synthetic.main.wifi_info_layout.*

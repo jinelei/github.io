@@ -58,4 +58,14 @@
     <string name="bluetooth_already_closed">bluetooth already closed</string>
     <string name="scan_bluetooth_need_open_bluetooth">scan bluetooth need open bluetooth</string>
     <string name="all_uuid_service">all uuid service</string>
+    <string name="navigation_more">more</string>
+
+    <string-array name="enable_grid_menu">
+        <item>info</item>
+        <item>debug</item>
+        <item>error</item>
+        <item>@string/scan_wifi</item>
+        <item>@string/scan_device</item>
+    </string-array>
+
 </resources>

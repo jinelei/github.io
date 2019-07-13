@@ -1,4 +1,4 @@
-package cn.jinelei.rainbow.ui.view
+package cn.jinelei.rainbow.ui.base.components
 
 import android.content.Context
 import android.graphics.*
@@ -7,13 +7,12 @@ import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.util.AttributeSet
-import android.util.Log
 import android.widget.ImageView
 import cn.jinelei.rainbow.R
 
 
 class CircleImageView(context: Context?, attrs: AttributeSet?) : ImageView(context, attrs) {
-	private val SCALE_TYPE = ScaleType.CENTER_CROP
+	private val defaultScaleType = ScaleType.CENTER_CROP
 	
 	private val mDrawableRect = RectF()//图像矩形
 	private val mBorderRect = RectF()  //边框矩形
@@ -37,20 +36,13 @@ class CircleImageView(context: Context?, attrs: AttributeSet?) : ImageView(conte
 	private var mSetupPending: Boolean = false
 	
 	init {
-		context?.obtainStyledAttributes(attrs, R.styleable.CircleImageView).let {
-			it?.let {
-				mBorderWidth = it.getInteger(R.styleable.CircleImageView_defaultBorderWidth, mBorderWidth)
-				mBorderColor = it.getColor(R.styleable.CircleImageView_defaultBorderColor, mBorderColor)
-				it.recycle()
-				init()
-				Log.e(
-					CircleImageView::class.java.simpleName,
-					"init: mBorderWidth $mBorderWidth mBorderColor $mBorderColor"
-				)
-			}
+		context?.obtainStyledAttributes(attrs, R.styleable.CircleImageView)?.let {
+			mBorderWidth = it.getInteger(R.styleable.CircleImageView_defaultBorderWidth, mBorderWidth)
+			mBorderColor = it.getColor(R.styleable.CircleImageView_defaultBorderColor, mBorderColor)
+			it.recycle()
+			init()
 		}
 	}
-	
 	
 	private fun getBitmapFromDrawable(drawable: Drawable?): Bitmap? {
 		if (drawable == null) {
@@ -76,9 +68,8 @@ class CircleImageView(context: Context?, attrs: AttributeSet?) : ImageView(conte
 		}
 	}
 	
-	
 	private fun init() {
-		super.setScaleType(SCALE_TYPE)
+		super.setScaleType(defaultScaleType)
 		mReady = true
 		if (mSetupPending) {
 			setup()
@@ -87,17 +78,16 @@ class CircleImageView(context: Context?, attrs: AttributeSet?) : ImageView(conte
 	}
 	
 	override fun getScaleType(): ScaleType {
-		return SCALE_TYPE
+		return defaultScaleType
 	}
 	
 	override fun setScaleType(scaleType: ScaleType) {
-		if (scaleType != SCALE_TYPE) {
+		if (scaleType != defaultScaleType) {
 			throw IllegalArgumentException(String.format("ScaleType %s not supported.", scaleType))
 		}
 	}
 	
 	override fun onDraw(canvas: Canvas) {
-		Log.e(CircleImageView::class.java.simpleName, "onDraw: mBorderWidth $mBorderWidth mBorderColor $mBorderColor")
 		if (drawable == null) {
 			return
 		}
@@ -137,7 +127,6 @@ class CircleImageView(context: Context?, attrs: AttributeSet?) : ImageView(conte
 	}
 	
 	private fun setup() {
-		Log.e(CircleImageView::class.java.simpleName, "进入setUp")
 		if (!mReady) {
 			mSetupPending = true
 			return
@@ -147,7 +136,7 @@ class CircleImageView(context: Context?, attrs: AttributeSet?) : ImageView(conte
 			return
 		}
 		
-		mBitmapShader = BitmapShader(mBitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP)
+		mBitmapShader = BitmapShader(mBitmap!!, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP)
 		
 		mBitmapPaint.isAntiAlias = true
 		mBitmapPaint.shader = mBitmapShader
@@ -176,7 +165,6 @@ class CircleImageView(context: Context?, attrs: AttributeSet?) : ImageView(conte
 	}
 	
 	private fun updateShaderMatrix() {
-		Log.e(CircleImageView::class.java.simpleName, "updateShaderMatrix")
 		val scale: Float
 		var dx = 0f
 		var dy = 0f
@@ -196,6 +184,5 @@ class CircleImageView(context: Context?, attrs: AttributeSet?) : ImageView(conte
 		
 		mBitmapShader!!.setLocalMatrix(mShaderMatrix)
 	}
-	
 	
 }

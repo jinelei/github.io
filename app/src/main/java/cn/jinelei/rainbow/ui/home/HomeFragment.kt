@@ -1,4 +1,4 @@
-package cn.jinelei.rainbow.ui.fragment
+package cn.jinelei.rainbow.ui.home
 
 import android.os.Bundle
 import android.support.v4.app.Fragment

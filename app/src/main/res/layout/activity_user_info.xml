@@ -6,7 +6,7 @@
         android:id="@+id/layout_user_info"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".ui.activity.UserInfoActivity">
+        tools:context=".ui.more.UserInfoActivity">
 
     <include layout="@layout/include_top_navigation"
              android:id="@+id/layout_top_navigation"/>

@@ -1,11 +1,9 @@
-package cn.jinelei.rainbow.ui.fragment
+package cn.jinelei.rainbow.ui.home
 
 import android.os.Bundle
 import android.support.v7.preference.ListPreference
-import android.support.v7.preference.PreferenceFragmentCompat
 import android.util.Log
 import cn.jinelei.rainbow.R
-import cn.jinelei.rainbow.app.BaseApp
 import cn.jinelei.rainbow.base.BasePreferenceFragmentCompat
 import cn.jinelei.rainbow.constant.PRE_KEY_DEBUG
 import cn.jinelei.rainbow.constant.PRE_NAME_MINE

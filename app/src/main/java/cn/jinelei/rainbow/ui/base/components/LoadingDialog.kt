@@ -1,4 +1,4 @@
-package cn.jinelei.rainbow.ui.view
+package cn.jinelei.rainbow.ui.base.components
 
 import android.app.AlertDialog
 import android.content.Context

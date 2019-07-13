@@ -10,8 +10,8 @@ import android.view.ViewGroup
 import cn.jinelei.rainbow.app.BaseApp
 
 open class BaseFragment : Fragment() {
-    private lateinit var mBaseApp: BaseApp
-    private lateinit var mBaseActivity: BaseActivity
+    protected lateinit var mBaseApp: BaseApp
+    protected lateinit var mBaseActivity: BaseActivity
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
